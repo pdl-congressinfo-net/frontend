@@ -1,0 +1,54 @@
+name: Build Refine App & Publish Branch
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Refine
+        run: npx refine build
+
+      - name: Publish dist to build branch
+        run: |
+          set -e
+
+          TARGET_BRANCH="build"
+          BUILD_DIR="dist"
+
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          # Create orphan build branch
+          git checkout --orphan "$TARGET_BRANCH"
+
+          # Remove everything
+          git rm -rf .
+
+          # Copy build output
+          cp -r "$BUILD_DIR"/* .
+
+          # Required for GitHub Pages
+          touch .nojekyll
+
+          # Commit and force push
+          git add .
+          git commit -m "Refine build from $GITHUB_SHA"
+          git push origin "$TARGET_BRANCH" --force
