@@ -1,4 +1,7 @@
 import { AuthProvider } from "@refinedev/core";
+import { mapUser } from "../features/users/user.mapper";
+import { ApiResponse } from "../common/types/api";
+import { UserDTO } from "../features/users/user.responses";
 
 const API_URL = "https://api.dpfurner.xyz/api/v1";
 
@@ -35,10 +38,6 @@ export const authProvider: AuthProvider = {
             },
           };
         }
-
-        const data = await response.json();
-        localStorage.setItem("access_token", data.access_token);
-
         return {
           success: true,
           redirectTo: "/",
@@ -222,7 +221,7 @@ export const authProvider: AuthProvider = {
   getIdentity: async () => {
     try {
       // Assuming you have a /users/me endpoint or similar
-      const response = await fetch(`${API_URL}/users/me`, {
+      const res = await fetch(`${API_URL}/users/me`, {
         method: "GET",
         headers: {
           "X-Requested-With": "XMLHttpRequest",
@@ -230,19 +229,14 @@ export const authProvider: AuthProvider = {
         credentials: "include",
       });
 
-      if (!response.ok) {
+      if (!res.ok) {
         return null;
       }
 
-      const user = await response.json();
-      return {
-        id: user.id,
-        full_name: user.full_name || user.email,
-        email: user.email,
-        created_at: user.created_at,
-        last_login: user.last_login,
-        roles: user.roles,
-      };
+      const apiResponse: ApiResponse<UserDTO> = await res.json();
+      const user = mapUser(apiResponse.data);
+      
+      return user;
     } catch (error) {
       return null;
     }
