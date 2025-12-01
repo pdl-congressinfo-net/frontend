@@ -1,7 +1,27 @@
-import { EventDTO } from "./event.responses";
-import { Event } from "./event.model";
+import { EventDTO, EventCategoryDTO, EventTypeDTO } from "./event.responses";
+import { Event, EventCategory, EventType } from "./event.model";
 
-export function mapUser(dto: EventDTO): Event {
+export function mapEventCategory(dto: EventCategoryDTO): EventCategory {
+  return {
+    id: dto.id,
+    code: dto.code,
+    nameDe: dto.name_de,
+    nameEn: dto.name_en,
+  };
+}
+
+export function mapEventType(dto: EventTypeDTO): EventType {
+  return {
+    id: dto.id,
+    code: dto.code,
+    nameDe: dto.name_de,
+    nameEn: dto.name_en,
+    descriptionDe: dto.description_de,
+    descriptionEn: dto.description_en,
+  };
+}
+
+export function mapEvent(dto: EventDTO): Event {
   return {
     id: dto.id,
     name: dto.name,
