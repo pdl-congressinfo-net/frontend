@@ -1,7 +1,7 @@
 import { CanAccess, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import dataProvider from "@refinedev/simple-rest";
+import { dataProvider } from "./rest-data-provider";
 
 import routerProvider, {
   DocumentTitleHandler,
