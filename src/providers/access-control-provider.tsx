@@ -16,10 +16,10 @@ export const accessControlProvider: AccessControlProvider = {
             "X-Requested-With": "XMLHttpRequest",
           },
           body: JSON.stringify({
-            permission: `${resource}:${action}`,
+            name: `${resource}:${action}`,
           }),
           credentials: "include",
-        }
+        },
       );
       const data = await response.json();
       return { can: data ?? false };
