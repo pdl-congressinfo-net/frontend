@@ -1,10 +1,10 @@
-export interface LocationType {
+export interface LocationTypeDTO {
   id: string;
   name: string;
   description?: string;
 }
 
-export interface Country {
+export interface CountryDTO {
   id: string;
   name: string;
   code2: string;
@@ -12,7 +12,7 @@ export interface Country {
   devco: boolean;
 }
 
-export interface Location {
+export interface LocationDTO {
   id: string;
   name: string;
   road?: string;
@@ -20,9 +20,9 @@ export interface Location {
   address?: string;
   city?: string;
   state?: string;
-  postalCode?: string;
+  postal_code?: string;
   lat?: number;
   lng?: number;
-  countryId: string;
-  locationTypeId: string;
+  country_id: string;
+  location_type_id: string;
 }

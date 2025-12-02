@@ -1,9 +1,9 @@
 export const eventCategoryResource = {
   name: "event-categories",
-  list: "/event-categories",
-  create: "/event-categories",
-  edit: "/event-categories/edit/:id",
-  show: "/event-categories/show/:id",
+  list: "/events/categories",
+  create: "/events/categories",
+  edit: "/events/categories/edit/:id",
+  show: "/events/categories/show/:id",
   meta: {
     canDelete: true,
   },
@@ -11,10 +11,10 @@ export const eventCategoryResource = {
 
 export const eventTypeResource = {
   name: "event-types",
-  list: "/event-types",
-  create: "/event-types",
-  edit: "/event-types/edit/:id",
-  show: "/event-types/show/:id",
+  list: "/events/types",
+  create: "/events/types",
+  edit: "/events/types/edit/:id",
+  show: "/events/types/show/:id",
   meta: {
     canDelete: true,
   },
