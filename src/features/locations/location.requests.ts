@@ -13,6 +13,7 @@ export interface CreateCountryRequest {
   code2: string;
   code3: string;
   devco: boolean;
+  preferred: boolean;
 }
 
 export interface UpdateCountryRequest {
@@ -20,6 +21,7 @@ export interface UpdateCountryRequest {
   code2?: string;
   code3?: string;
   devco?: boolean;
+  preferred?: boolean;
 }
 
 export interface CreateLocationRequest {
@@ -32,6 +34,7 @@ export interface CreateLocationRequest {
   postal_code?: string;
   lat?: number;
   lng?: number;
+  link?: string;
   country_id: string;
   location_type_id: string;
 }
@@ -40,12 +43,12 @@ export interface UpdateLocationRequest {
   name?: string;
   road?: string;
   number?: string;
-  address?: string;
   city?: string;
   state?: string;
   postal_code?: string;
   lat?: number;
   lng?: number;
+  link?: string;
   country_id?: string;
   location_type_id?: string;
 }

@@ -10,6 +10,7 @@ export interface Country {
   code2: string;
   code3: string;
   devco: boolean;
+  preferred: boolean;
 }
 
 export interface Location {
@@ -17,12 +18,11 @@ export interface Location {
   name: string;
   road?: string;
   number?: string;
-  address?: string;
   city?: string;
-  state?: string;
   postalCode?: string;
   lat?: number;
   lng?: number;
+  link?: string;
   countryId: string;
   locationTypeId: string;
 }

@@ -7,12 +7,12 @@ export function mapLocation(dto: LocationDTO): Location {
     name: dto.name,
     road: dto.road,
     number: dto.number,
-    address: dto.address,
     city: dto.city,
     state: dto.state,
     postalCode: dto.postal_code,
     lat: dto.lat,
     lng: dto.lng,
+    link: dto.link,
     countryId: dto.country_id,
     locationTypeId: dto.location_type_id,
   };
@@ -25,6 +25,7 @@ export function mapCountry(dto: CountryDTO): Country {
     code2: dto.code2,
     code3: dto.code3,
     devco: dto.devco,
+    preferred: dto.preferred,
   };
 }
 
