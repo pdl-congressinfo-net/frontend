@@ -1,21 +1,12 @@
 import { Stack, Text } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { EventCard } from "./EventCard";
 import EventDetailsDialog from "./EventDetailsDialog";
 import EventLoginDialog from "./EventLoginDialog";
 import { EventDetails } from "./EventDetails";
-import { useCan, useList, useOne } from "@refinedev/core";
-
-interface Event {
-  id: string;
-  name: string;
-  start_date: Date;
-  end_date: Date;
-  location_id: string;
-  cathegory_id: string;
-}
-
-interface Location {}
+import { useCan, useList, useMany, useOne } from "@refinedev/core";
+import { Event } from "../../features/events/event.model";
+import { Country, Location } from "../../features/locations/location.model";
 
 export const EventList = () => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
@@ -27,16 +18,61 @@ export const EventList = () => {
     filters: [{ field: "is_published", operator: "eq", value: true }],
   });
 
+  const locationIds = useMemo(() => {
+    return eventsData?.data.map((event) => event.locationId) ?? [];
+  }, [eventsData]);
+
+  const { data: locationsData, isLoading: locationsLoading } =
+    useMany<Location>({
+      resource: "locations",
+      ids: locationIds,
+      queryOptions: {
+        enabled: locationIds.length > 0,
+      },
+    });
+
+  const countryIds = useMemo(() => {
+    return (
+      locationsData?.data.map((location: Location) => location.countryId) ?? []
+    );
+  }, [locationsData]);
+
+  const { data: countriesData, isLoading: countriesLoading } = useMany<Country>(
+    {
+      resource: "countries",
+      ids: countryIds,
+      queryOptions: {
+        enabled: countryIds.length > 0,
+      },
+    },
+  );
+
+  const countriesMap = useMemo(() => {
+    const map = new Map<string, Country>();
+    countriesData?.data.forEach((country: Country) => {
+      map.set(country.id, country);
+    });
+    return map;
+  }, [countriesData]);
+
+  const locationsMap = useMemo(() => {
+    const map = new Map<string, Location>();
+    locationsData?.data.forEach((location: Location) => {
+      map.set(location.id, location);
+    });
+    return map;
+  }, [locationsData]);
+
   const { data: canAccess } = useCan({ resource: "events", action: "show" });
 
   const [detailsDialog, setDetailsDialog] = useState<{
     isOpen: boolean;
-    event: any | null;
+    event: Event | null;
   }>({ isOpen: false, event: null });
 
   const [loginDialog, setLoginDialog] = useState<{
     isOpen: boolean;
-    event: any | null;
+    event: Event | null;
   }>({ isOpen: false, event: null });
 
   const events = eventsData?.data || [];
@@ -60,17 +96,23 @@ export const EventList = () => {
   return (
     <>
       <Stack gap={4} width="80%">
-        {events.map((event, index) => (
-          <EventCard
-            key={index}
-            title={event.name}
-            date={event.start_date.toDateString()}
-            location={event.location_id}
-            imageUrl={"/assets/images/logos/logo_506.png"}
-            onCardClick={() => handleCardClick(event)}
-            onAnmeldenClick={() => handleAnmeldenClick(event)}
-          />
-        ))}
+        {events.map((event, index) => {
+          const location = locationsMap.get(event.locationId);
+          const country = location
+            ? countriesMap.get(location.countryId)
+            : undefined;
+          return (
+            <EventCard
+              key={event.id ?? index}
+              event={event}
+              country={country}
+              location={location}
+              imageUrl={"/assets/images/logos/logo_506.png"}
+              onCardClick={() => handleCardClick(event)}
+              onAnmeldenClick={() => handleAnmeldenClick(event)}
+            />
+          );
+        })}
       </Stack>
 
       {detailsDialog.event && (

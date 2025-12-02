@@ -1,7 +1,7 @@
 import { CanAccess, Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import { dataProvider } from "./rest-data-provider";
+import { dataProvider } from "./providers/rest-data-provider";
 
 import routerProvider, {
   DocumentTitleHandler,
@@ -19,9 +19,15 @@ import { Toaster } from "./components/ui/toaster";
 import { ToasterMobile } from "./components/ui/toasterMobile";
 import "./i18n";
 
-import EventList from "./components/Events/EventList";
 import { AdminTemp } from "./components/Admin/AdminTemp";
 import { httpClient } from "./utils/httpClient";
+import EventsPage from "./pages/events/events";
+import CreateEventPage from "./pages/events/create";
+import {
+  eventCategoryResource,
+  eventTypeResource,
+  eventResource,
+} from "./features/events/event.resource";
 
 function App() {
   return (
@@ -34,7 +40,7 @@ function App() {
               authProvider={authProvider}
               dataProvider={dataProvider(
                 "https://api.dpfurner.xyz/api/v1",
-                httpClient
+                httpClient,
               )}
               routerProvider={routerProvider}
               i18nProvider={i18nProvider}
@@ -55,6 +61,9 @@ function App() {
                     canDelete: true,
                   },
                 },
+                eventCategoryResource,
+                eventTypeResource,
+                eventResource,
               ]}
             >
               <Routes>
@@ -71,11 +80,18 @@ function App() {
                       index
                       element={
                         <CanAccess>
-                          <EventList />
+                          <EventsPage />
                         </CanAccess>
                       }
                     />
-                    <Route path="create" element={<div>Create Event</div>} />
+                    <Route
+                      path="create"
+                      element={
+                        <CanAccess>
+                          <CreateEventPage />
+                        </CanAccess>
+                      }
+                    />
                     <Route path="edit/:id" element={<div>Edit Event</div>} />
                     <Route path="show/:id" element={<div>Show Event</div>} />
                   </Route>
