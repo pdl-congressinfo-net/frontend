@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Input,
   Field,
@@ -9,7 +8,6 @@ import {
   createListCollection,
   Select,
   Portal,
-  Splitter,
   Separator,
 } from "@chakra-ui/react";
 import { useEffect, useMemo } from "react";
@@ -22,7 +20,6 @@ import { Country, Location } from "../../../features/locations/location.model";
 import { useList } from "@refinedev/core";
 import { CountryDTO } from "../../../features/locations/location.responses";
 import { mapCountry } from "../../../features/locations/location.mapper";
-import { count } from "console";
 
 type PhysicalLocationFormValues = {
   name: string;
@@ -34,6 +31,11 @@ type PhysicalLocationFormValues = {
   lng: number;
   country: string;
   countryId: string;
+};
+
+type WebinarLocationFormValues = {
+  name: string;
+  link: string;
 };
 
 type StepStatus = "done" | "error" | "open";
@@ -70,6 +72,11 @@ const physicalSchema = z
     }
   });
 
+const webinarSchema = z.object({
+  name: z.string().min(1, "Webinar name is required"),
+  link: z.string().min(1, "Webinar link is required"),
+});
+
 const LocationPage = ({
   onNext,
   onPrevious,
@@ -77,7 +84,10 @@ const LocationPage = ({
   eventTypeCode,
 }: LocationProps) => {
   const isWeb = eventTypeCode === "WEB";
-  const schema = useMemo(() => physicalSchema, [isWeb]);
+  const schema = useMemo(
+    () => (isWeb ? webinarSchema : physicalSchema),
+    [isWeb],
+  );
 
   const { result: locationsCountriesResult } = useList<CountryDTO>({
     resource: "countries",
@@ -109,22 +119,24 @@ const LocationPage = ({
       }),
     [countries],
   );
-  const { register, handleSubmit, setValue, watch, formState } =
-    useForm<PhysicalLocationFormValues>({
-      mode: "onChange",
-      resolver: zodResolver(schema) as any,
-      defaultValues: {
-        name: "",
-        road: "",
-        number: "",
-        postalCode: "",
-        city: "",
-        lat: undefined,
-        lng: undefined,
-        country: "",
-        countryId: "",
-      },
-    });
+  const { register, handleSubmit, setValue, watch, formState } = useForm<
+    PhysicalLocationFormValues | WebinarLocationFormValues
+  >({
+    mode: "onChange",
+    resolver: zodResolver(schema) as any,
+    defaultValues: {
+      name: "",
+      road: "",
+      number: "",
+      postalCode: "",
+      city: "",
+      lat: undefined,
+      lng: undefined,
+      country: "",
+      countryId: "",
+      link: "",
+    },
+  });
 
   const {
     errors,
@@ -140,6 +152,7 @@ const LocationPage = ({
   const road = watch("road");
   const number = watch("number");
   const postalCode = watch("postalCode");
+  const link = watch("link");
   const city = watch("city");
   const selectedCountry = watch("countryId");
   const country = watch("country");
@@ -231,180 +244,217 @@ const LocationPage = ({
               : "Enter the address and fine-tune it on the map."}
           </Fieldset.HelperText>
         </Stack>
-        <Fieldset.Content mt={4}>
-          <Stack gap="2vh" align="flex-start">
-            <Flex gap="1vw" wrap="wrap">
-              <Field.Root invalid={!!errors?.name} width={"40vw"}>
-                <Field.Label>Name</Field.Label>
-                <Input {...register("name")} />
-                <Field.ErrorText>
-                  {(errors as any)?.name?.message as any}
-                </Field.ErrorText>
-              </Field.Root>
-            </Flex>
-            <Flex gap="1vw" wrap="wrap">
-              <Field.Root invalid={!!errors?.road} width={"30vw"}>
-                <Field.Label>Street</Field.Label>
-                <Input {...register("road")} />
-                <Field.ErrorText>
-                  {(errors as any)?.road?.message as any}
-                </Field.ErrorText>
-              </Field.Root>
-              <Field.Root invalid={!!errors?.number} width={"9vw"}>
-                <Field.Label>No.</Field.Label>
-                <Input {...register("number")} />
-                <Field.ErrorText>
-                  {(errors as any)?.number?.message as any}
-                </Field.ErrorText>
-              </Field.Root>
-            </Flex>
-            <Flex gap="1vw" wrap="wrap">
-              <Field.Root invalid={!!errors?.postalCode} width={"7vw"}>
-                <Field.Label>Postal Code</Field.Label>
-                <Input {...register("postalCode")} />
-                <Field.ErrorText>
-                  {(errors as any)?.postalCode?.message as any}
-                </Field.ErrorText>
-              </Field.Root>
-              <Field.Root invalid={!!errors?.city} width={"13vw"}>
-                <Field.Label>City</Field.Label>
-                <Input {...register("city")} />
-                <Field.ErrorText>
-                  {(errors as any)?.city?.message as any}
-                </Field.ErrorText>
-              </Field.Root>
-              {countryCollection && (
-                <Select.Root
-                  collection={countryCollection}
-                  size={"sm"}
-                  width={"18vw"}
-                  value={selectedCountry ? [selectedCountry] : []}
-                  onValueChange={(e) => {
-                    const nextId = Array.isArray(e.value)
-                      ? e.value[0]
-                      : e.value;
-                    const nextCountry = countries.find((c) => c.id === nextId);
-                    setValue("countryId", nextId ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                    setValue("country", nextCountry?.name || "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                  }}
+        {isWeb ? (
+          <Fieldset.Content mt={4}>
+            <Stack gap="2vh" align="flex-start">
+              <Flex gap="1vw" wrap="wrap">
+                <Field.Root invalid={!!errors?.name} width={"40vw"}>
+                  <Field.Label>Webinar Name</Field.Label>
+                  <Input {...register("name")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.name?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+                <Field.Root invalid={!!errors?.link} width={"40vw"}>
+                  <Field.Label>Webinar Link</Field.Label>
+                  <Input {...register("link")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.link?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+              </Flex>
+              <Flex gap="2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onPrevious?.()}
                 >
-                  <Select.HiddenSelect name="country" />
-                  <Select.Label>Select Country</Select.Label>
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select country" />
-                    </Select.Trigger>
-                    <Select.Indicator />
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {countryCollection.items
-                          .filter((item) => {
-                            const country = countries.find(
-                              (c) => c.id === item.value,
-                            );
-                            return country?.preferred;
-                          })
-                          .map((item) => (
-                            <Select.Item key={item.value} item={item}>
-                              {item.label}
-                              <Select.ItemIndicator />
-                            </Select.Item>
-                          ))}
-                        <Separator size={"lg"} />
-                        {countryCollection.items
-                          .filter((item) => {
-                            const country = countries.find(
-                              (c) => c.id === item.value,
-                            );
-                            return !country?.preferred;
-                          })
-                          .map((item) => (
-                            <Select.Item key={item.value} item={item}>
-                              {item.label}
-                              <Select.ItemIndicator />
-                            </Select.Item>
-                          ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              )}
-            </Flex>
-            <Flex gap="2vh" align="center">
-              <Button type="button" onClick={onGeocode}>
-                Find on map
-              </Button>
-            </Flex>
-            <MapPicker
-              location={
-                {
-                  id: "",
-                  name: (name || "").trim(),
-                  road: (road || "").trim(),
-                  number: (number || "").trim(),
-                  postalCode: (postalCode || "").trim(),
-                  city: (city || "").trim(),
-                  lat: lat,
-                  lng: lng,
-                  country: country,
-                  countryId: selectedCountry,
-                  locationTypeId: "",
-                } as Location
-              }
-              title="Adjust Location"
-              previewHeight={180}
-              bounds={europeBounds}
-              defaultCenter={defaultCenter}
-              onSave={(loc: any) => {
-                const match = resolveCountryId(loc, countries);
-
-                if (match) {
-                  setValue("countryId", match.id, {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  });
-                  setValue("country", match.name, {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  });
+                  Previous
+                </Button>
+                <Button type="submit" disabled={!isValid}>
+                  Next
+                </Button>
+              </Flex>
+            </Stack>
+          </Fieldset.Content>
+        ) : (
+          <Fieldset.Content mt={4}>
+            <Stack gap="2vh" align="flex-start">
+              <Flex gap="1vw" wrap="wrap">
+                <Field.Root invalid={!!errors?.name} width={"40vw"}>
+                  <Field.Label>Name</Field.Label>
+                  <Input {...register("name")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.name?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+              </Flex>
+              <Flex gap="1vw" wrap="wrap">
+                <Field.Root invalid={!!errors?.road} width={"30vw"}>
+                  <Field.Label>Street</Field.Label>
+                  <Input {...register("road")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.road?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+                <Field.Root invalid={!!errors?.number} width={"9vw"}>
+                  <Field.Label>No.</Field.Label>
+                  <Input {...register("number")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.number?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+              </Flex>
+              <Flex gap="1vw" wrap="wrap">
+                <Field.Root invalid={!!errors?.postalCode} width={"7vw"}>
+                  <Field.Label>Postal Code</Field.Label>
+                  <Input {...register("postalCode")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.postalCode?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+                <Field.Root invalid={!!errors?.city} width={"13vw"}>
+                  <Field.Label>City</Field.Label>
+                  <Input {...register("city")} />
+                  <Field.ErrorText>
+                    {(errors as any)?.city?.message as any}
+                  </Field.ErrorText>
+                </Field.Root>
+                {countryCollection && (
+                  <Select.Root
+                    collection={countryCollection}
+                    size={"sm"}
+                    width={"18vw"}
+                    value={selectedCountry ? [selectedCountry] : []}
+                    onValueChange={(e) => {
+                      const nextId = Array.isArray(e.value)
+                        ? e.value[0]
+                        : e.value;
+                      const nextCountry = countries.find(
+                        (c) => c.id === nextId,
+                      );
+                      setValue("countryId", nextId ?? "", {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      });
+                      setValue("country", nextCountry?.name || "", {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      });
+                    }}
+                  >
+                    <Select.HiddenSelect name="country" />
+                    <Select.Label>Select Country</Select.Label>
+                    <Select.Control>
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Select country" />
+                      </Select.Trigger>
+                      <Select.Indicator />
+                    </Select.Control>
+                    <Portal>
+                      <Select.Positioner>
+                        <Select.Content>
+                          {countryCollection.items
+                            .filter((item) => {
+                              const country = countries.find(
+                                (c) => c.id === item.value,
+                              );
+                              return country?.preferred;
+                            })
+                            .map((item) => (
+                              <Select.Item key={item.value} item={item}>
+                                {item.label}
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          <Separator size={"lg"} />
+                          {countryCollection.items
+                            .filter((item) => {
+                              const country = countries.find(
+                                (c) => c.id === item.value,
+                              );
+                              return !country?.preferred;
+                            })
+                            .map((item) => (
+                              <Select.Item key={item.value} item={item}>
+                                {item.label}
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                        </Select.Content>
+                      </Select.Positioner>
+                    </Portal>
+                  </Select.Root>
+                )}
+              </Flex>
+              <Flex gap="2vh" align="center">
+                <Button type="button" onClick={onGeocode}>
+                  Find on map
+                </Button>
+              </Flex>
+              <MapPicker
+                location={
+                  {
+                    id: "",
+                    name: (name || "").trim(),
+                    road: (road || "").trim(),
+                    number: (number || "").trim(),
+                    postalCode: (postalCode || "").trim(),
+                    city: (city || "").trim(),
+                    lat: lat,
+                    lng: lng,
+                    country: country,
+                    countryId: selectedCountry,
+                    locationTypeId: "",
+                  } as Location
                 }
+                title="Adjust Location"
+                previewHeight={180}
+                bounds={europeBounds}
+                defaultCenter={defaultCenter}
+                onSave={(loc: any) => {
+                  const match = resolveCountryId(loc, countries);
 
-                setValue("name", loc.name || "");
-                setValue("road", loc.road || "");
-                setValue("number", loc.number || "");
-                setValue("postalCode", loc.postalCode || "");
-                setValue("city", loc.city || "");
+                  if (match) {
+                    setValue("countryId", match.id, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                    setValue("country", match.name, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }
 
-                if (loc.lat != null)
-                  setValue("lat", loc.lat, { shouldDirty: true });
-                if (loc.lng != null)
-                  setValue("lng", loc.lng, { shouldDirty: true });
-              }}
-            />
-            <Flex gap="2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onPrevious?.()}
-              >
-                Previous
-              </Button>
-              <Button type="submit" disabled={!isValid}>
-                Next
-              </Button>
-            </Flex>
-          </Stack>
-        </Fieldset.Content>
+                  setValue("name", loc.name || "");
+                  setValue("road", loc.road || "");
+                  setValue("number", loc.number || "");
+                  setValue("postalCode", loc.postalCode || "");
+                  setValue("city", loc.city || "");
+
+                  if (loc.lat != null)
+                    setValue("lat", loc.lat, { shouldDirty: true });
+                  if (loc.lng != null)
+                    setValue("lng", loc.lng, { shouldDirty: true });
+                }}
+              />
+              <Flex gap="2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onPrevious?.()}
+                >
+                  Previous
+                </Button>
+                <Button type="submit" disabled={!isValid}>
+                  Next
+                </Button>
+              </Flex>
+            </Stack>
+          </Fieldset.Content>
+        )}
       </Fieldset.Root>
     </form>
   );

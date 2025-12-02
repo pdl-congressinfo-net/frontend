@@ -30,7 +30,8 @@ interface BasicInformationValues {
   startDate: string; // yyyy-MM-dd
   oneDay: boolean;
   endDate?: string; // yyyy-MM-dd
-  type: string;
+  typeId: string;
+  typeCode: string;
   field: string;
 }
 
@@ -67,7 +68,8 @@ const BasicInformationSchema = z
       if (v === "" || v == null) return undefined;
       return toYMD(v);
     }, z.string().optional()),
-    type: z.string().default("CON"),
+    typeId: z.string().min(1, "Event type is required"),
+    typeCode: z.string().min(1, "Event type code is required").default("CON"),
     field: z.string().default("MED"),
   })
   .superRefine((data, ctx) => {
@@ -194,7 +196,8 @@ const BasicInformation = ({
   const oneDay = watch("oneDay");
   const startDate = watch("startDate");
   const selectedField = watch("field");
-  const selectedType = watch("type");
+  const selectedType = watch("typeId");
+  const selectedTypeCode = watch("typeCode");
 
   // Set default category by code 'MED' or first available
   useEffect(() => {
@@ -222,7 +225,12 @@ const BasicInformation = ({
     const fallbackType = (eventTypes as EventType[])[0];
     const nextDefault = preferredType?.id ?? fallbackType?.id;
     if (nextDefault && !selectedType) {
-      setValue("type", nextDefault, {
+      setValue("typeId", nextDefault, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      setValue("typeCode", nextDefault ? "CON" : "", {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -367,14 +375,20 @@ const BasicInformation = ({
                 value={selectedType ? [selectedType] : []}
                 onValueChange={(e) => {
                   const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                  setValue("type", next ?? "", {
+                  setValue("typeId", next ?? "", {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
+                  const selectedTypeObj = eventTypes.find((t) => t.id === next);
+                  setValue("typeCode", selectedTypeObj?.code ?? "", {
                     shouldValidate: true,
                     shouldDirty: true,
                     shouldTouch: true,
                   });
                 }}
               >
-                <Select.HiddenSelect name="type" />
+                <Select.HiddenSelect name="typeId" />
                 <Select.Label>Select Type</Select.Label>
                 <Select.Control>
                   <Select.Trigger>
