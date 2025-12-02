@@ -61,6 +61,7 @@ export type MapPickerProps = {
   location?: Location;
   title?: string;
   previewHeight?: string | number;
+  previewWidth?: string | number;
   bounds?: L.LatLngBoundsExpression;
   defaultCenter?: [number, number];
   onSave?: (location: Location) => void;
@@ -71,6 +72,7 @@ export function MapPicker({
   location,
   title = "Adjust Location",
   previewHeight = 180,
+  previewWidth = "40vw",
   bounds,
   defaultCenter,
   onSave,
@@ -153,7 +155,7 @@ export function MapPicker({
           </Text>
           {locationState?.lat != null && locationState?.lng != null ? (
             <Box
-              width="100%"
+              width={previewWidth}
               height={previewHeight}
               onClick={() => setOpen(true)}
               cursor="pointer"
@@ -161,7 +163,10 @@ export function MapPicker({
               <MapContainer
                 center={[locationState.lat, locationState.lng]}
                 zoom={15}
-                style={{ width: "100%", height: "100%" }}
+                style={{
+                  width: `calc(${previewWidth} - 6vw)`,
+                  height: previewHeight,
+                }}
                 maxBounds={europeBounds}
                 maxBoundsViscosity={1.0}
                 scrollWheelZoom={false}
@@ -178,8 +183,8 @@ export function MapPicker({
             </Box>
           ) : (
             <Box
-              width="100%"
-              height={previewHeight}
+              width={`calc(${previewWidth} - 6vw)`}
+              height={`calc(${previewHeight} - 6vw)`}
               bg="gray.50"
               borderRadius="md"
               display="flex"

@@ -13,7 +13,6 @@ export interface EventCardInterface {
 export const EventCard = ({
   event,
   location,
-  country,
   imageUrl,
   onCardClick,
   onAnmeldenClick,
