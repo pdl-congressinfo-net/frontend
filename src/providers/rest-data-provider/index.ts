@@ -1,28 +1,104 @@
 import { axiosInstance, generateSort, generateFilter } from "./utils";
 import { stringify } from "query-string";
 import type { AxiosInstance } from "axios";
-import type { DataProvider } from "@refinedev/core";
+import type { CrudFilters, CrudSorting, DataProvider } from "@refinedev/core";
 import { ApiResponse } from "../../common/types/api";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
+
+export type GetListParams = {
+  resource: string;
+  pagination?: {
+    currentPage?: number;
+    pageSize?: number;
+    mode?: "server" | "client";
+  };
+  filters?: CrudFilters;
+  sorters?: CrudSorting;
+  meta?: {
+    headers?: Record<string, string>;
+    method?: MethodTypes;
+    parentmodule?: string;
+  };
+};
+
+export type GetManyParams = {
+  resource: string;
+  ids: number[] | string[];
+  meta?: {
+    headers?: Record<string, string>;
+    method?: MethodTypes;
+    parentmodule?: string;
+  };
+};
+
+export type CreateParams = {
+  resource: string;
+  variables: Record<string, any>;
+  meta?: {
+    headers?: Record<string, string>;
+    method?: MethodTypesWithBody;
+    parentmodule?: string;
+  };
+};
+
+export type UpdateParams = {
+  resource: string;
+  id: number | string;
+  variables: Record<string, any>;
+  meta?: {
+    headers?: Record<string, string>;
+    method?: MethodTypesWithBody;
+    parentmodule?: string;
+  };
+};
+
+export type GetOneParams = {
+  resource: string;
+  id: number | string;
+  meta?: {
+    headers?: Record<string, string>;
+    method?: MethodTypes;
+    parentmodule?: string;
+  };
+};
+
+export type DeleteOneParams = {
+  resource: string;
+  id: number | string;
+  variables?: Record<string, any>;
+  meta?: {
+    headers?: Record<string, string>;
+    method?: MethodTypesWithBody;
+    parentmodule?: string;
+  };
+};
 
 export const dataProvider = (
   apiUrl: string,
   httpClient: AxiosInstance = axiosInstance,
 ): Omit<Required<DataProvider>, "createMany" | "updateMany" | "deleteMany"> =>
   ({
-    getList: async ({ resource, pagination, filters, sorters, meta }) => {
-      const url = `${apiUrl}/${resource}`;
-
+    getList: async ({
+      resource,
+      pagination,
+      filters,
+      sorters,
+      meta,
+    }: GetListParams) => {
       const {
         currentPage = 1,
         pageSize = 10,
         mode = "server",
       } = pagination ?? {};
 
-      const { headers: headersFromMeta, method } = meta ?? {};
+      const { headers: headersFromMeta, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
+
+      const url = parentmodule
+        ? `${apiUrl}/${parentmodule}/${resource}`
+        : `${apiUrl}/${resource}`;
 
       const queryFilters = generateFilter(filters);
 
@@ -56,8 +132,6 @@ export const dataProvider = (
         headers: headersFromMeta,
       });
 
-      console.log("getList response data:", data);
-
       const total = +headers["x-total-count"];
 
       return {
@@ -66,26 +140,30 @@ export const dataProvider = (
       };
     },
 
-    getMany: async ({ resource, ids, meta }) => {
-      const { headers, method } = meta ?? {};
+    getMany: async ({ resource, ids, meta }: GetManyParams) => {
+      const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
+      const url = parentmodule
+        ? `${apiUrl}/${parentmodule}/${resource}?${stringify({ id: ids })}`
+        : `${apiUrl}/${resource}?${stringify({ id: ids })}`;
 
-      const { data } = await httpClient[requestMethod]<ApiResponse<any>>(
-        `${apiUrl}/${resource}?${stringify({ id: ids })}`,
-        { headers },
-      );
+      const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
+        headers,
+      });
 
       return {
         data: data.data,
       };
     },
 
-    create: async ({ resource, variables, meta }) => {
-      const url = `${apiUrl}/${resource}`;
-
-      const { headers, method } = meta ?? {};
+    create: async ({ resource, variables, meta }: CreateParams) => {
+      const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "post";
 
+      const url = parentmodule
+        ? `${apiUrl}/${parentmodule}/${resource}`
+        : `${apiUrl}/${resource}`;
+
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(
         url,
         variables,
@@ -99,12 +177,14 @@ export const dataProvider = (
       };
     },
 
-    update: async ({ resource, id, variables, meta }) => {
-      const url = `${apiUrl}/${resource}/${id}`;
-
-      const { headers, method } = meta ?? {};
+    update: async ({ resource, id, variables, meta }: UpdateParams) => {
+      const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "patch";
 
+      const url = parentmodule
+        ? `${apiUrl}/${parentmodule}/${resource}/${id}`
+        : `${apiUrl}/${resource}/${id}`;
+
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(
         url,
         variables,
@@ -118,11 +198,13 @@ export const dataProvider = (
       };
     },
 
-    getOne: async ({ resource, id, meta }) => {
-      const url = `${apiUrl}/${resource}/${id}`;
-
-      const { headers, method } = meta ?? {};
+    getOne: async ({ resource, id, meta }: GetOneParams) => {
+      const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
+
+      const url = parentmodule
+        ? `${apiUrl}/${parentmodule}/${resource}/${id}`
+        : `${apiUrl}/${resource}/${id}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
         headers,
@@ -133,11 +215,13 @@ export const dataProvider = (
       };
     },
 
-    deleteOne: async ({ resource, id, variables, meta }) => {
-      const url = `${apiUrl}/${resource}/${id}`;
-
-      const { headers, method } = meta ?? {};
+    deleteOne: async ({ resource, id, variables, meta }: DeleteOneParams) => {
+      const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "delete";
+
+      const url = parentmodule
+        ? `${apiUrl}/${parentmodule}/${resource}/${id}`
+        : `${apiUrl}/${resource}/${id}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
         data: variables,
