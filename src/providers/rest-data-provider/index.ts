@@ -181,7 +181,7 @@ export const dataProvider = (
 
     update: async ({ resource, id, variables, meta }: UpdateParams) => {
       const { headers, method, parentmodule, relation_ids } = meta ?? {};
-      const requestMethod = (method as MethodTypesWithBody) ?? "patch";
+      const requestMethod = (method as MethodTypesWithBody) ?? "put";
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
 
