@@ -1,25 +1,55 @@
 import { Box, Button, Card, Flex, Heading, Image } from "@chakra-ui/react";
-import { CanAccess } from "@refinedev/core";
+import { CanAccess, useOne } from "@refinedev/core";
 import { Event } from "../../features/events/event.model";
 import { Country, Location } from "../../features/locations/location.model";
+import { LocationDTO } from "../../features/locations/location.responses";
+import { mapLocation } from "../../features/locations/location.mapper";
+import { useEffect } from "react";
+import { toDate } from "../../utils/helpers";
 
 export interface EventCardInterface {
   event: Event;
-  location?: Location;
-  country?: Country;
-  imageUrl?: string;
+  onCardClick?: () => void;
+  onParticipateClick?: () => void;
 }
 
 export const EventCard = ({
   event,
-  location,
-  imageUrl,
   onCardClick,
-  onAnmeldenClick,
-}: EventCardInterface & {
-  onCardClick?: () => void;
-  onAnmeldenClick?: () => void;
-}) => {
+  onParticipateClick,
+}: EventCardInterface) => {
+  const {
+    result: locationDTO,
+    query: { isLoading, isError },
+  } = useOne<LocationDTO>({
+    resource: "locations",
+    id: event.locationId,
+    queryOptions: {
+      enabled: !!event.locationId,
+    },
+  });
+
+  const location = locationDTO ? mapLocation(locationDTO) : undefined;
+
+  const { result: country } = useOne<Country>({
+    resource: "countries",
+    id: location?.countryId || "",
+    queryOptions: {
+      enabled: !!location?.countryId,
+    },
+  });
+
+  useEffect(() => {
+    if (isError) {
+      console.error("Error fetching location data");
+    }
+    console.log("Event data:", event);
+    console.log("Location data:", location);
+  }, [isError, location]);
+
+  const imageUrl =
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60";
+
   return (
     <Card.Root
       size="md"
@@ -29,11 +59,12 @@ export const EventCard = ({
       onClick={onCardClick}
       cursor="pointer"
       _hover={{ dropShadow: "lg" }}
+      backgroundColor={event.isPublished ? "inherit" : "red.100"}
     >
       <Flex direction="row" justifyContent="space-between" gap={4} padding={4}>
         <Image
           src={imageUrl}
-          alt={event.name}
+          alt={event?.name}
           borderRadius="md"
           boxSize="150px"
         />
@@ -42,7 +73,14 @@ export const EventCard = ({
             <Flex direction="column">
               <Heading size="md">{event.name}</Heading>
               <Box fontSize="sm" color="ui.muted">
-                {event.startDate.toDateString()}
+                {(() => {
+                  const s = toDate(event?.startDate);
+                  const e = toDate(event?.endDate);
+
+                  if (!s && !e) return "";
+                  if (s && e && s === e) return s;
+                  return `${s}${s && e ? " - " : ""}${e}`;
+                })()}
               </Box>
             </Flex>
             <Flex direction="column" justifyContent="space-between" ml="auto">
@@ -55,7 +93,7 @@ export const EventCard = ({
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAnmeldenClick?.();
+                    onParticipateClick?.();
                   }}
                 >
                   Anmelden

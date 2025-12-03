@@ -7,63 +7,35 @@ import { EventDetails } from "./EventDetails";
 import { useCan, useList, useMany, useOne } from "@refinedev/core";
 import { Event } from "../../features/events/event.model";
 import { Country, Location } from "../../features/locations/location.model";
+import { EventDTO } from "../../features/events/event.responses";
+import { mapEvent } from "../../features/events/event.mapper";
 
 export const EventList = () => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [isPublished, setIsPublished] = useState<boolean>(true);
 
-  const { result: eventsData, query } = useList<Event>({
+  const { data: canUpdateForFilter } = useCan({
+    resource: "events",
+    action: "update",
+  });
+
+  const filters = canUpdateForFilter?.can
+    ? undefined
+    : [{ field: "is_published", operator: "eq", value: isPublished }];
+
+  const { result: eventsDto, query } = useList<EventDTO>({
     resource: "events",
     pagination: { pageSize: 10, currentPage: 1, mode: "server" },
     sorters: [{ field: "start_date", order: order }],
-    filters: [{ field: "is_published", operator: "eq", value: true }],
+    filters,
   });
 
-  const locationIds = useMemo(() => {
-    return eventsData?.data.map((event) => event.locationId) ?? [];
-  }, [eventsData]);
+  const eventsData: Event[] = Array.isArray(eventsDto?.data)
+    ? (eventsDto?.data as EventDTO[]).map(mapEvent)
+    : [];
 
-  const { data: locationsData, isLoading: locationsLoading } =
-    useMany<Location>({
-      resource: "locations",
-      ids: locationIds,
-      queryOptions: {
-        enabled: locationIds.length > 0,
-      },
-    });
-
-  const countryIds = useMemo(() => {
-    return (
-      locationsData?.data.map((location: Location) => location.countryId) ?? []
-    );
-  }, [locationsData]);
-
-  const { data: countriesData, isLoading: countriesLoading } = useMany<Country>(
-    {
-      resource: "countries",
-      ids: countryIds,
-      queryOptions: {
-        enabled: countryIds.length > 0,
-      },
-    },
-  );
-
-  const countriesMap = useMemo(() => {
-    const map = new Map<string, Country>();
-    countriesData?.data.forEach((country: Country) => {
-      map.set(country.id, country);
-    });
-    return map;
-  }, [countriesData]);
-
-  const locationsMap = useMemo(() => {
-    const map = new Map<string, Location>();
-    locationsData?.data.forEach((location: Location) => {
-      map.set(location.id, location);
-    });
-    return map;
-  }, [locationsData]);
-
-  const { data: canAccess } = useCan({ resource: "events", action: "show" });
+  const { data: canShow } = useCan({ resource: "events", action: "show" });
+  const { data: canUpdate } = useCan({ resource: "events", action: "update" });
 
   const [detailsDialog, setDetailsDialog] = useState<{
     isOpen: boolean;
@@ -75,7 +47,9 @@ export const EventList = () => {
     event: Event | null;
   }>({ isOpen: false, event: null });
 
-  const events = eventsData?.data || [];
+  const events = eventsData ?? [];
+
+  console.log("Fetched events:", events);
 
   if (query.isLoading) {
     return <Text>Loading events...</Text>;
@@ -86,10 +60,10 @@ export const EventList = () => {
   }
 
   const handleCardClick = (event: any) => {
-    setDetailsDialog({ isOpen: Boolean(canAccess?.can), event });
+    setDetailsDialog({ isOpen: Boolean(canShow?.can), event });
   };
 
-  const handleAnmeldenClick = (event: any) => {
+  const handleParticipateClick = (event: any) => {
     setLoginDialog({ isOpen: true, event });
   };
 
@@ -97,19 +71,12 @@ export const EventList = () => {
     <>
       <Stack gap={4} width="80%">
         {events.map((event, index) => {
-          const location = locationsMap.get(event.locationId);
-          const country = location
-            ? countriesMap.get(location.countryId)
-            : undefined;
           return (
             <EventCard
               key={event.id ?? index}
               event={event}
-              country={country}
-              location={location}
-              imageUrl={"/assets/images/logos/logo_506.png"}
               onCardClick={() => handleCardClick(event)}
-              onAnmeldenClick={() => handleAnmeldenClick(event)}
+              onParticipateClick={() => handleParticipateClick(event)}
             />
           );
         })}
@@ -129,7 +96,7 @@ export const EventList = () => {
         <EventLoginDialog
           isOpen={loginDialog.isOpen}
           onClose={() => setLoginDialog({ isOpen: false, event: null })}
-          title={loginDialog.event.title}
+          title={loginDialog.event.name}
         />
       )}
     </>
