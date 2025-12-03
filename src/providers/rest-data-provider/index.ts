@@ -51,6 +51,7 @@ export type UpdateParams = {
     headers?: Record<string, string>;
     method?: MethodTypesWithBody;
     parentmodule?: string;
+    relation_ids?: number[] | string[];
   };
 };
 
@@ -72,6 +73,7 @@ export type DeleteOneParams = {
     headers?: Record<string, string>;
     method?: MethodTypesWithBody;
     parentmodule?: string;
+    relation_ids?: number[] | string[];
   };
 };
 
@@ -178,12 +180,14 @@ export const dataProvider = (
     },
 
     update: async ({ resource, id, variables, meta }: UpdateParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method, parentmodule, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "patch";
 
+      const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
+
       const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}/${id}`
-        : `${apiUrl}/${resource}/${id}`;
+        ? `${apiUrl}/${parentmodule}/${resource}/${selector}`
+        : `${apiUrl}/${resource}/${selector}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(
         url,
@@ -216,12 +220,14 @@ export const dataProvider = (
     },
 
     deleteOne: async ({ resource, id, variables, meta }: DeleteOneParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method, parentmodule, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "delete";
 
+      const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
+
       const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}/${id}`
-        : `${apiUrl}/${resource}/${id}`;
+        ? `${apiUrl}/${parentmodule}/${resource}/${selector}`
+        : `${apiUrl}/${resource}/${selector}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
         data: variables,
