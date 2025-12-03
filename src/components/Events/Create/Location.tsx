@@ -130,12 +130,12 @@ const LocationPage = ({
       number: "",
       postalCode: "",
       city: "",
-      lat: undefined,
-      lng: undefined,
+      lat: 47.516231,
+      lng: 14.550072,
       country: "",
       countryId: "",
       link: "",
-    },
+    } as any,
   });
 
   const {
@@ -146,13 +146,13 @@ const LocationPage = ({
     isSubmitted,
     submitCount,
   } = formState as any;
+
   const name = watch("name");
   const lat = watch("lat");
   const lng = watch("lng");
   const road = watch("road");
   const number = watch("number");
   const postalCode = watch("postalCode");
-  const link = watch("link");
   const city = watch("city");
   const selectedCountry = watch("countryId");
   const country = watch("country");

@@ -278,13 +278,13 @@ const BasicInformation = ({
         </Stack>
         <Fieldset.Content mt={4}>
           <Stack gap="4" align="flex-start">
-            <Field.Root invalid={!!errors.name} width={"30vw"}>
+            <Field.Root invalid={!!errors.name} width={"40vw"}>
               <Field.Label>Event Name</Field.Label>
               <Input size="md" {...register("name")} />
               <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
             </Field.Root>
             <Flex gap="4">
-              <Field.Root invalid={!!errors.startDate} width="15vw">
+              <Field.Root invalid={!!errors.startDate} width="20vw">
                 <Field.Label>Start Date</Field.Label>
                 <Input type="date" {...register("startDate")} />
                 <Field.ErrorText>
@@ -293,7 +293,7 @@ const BasicInformation = ({
               </Field.Root>
 
               <Flex align="center" height="40px" mt="28px">
-                <Checkbox.Root>
+                <Checkbox.Root width="20vw">
                   <Checkbox.HiddenInput
                     {...register("oneDay")}
                     onChange={(e) => {
@@ -322,96 +322,99 @@ const BasicInformation = ({
               </Flex>
             </Flex>
 
-            <Field.Root invalid={!!errors.endDate} width={"15vw"}>
+            <Field.Root invalid={!!errors.endDate} width={"20vw"}>
               <Field.Label>End Date</Field.Label>
               <Input type="date" disabled={oneDay} {...register("endDate")} />
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
             </Field.Root>
-
-            {eventCategoryCollection && (
-              <Select.Root
-                collection={eventCategoryCollection}
-                size="sm"
-                width="320px"
-                value={selectedField ? [selectedField] : []}
-                onValueChange={(e) => {
-                  const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                  setValue("field", next ?? "", {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  });
-                }}
-              >
-                <Select.HiddenSelect name="field" />
-                <Select.Label>Select Category</Select.Label>
-                <Select.Control>
-                  <Select.Trigger>
-                    <Select.ValueText placeholder="Select Category" />
-                  </Select.Trigger>
-                  <Select.IndicatorGroup>
-                    <Select.Indicator />
-                  </Select.IndicatorGroup>
-                </Select.Control>
-                <Portal>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {eventCategoryCollection.items.map((item) => (
-                        <Select.Item item={item} key={item.value}>
-                          {item.label}
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Portal>
-              </Select.Root>
-            )}
-            {eventTypeCollection && (
-              <Select.Root
-                collection={eventTypeCollection}
-                size="sm"
-                width="320px"
-                value={selectedType ? [selectedType] : []}
-                onValueChange={(e) => {
-                  const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                  setValue("typeId", next ?? "", {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  });
-                  const selectedTypeObj = eventTypes.find((t) => t.id === next);
-                  setValue("typeCode", selectedTypeObj?.code ?? "", {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  });
-                }}
-              >
-                <Select.HiddenSelect name="typeId" />
-                <Select.Label>Select Type</Select.Label>
-                <Select.Control>
-                  <Select.Trigger>
-                    <Select.ValueText placeholder="Select Type" />
-                  </Select.Trigger>
-                  <Select.IndicatorGroup>
-                    <Select.Indicator />
-                  </Select.IndicatorGroup>
-                </Select.Control>
-                <Portal>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {eventTypeCollection.items.map((item) => (
-                        <Select.Item item={item} key={item.value}>
-                          {item.label}
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Portal>
-              </Select.Root>
-            )}
+            <Flex gap="2vw" wrap={"wrap"} direction="row">
+              {eventCategoryCollection && (
+                <Select.Root
+                  collection={eventCategoryCollection}
+                  size="sm"
+                  width="19vw"
+                  value={selectedField ? [selectedField] : []}
+                  onValueChange={(e) => {
+                    const next = Array.isArray(e.value) ? e.value[0] : e.value;
+                    setValue("field", next ?? "", {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true,
+                    });
+                  }}
+                >
+                  <Select.HiddenSelect name="field" />
+                  <Select.Label>Select Category</Select.Label>
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText placeholder="Select Category" />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {eventCategoryCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
+              )}
+              {eventTypeCollection && (
+                <Select.Root
+                  collection={eventTypeCollection}
+                  size="sm"
+                  width="19vw"
+                  value={selectedType ? [selectedType] : []}
+                  onValueChange={(e) => {
+                    const next = Array.isArray(e.value) ? e.value[0] : e.value;
+                    setValue("typeId", next ?? "", {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true,
+                    });
+                    const selectedTypeObj = eventTypes.find(
+                      (t) => t.id === next,
+                    );
+                    setValue("typeCode", selectedTypeObj?.code ?? "", {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true,
+                    });
+                  }}
+                >
+                  <Select.HiddenSelect name="typeId" />
+                  <Select.Label>Select Type</Select.Label>
+                  <Select.Control>
+                    <Select.Trigger>
+                      <Select.ValueText placeholder="Select Type" />
+                    </Select.Trigger>
+                    <Select.IndicatorGroup>
+                      <Select.Indicator />
+                    </Select.IndicatorGroup>
+                  </Select.Control>
+                  <Portal>
+                    <Select.Positioner>
+                      <Select.Content>
+                        {eventTypeCollection.items.map((item) => (
+                          <Select.Item item={item} key={item.value}>
+                            {item.label}
+                            <Select.ItemIndicator />
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Positioner>
+                  </Portal>
+                </Select.Root>
+              )}
+            </Flex>
             <Flex gap="2">
               <Button
                 type="button"
