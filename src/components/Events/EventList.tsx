@@ -6,28 +6,25 @@ import EventLoginDialog from "./EventLoginDialog";
 import { EventDetails } from "./EventDetails";
 import { useCan, useList, useMany, useOne } from "@refinedev/core";
 import { Event } from "../../features/events/event.model";
-import { Country, Location } from "../../features/locations/location.model";
 import { EventDTO } from "../../features/events/event.responses";
 import { mapEvent } from "../../features/events/event.mapper";
 
 export const EventList = () => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [isPublished, setIsPublished] = useState<boolean>(true);
-
-  const { data: canUpdateForFilter } = useCan({
-    resource: "events",
-    action: "update",
-  });
-
-  const filters = canUpdateForFilter?.can
-    ? undefined
-    : [{ field: "is_published", operator: "eq", value: isPublished }];
+  const startDate = useMemo(() => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }, []);
 
   const { result: eventsDto, query } = useList<EventDTO>({
     resource: "events",
     pagination: { pageSize: 10, currentPage: 1, mode: "server" },
     sorters: [{ field: "start_date", order: order }],
-    filters,
+    filters: [{ field: "end_date", operator: "gte", value: startDate }],
   });
 
   const eventsData: Event[] = Array.isArray(eventsDto?.data)
@@ -48,8 +45,6 @@ export const EventList = () => {
   }>({ isOpen: false, event: null });
 
   const events = eventsData ?? [];
-
-  console.log("Fetched events:", events);
 
   if (query.isLoading) {
     return <Text>Loading events...</Text>;

@@ -35,8 +35,8 @@ export interface CreateLocationRequest {
   lat?: number;
   lng?: number;
   link?: string;
-  country_id: string;
-  location_type_id: string;
+  country_id?: string;
+  location_type_id?: string;
 }
 
 export interface UpdateLocationRequest {

@@ -13,7 +13,7 @@ import {
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { string, z } from "zod";
+import { z } from "zod";
 import L from "leaflet";
 import { MapPicker } from "../../Common/Map";
 import { Country, Location } from "../../../features/locations/location.model";
@@ -21,19 +21,19 @@ import { useList } from "@refinedev/core";
 import { CountryDTO } from "../../../features/locations/location.responses";
 import { mapCountry } from "../../../features/locations/location.mapper";
 
-type PhysicalLocationFormValues = {
+export type PhysicalLocationFormValues = {
   name: string;
   road: string;
   number: string;
   postalCode: string;
   city: string;
-  lat: number;
-  lng: number;
+  lat?: number;
+  lng?: number;
   country: string;
   countryId: string;
 };
 
-type WebinarLocationFormValues = {
+export type WebinarLocationFormValues = {
   name: string;
   link: string;
 };
@@ -44,8 +44,16 @@ type LocationProps = {
   onNext?: () => void;
   onPrevious?: () => void;
   onStatus?: (status: StepStatus) => void;
+  onSave?: (
+    data: PhysicalLocationFormValues | WebinarLocationFormValues,
+  ) => Promise<SaveResult | void> | SaveResult | void;
   eventTypeCode?: string | null;
+  initialValues?:
+    | Partial<PhysicalLocationFormValues>
+    | Partial<WebinarLocationFormValues>;
 };
+
+type SaveResult = { success?: boolean; id?: string };
 
 const physicalSchema = z
   .object({
@@ -81,7 +89,9 @@ const LocationPage = ({
   onNext,
   onPrevious,
   onStatus,
+  onSave,
   eventTypeCode,
+  initialValues,
 }: LocationProps) => {
   const isWeb = eventTypeCode === "WEB";
   const schema = useMemo(
@@ -119,12 +129,8 @@ const LocationPage = ({
       }),
     [countries],
   );
-  const { register, handleSubmit, setValue, watch, formState } = useForm<
-    PhysicalLocationFormValues | WebinarLocationFormValues
-  >({
-    mode: "onChange",
-    resolver: zodResolver(schema) as any,
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       name: "",
       road: "",
       number: "",
@@ -135,8 +141,30 @@ const LocationPage = ({
       country: "",
       countryId: "",
       link: "",
-    } as any,
+    }),
+    [],
+  );
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState,
+  } = useForm<PhysicalLocationFormValues | WebinarLocationFormValues>({
+    mode: "onChange",
+    resolver: zodResolver(schema) as any,
+    defaultValues: defaultValues as any,
   });
+
+  useEffect(() => {
+    if (!initialValues) return;
+    reset({
+      ...defaultValues,
+      ...initialValues,
+    } as any);
+  }, [initialValues, reset, defaultValues]);
 
   const {
     errors,
@@ -203,7 +231,16 @@ const LocationPage = ({
     }
   };
 
-  const onSubmit = handleSubmit(() => onNext?.());
+  const onSubmit = handleSubmit(
+    async (data: PhysicalLocationFormValues | WebinarLocationFormValues) => {
+      try {
+        await onSave?.(data);
+        onNext?.();
+      } catch (error) {
+        console.error("Failed to persist location information", error);
+      }
+    },
+  );
 
   function resolveCountryId(
     loc: any,

@@ -43,8 +43,6 @@ export const EventCard = ({
     if (isError) {
       console.error("Error fetching location data");
     }
-    console.log("Event data:", event);
-    console.log("Location data:", location);
   }, [isError, location]);
 
   const imageUrl =

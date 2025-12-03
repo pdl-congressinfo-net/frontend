@@ -10,13 +10,12 @@ import {
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-import { useCreate, useInfiniteList, useList } from "@refinedev/core";
-import { use, useEffect, useMemo, useState } from "react";
+import { useList } from "@refinedev/core";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EventCategory, EventType } from "../../../features/events/event.model";
-import { CreateEventRequest } from "../../../features/events/event.requests";
 import {
   mapEventCategory,
   mapEventType,
@@ -26,7 +25,7 @@ import {
   EventTypeDTO,
 } from "../../../features/events/event.responses";
 
-interface BasicInformationValues {
+export interface BasicInformationValues {
   name: string;
   startDate: string; // yyyy-MM-dd
   oneDay: boolean;
@@ -95,11 +94,16 @@ const BasicInformationSchema = z
     }
   });
 
+type SaveResult = { success?: boolean; id?: string };
+
 type BasicInformationProps = {
   onNext?: () => void;
   onPrevious?: () => void;
   onStatus?: (status: StepStatus) => void;
-  onSave?: (data: BasicInformationValues) => void;
+  onSave?: (
+    data: BasicInformationValues,
+  ) => Promise<SaveResult | void> | SaveResult | void;
+  initialValues?: Partial<BasicInformationValues>;
 };
 type StepStatus = "done" | "error" | "open";
 
@@ -107,15 +111,31 @@ const BasicInformation = ({
   onNext,
   onStatus,
   onSave,
+  initialValues,
 }: BasicInformationProps) => {
-  const { mutate, mutation } = useCreate({
-    resource: "events",
-  });
+  const defaultValues = useMemo<BasicInformationValues>(() => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return {
+      name: "",
+      startDate: `${y}-${m}-${day}`,
+      oneDay: false,
+      endDate: undefined,
+      typeId: "",
+      typeCode: "CON",
+      field: "",
+    };
+  }, []);
+
   const {
     watch,
     register,
     handleSubmit,
     setValue,
+    reset,
+    getValues,
     formState: {
       errors,
       isValid,
@@ -127,21 +147,28 @@ const BasicInformation = ({
   } = useForm<BasicInformationValues>({
     mode: "onChange",
     resolver: zodResolver(BasicInformationSchema) as any,
-    defaultValues: {
-      name: "",
-      startDate: (() => {
-        const d = new Date();
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${y}-${m}-${day}`; // yyyy-MM-dd local
-      })(),
-      oneDay: false,
-      endDate: undefined,
-      field: "",
-    },
+    defaultValues,
     shouldUnregister: false,
   });
+
+  useEffect(() => {
+    if (!initialValues) return;
+    const current = getValues();
+    const next: BasicInformationValues = {
+      ...current,
+      ...initialValues,
+      startDate: initialValues.startDate ?? current.startDate,
+      oneDay: initialValues.oneDay ?? current.oneDay,
+      endDate:
+        (initialValues.oneDay ?? current.oneDay)
+          ? initialValues.startDate ?? current.startDate
+          : initialValues.endDate ?? current.endDate,
+      typeId: initialValues.typeId ?? current.typeId,
+      typeCode: initialValues.typeCode ?? current.typeCode,
+      field: initialValues.field ?? current.field,
+    };
+    reset(next);
+  }, [initialValues, getValues, reset]);
 
   // Derive collections from fetched arrays to avoid stale state
 
@@ -200,7 +227,6 @@ const BasicInformation = ({
   const startDate = watch("startDate");
   const selectedField = watch("field");
   const selectedType = watch("typeId");
-  const selectedTypeCode = watch("typeCode");
 
   // Set default category by code 'MED' or first available
   useEffect(() => {
@@ -233,7 +259,8 @@ const BasicInformation = ({
         shouldDirty: true,
         shouldTouch: true,
       });
-      setValue("typeCode", nextDefault ? "CON" : "", {
+      const nextCode = preferredType?.code ?? fallbackType?.code ?? "";
+      setValue("typeCode", nextCode, {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -251,25 +278,13 @@ const BasicInformation = ({
     }
   }, [oneDay, startDate, setValue]);
 
-  const onSubmit = handleSubmit((data) => {
-    onSave?.(data);
-
-    const createEvent: CreateEventRequest = {
-      name: data.name,
-      start_date: new Date(data.startDate),
-      end_date: new Date(data.endDate ?? data.startDate),
-      category_id: data.field,
-      type_id: data.typeId,
-    };
-
-    mutate(
-      { values: createEvent },
-      {
-        onSuccess: () => {
-          if (onNext) onNext();
-        },
-      },
-    );
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      await onSave?.(data);
+      onNext?.();
+    } catch (error) {
+      console.error("Failed to persist basic information", error);
+    }
   });
 
   useEffect(() => {
@@ -284,7 +299,7 @@ const BasicInformation = ({
         ? "error"
         : "open";
     onStatus?.(status);
-  }, [isValid, isSubmitted, submitCount, touchedFields, dirtyFields]);
+  }, [isValid, isSubmitted, submitCount, touchedFields, dirtyFields, onStatus]);
 
   return (
     <form onSubmit={onSubmit}>
@@ -435,11 +450,7 @@ const BasicInformation = ({
               )}
             </Flex>
             <Flex gap="2">
-              <Button
-                type="submit"
-                disabled={!isValid}
-                loading={mutation.isLoading}
-              >
+              <Button type="submit" disabled={!isValid}>
                 Next
               </Button>
             </Flex>
