@@ -2,6 +2,7 @@ import { AuthProvider } from "@refinedev/core";
 import { mapUser } from "../features/users/user.mapper";
 import { ApiResponse } from "../common/types/api";
 import { UserDTO } from "../features/users/user.responses";
+import { resetPermissionCache } from "./access-control-provider";
 
 const API_URL = "https://api.dpfurner.xyz/api/v1";
 
@@ -25,7 +26,7 @@ export const authProvider: AuthProvider = {
               "X-Requested-With": "XMLHttpRequest",
             },
             credentials: "include",
-          }
+          },
         );
 
         if (!response.ok) {
@@ -179,6 +180,7 @@ export const authProvider: AuthProvider = {
     } finally {
       localStorage.removeItem("access_token");
     }
+    resetPermissionCache();
 
     return {
       success: true,
@@ -235,7 +237,7 @@ export const authProvider: AuthProvider = {
 
       const apiResponse: ApiResponse<UserDTO> = await res.json();
       const user = mapUser(apiResponse.data);
-      
+
       return user;
     } catch (error) {
       return null;
