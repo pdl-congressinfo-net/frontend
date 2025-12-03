@@ -261,9 +261,15 @@ const BasicInformation = ({
       category_id: data.field,
       type_id: data.typeId,
     };
-    mutate({ values: createEvent });
 
-    if (onNext) onNext();
+    mutate(
+      { values: createEvent },
+      {
+        onSuccess: () => {
+          if (onNext) onNext();
+        },
+      },
+    );
   });
 
   useEffect(() => {
