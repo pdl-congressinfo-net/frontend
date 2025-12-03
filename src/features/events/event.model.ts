@@ -19,6 +19,7 @@ export interface Event {
   name: string;
   startDate: Date;
   endDate: Date;
+  isPublished: boolean;
   locationId: string;
   categoryId: string;
 }

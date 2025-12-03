@@ -10,12 +10,13 @@ import {
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-import { useInfiniteList, useList } from "@refinedev/core";
-import { use, useEffect, useMemo } from "react";
+import { useCreate, useInfiniteList, useList } from "@refinedev/core";
+import { use, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EventCategory, EventType } from "../../../features/events/event.model";
+import { CreateEventRequest } from "../../../features/events/event.requests";
 import {
   mapEventCategory,
   mapEventType,
@@ -104,10 +105,12 @@ type StepStatus = "done" | "error" | "open";
 
 const BasicInformation = ({
   onNext,
-  onPrevious,
   onStatus,
   onSave,
 }: BasicInformationProps) => {
+  const { mutate, mutation } = useCreate({
+    resource: "events",
+  });
   const {
     watch,
     register,
@@ -250,6 +253,16 @@ const BasicInformation = ({
 
   const onSubmit = handleSubmit((data) => {
     onSave?.(data);
+
+    const createEvent: CreateEventRequest = {
+      name: data.name,
+      start_date: new Date(data.startDate),
+      end_date: new Date(data.endDate ?? data.startDate),
+      category_id: data.field,
+      type_id: data.typeId,
+    };
+    mutate({ values: createEvent });
+
     if (onNext) onNext();
   });
 
@@ -417,13 +430,10 @@ const BasicInformation = ({
             </Flex>
             <Flex gap="2">
               <Button
-                type="button"
-                variant="outline"
-                onClick={() => onPrevious && onPrevious()}
+                type="submit"
+                disabled={!isValid}
+                loading={mutation.isLoading}
               >
-                Previous
-              </Button>
-              <Button type="submit" disabled={!isValid}>
                 Next
               </Button>
             </Flex>

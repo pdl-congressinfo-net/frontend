@@ -27,7 +27,8 @@ export function mapEvent(dto: EventDTO): Event {
     name: dto.name,
     startDate: dto.start_date,
     endDate: dto.end_date,
+    isPublished: dto.is_published,
     locationId: dto.location_id,
-    categoryId: dto.cathegory_id,
+    categoryId: dto.category_id,
   };
 }
