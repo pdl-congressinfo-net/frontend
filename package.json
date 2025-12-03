@@ -13,6 +13,8 @@
     "@refinedev/kbar": "^2.0.0",
     "@refinedev/react-router": "^2.0.0",
     "@refinedev/simple-rest": "^6.0.0",
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.12",
     "axios": "^1.6.2",
     "i18next": "^25.6.3",
     "leaflet": "^1.9.4",
