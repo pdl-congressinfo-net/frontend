@@ -161,10 +161,11 @@ export function MapPicker({
               cursor="pointer"
             >
               <MapContainer
+                key={`preview-${locationState?.lat ?? "null"}-${locationState?.lng ?? "null"}`}
                 center={[locationState.lat, locationState.lng]}
                 zoom={15}
                 style={{
-                  width: `calc(${previewWidth} - 6vw)`,
+                  width: `calc(${previewWidth} - 8vw)`,
                   height: previewHeight,
                 }}
                 maxBounds={europeBounds}
