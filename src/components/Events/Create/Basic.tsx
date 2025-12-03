@@ -283,8 +283,8 @@ const BasicInformation = ({
               <Input size="md" {...register("name")} />
               <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
             </Field.Root>
-            <Flex gap="4">
-              <Field.Root invalid={!!errors.startDate} width="20vw">
+            <Flex gap="2vw">
+              <Field.Root invalid={!!errors.startDate} width="19vw">
                 <Field.Label>Start Date</Field.Label>
                 <Input type="date" {...register("startDate")} />
                 <Field.ErrorText>
@@ -322,7 +322,7 @@ const BasicInformation = ({
               </Flex>
             </Flex>
 
-            <Field.Root invalid={!!errors.endDate} width={"20vw"}>
+            <Field.Root invalid={!!errors.endDate} width={"19vw"}>
               <Field.Label>End Date</Field.Label>
               <Input type="date" disabled={oneDay} {...register("endDate")} />
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
