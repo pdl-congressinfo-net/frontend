@@ -25,8 +25,8 @@ export function mapEvent(dto: EventDTO): Event {
   return {
     id: dto.id,
     name: dto.name,
-    startDate: dto.start_date,
-    endDate: dto.end_date,
+    startDate: dto.start_date ? new Date(dto.start_date) : undefined,
+    endDate: dto.end_date ? new Date(dto.end_date) : undefined,
     isPublished: dto.is_published,
     locationId: dto.location_id,
     categoryId: dto.category_id,

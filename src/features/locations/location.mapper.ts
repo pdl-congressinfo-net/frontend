@@ -8,7 +8,6 @@ export function mapLocation(dto: LocationDTO): Location {
     road: dto.road,
     number: dto.number,
     city: dto.city,
-    state: dto.state,
     postalCode: dto.postal_code,
     lat: dto.lat,
     lng: dto.lng,

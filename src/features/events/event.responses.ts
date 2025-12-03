@@ -21,5 +21,5 @@ export interface EventDTO {
   end_date: Date;
   is_published: boolean;
   location_id: string;
-  cathegory_id: string;
+  category_id: string;
 }

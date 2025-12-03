@@ -17,8 +17,8 @@ export interface EventType {
 export interface Event {
   id: string;
   name: string;
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   isPublished: boolean;
   locationId: string;
   categoryId: string;
