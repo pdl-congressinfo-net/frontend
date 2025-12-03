@@ -164,7 +164,7 @@ const CreateEventPage = ({}: Props) => {
                     onNext={goNext}
                     onPrevious={goPrevious}
                     onStatus={handleLocationStatus}
-                    eventTypeCode={(basicInfo as any).typeCode}
+                    eventTypeCode={basicInfo?.typeCode}
                   />
                 </Tabs.Content>
                 <Tabs.Content value="images">
