@@ -38,7 +38,7 @@ const normalizeEventValues = (
   data: BasicInformationValues,
 ): BasicInformationValues => ({
   ...data,
-  endDate: data.oneDay ? data.startDate : data.endDate ?? data.startDate,
+  endDate: data.oneDay ? data.startDate : (data.endDate ?? data.startDate),
 });
 
 const isSameEventValues = (
@@ -139,9 +139,8 @@ const CreateEventPage = ({}: Props) => {
   const [eventInfo, setEventInfo] = React.useState<StoredEventInfo | null>(
     null,
   );
-  const [locationInfo, setLocationInfo] = React.useState<
-    StoredLocationInfo | null
-  >(null);
+  const [locationInfo, setLocationInfo] =
+    React.useState<StoredLocationInfo | null>(null);
 
   const { mutateAsync: createEvent } = useCreate({ resource: "events" });
   const { mutateAsync: updateEvent } = useUpdate({ resource: "events" });
@@ -160,10 +159,13 @@ const CreateEventPage = ({}: Props) => {
 
   React.useEffect(() => {
     if (!eventInfo?.data?.typeCode || !locationInfo) return;
-    const expectedKind = eventInfo.data.typeCode === "WEB" ? "webinar" : "physical";
+    const expectedKind =
+      eventInfo.data.typeCode === "WEB" ? "webinar" : "physical";
     if (locationInfo.kind !== expectedKind) {
       setLocationInfo(null);
-      setEventInfo((prev) => (prev ? { ...prev, locationId: undefined } : prev));
+      setEventInfo((prev) =>
+        prev ? { ...prev, locationId: undefined } : prev,
+      );
     }
   }, [eventInfo?.data?.typeCode, locationInfo?.kind]);
 
@@ -192,8 +194,7 @@ const CreateEventPage = ({}: Props) => {
   const eventTypeCode = eventInfo?.data?.typeCode ?? null;
   const isWebEvent = eventTypeCode === "WEB";
   const locationInitialValues =
-    locationInfo &&
-    locationInfo.kind === (isWebEvent ? "webinar" : "physical")
+    locationInfo && locationInfo.kind === (isWebEvent ? "webinar" : "physical")
       ? locationInfo.data
       : undefined;
   const locationRenderKey = isWebEvent ? "web" : "physical";
@@ -208,17 +209,13 @@ const CreateEventPage = ({}: Props) => {
       step: "event" | "location",
     ): Promise<SaveResult> => {
       if (step === "event") {
-        const normalized = normalizeEventValues(
-          data as BasicInformationValues,
-        );
+        const normalized = normalizeEventValues(data as BasicInformationValues);
 
         if (!eventInfo?.id) {
           const createPayload: CreateEventRequest = {
             name: normalized.name,
             start_date: new Date(normalized.startDate),
-            end_date: new Date(
-              normalized.endDate ?? normalized.startDate,
-            ),
+            end_date: new Date(normalized.endDate ?? normalized.startDate),
             category_id: normalized.field,
             type_id: normalized.typeId,
             location_id: locationInfo?.id,
@@ -250,9 +247,7 @@ const CreateEventPage = ({}: Props) => {
         const updatePayload: UpdateEventRequest = {
           name: normalized.name,
           start_date: new Date(normalized.startDate),
-          end_date: new Date(
-            normalized.endDate ?? normalized.startDate,
-          ),
+          end_date: new Date(normalized.endDate ?? normalized.startDate),
           category_id: normalized.field,
           type_id: normalized.typeId,
           location_id: eventInfo.locationId,
@@ -298,7 +293,8 @@ const CreateEventPage = ({}: Props) => {
             const created = unwrapData<any>(response);
             locationId = created?.id ?? locationId;
           } else if (
-            !existing || !isSameWebinarLocation(existing.data, normalized)
+            !existing ||
+            !isSameWebinarLocation(existing.data, normalized)
           ) {
             const updatePayload: UpdateLocationRequest = {
               name: normalized.name,
@@ -315,9 +311,7 @@ const CreateEventPage = ({}: Props) => {
               id: currentEventId,
               values: { location_id: locationId },
             });
-            setEventInfo((prev) =>
-              prev ? { ...prev, locationId } : prev,
-            );
+            setEventInfo((prev) => (prev ? { ...prev, locationId } : prev));
           }
 
           setLocationInfo({
@@ -353,7 +347,8 @@ const CreateEventPage = ({}: Props) => {
           const created = unwrapData<any>(response);
           locationId = created?.id ?? locationId;
         } else if (
-          !existing || !isSamePhysicalLocation(existing.data, normalized)
+          !existing ||
+          !isSamePhysicalLocation(existing.data, normalized)
         ) {
           const updatePayload: UpdateLocationRequest = {
             name: normalized.name,
@@ -373,9 +368,7 @@ const CreateEventPage = ({}: Props) => {
             id: currentEventId,
             values: { location_id: locationId },
           });
-          setEventInfo((prev) =>
-            prev ? { ...prev, locationId } : prev,
-          );
+          setEventInfo((prev) => (prev ? { ...prev, locationId } : prev));
         }
 
         setLocationInfo({

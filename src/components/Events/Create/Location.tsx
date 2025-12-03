@@ -145,14 +145,9 @@ const LocationPage = ({
     [],
   );
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState,
-  } = useForm<PhysicalLocationFormValues | WebinarLocationFormValues>({
+  const { register, handleSubmit, setValue, watch, reset, formState } = useForm<
+    PhysicalLocationFormValues | WebinarLocationFormValues
+  >({
     mode: "onChange",
     resolver: zodResolver(schema) as any,
     defaultValues: defaultValues as any,

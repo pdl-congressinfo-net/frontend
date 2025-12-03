@@ -161,8 +161,8 @@ const BasicInformation = ({
       oneDay: initialValues.oneDay ?? current.oneDay,
       endDate:
         (initialValues.oneDay ?? current.oneDay)
-          ? initialValues.startDate ?? current.startDate
-          : initialValues.endDate ?? current.endDate,
+          ? (initialValues.startDate ?? current.startDate)
+          : (initialValues.endDate ?? current.endDate),
       typeId: initialValues.typeId ?? current.typeId,
       typeCode: initialValues.typeCode ?? current.typeCode,
       field: initialValues.field ?? current.field,
