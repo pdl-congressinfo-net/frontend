@@ -107,6 +107,9 @@ const Upsert = ({
   const [eventInfo, setEventInfo] = React.useState<StoredEventInfo | null>(
     null,
   );
+  const [basicDraft, setBasicDraft] =
+    React.useState<BasicInformationValues | null>(null);
+  const basicDirtyRef = React.useRef(false);
   const [locationInfo, setLocationInfo] =
     React.useState<StoredLocationInfo | null>(null);
   const [status, setStatus] = React.useState<Record<string, StepStatus>>(() => {
@@ -233,23 +236,18 @@ const Upsert = ({
   }, [locationResult]);
 
   const handleBasicChange = React.useCallback(
-    (values: BasicInformationValues) => {
-      const normalized = normalizeEventValues(values);
-      setEventInfo((prev) => {
-        if (prev) {
-          if (isSameEventValues(prev.data, normalized)) {
-            return prev;
-          }
-          return { ...prev, data: normalized };
-        }
-        return {
-          id: eventRecord?.id,
-          locationId: locationIdFromEvent ?? undefined,
-          data: normalized,
-        };
-      });
+    (
+      values: BasicInformationValues,
+      meta?: { source: "user" | "sync" },
+    ) => {
+      setBasicDraft((prev) =>
+        prev && isSameEventValues(prev, values) ? prev : values,
+      );
+      if (meta?.source === "user") {
+        basicDirtyRef.current = true;
+      }
     },
-    [eventRecord?.id, locationIdFromEvent],
+    [],
   );
 
   const typeIdForFetch = React.useMemo(() => {
@@ -310,6 +308,10 @@ const Upsert = ({
         data: normalized,
       };
     });
+    basicDirtyRef.current = false;
+    setBasicDraft((prev) =>
+      prev && isSameEventValues(prev, normalized) ? prev : normalized,
+    );
   }, [isEdit, eventRecord, locationIdFromEvent, eventInfo?.locationId]);
 
   React.useEffect(() => {
@@ -324,6 +326,13 @@ const Upsert = ({
         typeCode: (typeRecord as any)?.code ?? prev.data.typeCode,
         typeId: (typeRecord as any)?.id ?? prev.data.typeId,
       });
+      if (!basicDirtyRef.current) {
+        setBasicDraft((draftPrev) =>
+          draftPrev && isSameEventValues(draftPrev, normalized)
+            ? draftPrev
+            : normalized,
+        );
+      }
       return { ...prev, data: normalized };
     });
   }, [isEdit, typeRecord]);
@@ -333,22 +342,26 @@ const Upsert = ({
       const fallbackTypeCode =
         eventRecord?.type_code ?? eventRecord?.type?.code ?? undefined;
       if (fallbackTypeCode) {
-        setEventInfo((prev) =>
-          prev
-            ? {
-                ...prev,
-                data: normalizeEventValues({
-                  ...prev.data,
-                  typeCode: fallbackTypeCode,
-                  typeId:
-                    prev.data.typeId ??
-                    eventRecord?.type_id ??
-                    eventRecord?.type?.id ??
-                    "",
-                }),
-              }
-            : prev,
-        );
+        setEventInfo((prev) => {
+          if (!prev) return prev;
+          const updated = normalizeEventValues({
+            ...prev.data,
+            typeCode: fallbackTypeCode,
+            typeId:
+              prev.data.typeId ??
+              eventRecord?.type_id ??
+              eventRecord?.type?.id ??
+              "",
+          });
+          if (!basicDirtyRef.current) {
+            setBasicDraft((draftPrev) =>
+              draftPrev && isSameEventValues(draftPrev, updated)
+                ? draftPrev
+                : updated,
+            );
+          }
+          return { ...prev, data: updated };
+        });
       }
       return;
     }
@@ -430,7 +443,8 @@ const Upsert = ({
     }
   }, [eventInfo?.data?.typeCode, locationInfo?.kind]);
 
-  const eventTypeCode = eventInfo?.data?.typeCode ?? null;
+  const eventValuesForRender = basicDraft ?? eventInfo?.data ?? null;
+  const eventTypeCode = eventValuesForRender?.typeCode ?? null;
   const isWebEvent = eventTypeCode === "WEB";
   const locationInitialValues =
     locationInfo && locationInfo.kind === (isWebEvent ? "webinar" : "physical")
@@ -472,6 +486,8 @@ const Upsert = ({
             locationId: createdLocationId,
             data: normalized,
           });
+          basicDirtyRef.current = false;
+          setBasicDraft(normalized);
           return { success: true, id: newId };
         }
 
@@ -485,6 +501,8 @@ const Upsert = ({
                   data: normalized,
                 },
           );
+          basicDirtyRef.current = false;
+          setBasicDraft(normalized);
           return { success: true, id: eventInfo.id };
         }
 
@@ -507,6 +525,8 @@ const Upsert = ({
                 data: normalized,
               },
         );
+        basicDirtyRef.current = false;
+        setBasicDraft(normalized);
         return { success: true, id: eventInfo.id };
       }
 
@@ -792,7 +812,7 @@ const Upsert = ({
                     onPrevious={goPrevious}
                     onStatus={handleBasicStatus}
                     onSave={(data) => handleSave(data, "event")}
-                    initialValues={eventInfo?.data}
+                    initialValues={basicDraft ?? eventInfo?.data ?? undefined}
                     onChange={handleBasicChange}
                   />
                 </Tabs.Content>

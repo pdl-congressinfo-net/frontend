@@ -11,7 +11,7 @@ import {
   createListCollection,
 } from "@chakra-ui/react";
 import { useList } from "@refinedev/core";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -100,7 +100,10 @@ type BasicInformationProps = {
     data: BasicInformationValues,
   ) => Promise<SaveResult | void> | SaveResult | void;
   initialValues?: Partial<BasicInformationValues>;
-  onChange?: (data: BasicInformationValues) => void;
+  onChange?: (
+    data: BasicInformationValues,
+    meta?: { source: "user" | "sync" },
+  ) => void;
 };
 
 const BasicInformation = ({
@@ -110,6 +113,7 @@ const BasicInformation = ({
   initialValues,
   onChange,
 }: BasicInformationProps) => {
+  const syncingRef = useRef(false);
   const defaultValues = useMemo<BasicInformationValues>(() => {
     const d = new Date();
     const y = d.getFullYear();
@@ -172,8 +176,11 @@ const BasicInformation = ({
     if (isSameEventValues(normalizedCurrent, normalizedNext)) {
       return;
     }
+    syncingRef.current = true;
     reset(next);
-    void trigger();
+    void trigger().finally(() => {
+      syncingRef.current = false;
+    });
   }, [initialValues, getValues, reset, trigger]);
 
   // Derive collections from fetched arrays to avoid stale state
@@ -287,7 +294,11 @@ const BasicInformation = ({
   useEffect(() => {
     if (!onChange) return;
     const subscription = watch((value) => {
-      onChange(value as BasicInformationValues);
+      const normalized = normalizeEventValues(
+        value as BasicInformationValues,
+      );
+      const source = syncingRef.current ? "sync" : "user";
+      onChange(normalized, { source });
     });
     return () => subscription.unsubscribe();
   }, [watch, onChange]);
