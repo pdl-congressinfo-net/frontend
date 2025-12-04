@@ -236,10 +236,7 @@ const Upsert = ({
   }, [locationResult]);
 
   const handleBasicChange = React.useCallback(
-    (
-      values: BasicInformationValues,
-      meta?: { source: "user" | "sync" },
-    ) => {
+    (values: BasicInformationValues, meta?: { source: "user" | "sync" }) => {
       setBasicDraft((prev) =>
         prev && isSameEventValues(prev, values) ? prev : values,
       );

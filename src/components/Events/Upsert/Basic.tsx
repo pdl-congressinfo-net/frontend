@@ -294,9 +294,7 @@ const BasicInformation = ({
   useEffect(() => {
     if (!onChange) return;
     const subscription = watch((value) => {
-      const normalized = normalizeEventValues(
-        value as BasicInformationValues,
-      );
+      const normalized = normalizeEventValues(value as BasicInformationValues);
       const source = syncingRef.current ? "sync" : "user";
       onChange(normalized, { source });
     });
