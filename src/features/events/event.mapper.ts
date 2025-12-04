@@ -30,5 +30,7 @@ export function mapEvent(dto: EventDTO): Event {
     isPublished: dto.is_published,
     locationId: dto.location_id,
     categoryId: dto.category_id,
+    headerUrl: dto.header_url ?? dto.headerUrl ?? dto.header?.url ?? null,
+    logoUrl: dto.icon_url ?? dto.iconUrl ?? dto.icon?.url ?? null,
   };
 }

@@ -22,4 +22,10 @@ export interface EventDTO {
   is_published: boolean;
   location_id: string;
   category_id: string;
+  header_url?: string | null;
+  headerUrl?: string | null;
+  header?: { url?: string | null } | null;
+  icon_url?: string | null;
+  iconUrl?: string | null;
+  icon?: { url?: string | null } | null;
 }

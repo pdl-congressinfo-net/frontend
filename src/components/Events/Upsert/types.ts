@@ -24,3 +24,10 @@ export type WebinarLocationFormValues = {
   name: string;
   link: string;
 };
+
+export type EventImagesFormValues = {
+  headerFile?: File | null;
+  headerUrl?: string | null;
+  logoFile?: File | null;
+  logoUrl?: string | null;
+};

@@ -3,6 +3,7 @@ import {
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
+  EventImagesFormValues,
 } from "./types";
 
 type StepStatus = "done" | "error" | "open";
@@ -19,6 +20,11 @@ type StoredLocationInfo =
   | { id?: string; kind: "physical"; data: PhysicalLocationFormValues }
   | { id?: string; kind: "webinar"; data: WebinarLocationFormValues };
 
+type StoredImagesInfo = {
+  headerUrl?: string | null;
+  logoUrl?: string | null;
+};
+
 type EventDetail = {
   id: string;
   name?: string;
@@ -30,6 +36,12 @@ type EventDetail = {
   type?: { id?: string; code?: string } | null;
   location_id?: string;
   location?: LocationDetail | null;
+  header_url?: string | null;
+  headerUrl?: string | null;
+  header?: { url?: string | null } | null;
+  icon_url?: string | null;
+  iconUrl?: string | null;
+  icon?: { url?: string | null } | null;
   [key: string]: unknown;
 };
 
@@ -128,6 +140,10 @@ const isSameWebinarLocation = (
   b: WebinarLocationFormValues,
 ) => a.name === b.name && a.link === b.link;
 
+const isSameImagesInfo = (a: StoredImagesInfo, b: StoredImagesInfo) =>
+  (a.headerUrl ?? "") === (b.headerUrl ?? "") &&
+  (a.logoUrl ?? "") === (b.logoUrl ?? "");
+
 const toOptionalString = (value?: string) => {
   const trimmed = value?.trim();
   return trimmed && trimmed.length > 0 ? trimmed : undefined;
@@ -150,9 +166,11 @@ export type {
   SaveResult,
   StoredEventInfo,
   StoredLocationInfo,
+  StoredImagesInfo,
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
+  EventImagesFormValues,
   EventDetail,
   LocationDetail,
 };
@@ -166,6 +184,7 @@ export {
   isSamePhysicalLocation,
   normalizeWebinarLocation,
   isSameWebinarLocation,
+  isSameImagesInfo,
   toOptionalString,
   unwrapData,
 };

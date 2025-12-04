@@ -16,16 +16,19 @@ import { LuArrowLeft } from "react-icons/lu";
 
 import BasicInformation from "./Basic";
 import Location from "./Location";
+import Images from "./Images";
 import {
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
+  EventImagesFormValues,
 } from "./types";
 import {
   StepStatus,
   SaveResult,
   StoredEventInfo,
   StoredLocationInfo,
+  StoredImagesInfo,
   steps,
   getStatusIndicator,
   normalizeEventValues,
@@ -34,6 +37,7 @@ import {
   isSamePhysicalLocation,
   normalizeWebinarLocation,
   isSameWebinarLocation,
+  isSameImagesInfo,
   toOptionalString,
   unwrapData,
   EventDetail,
@@ -47,6 +51,7 @@ import {
   CreateLocationRequest,
   UpdateLocationRequest,
 } from "../../../features/locations/location.requests";
+import { httpClient } from "../../../utils/httpClient";
 
 export type UpsertMode = "create" | "edit";
 
@@ -112,6 +117,13 @@ const Upsert = ({
   const basicDirtyRef = React.useRef(false);
   const [locationInfo, setLocationInfo] =
     React.useState<StoredLocationInfo | null>(null);
+  const [imageInfo, setImageInfo] = React.useState<StoredImagesInfo | null>(
+    null,
+  );
+  const [imageDraft, setImageDraft] =
+    React.useState<EventImagesFormValues | null>(null);
+  const imageDirtyRef = React.useRef(false);
+  const [isSavingImages, setIsSavingImages] = React.useState(false);
   const [status, setStatus] = React.useState<Record<string, StepStatus>>(() => {
     const initial: Record<string, StepStatus> = {};
     mergedSteps.forEach((step) => {
@@ -163,6 +175,11 @@ const Upsert = ({
     [],
   );
 
+  const handleImagesStatus = React.useCallback(
+    (s: StepStatus) => setStatus((prev) => ({ ...prev, images: s })),
+    [],
+  );
+
   React.useEffect(() => {
     if (!eventInfo?.data) return;
     setStatus((prev) =>
@@ -176,6 +193,13 @@ const Upsert = ({
       prev.location === "open" ? { ...prev, location: "done" } : prev,
     );
   }, [locationInfo?.data]);
+
+  React.useEffect(() => {
+    if (!imageInfo?.headerUrl || !imageInfo.logoUrl) return;
+    setStatus((prev) =>
+      prev.images === "done" ? prev : { ...prev, images: "done" },
+    );
+  }, [imageInfo?.headerUrl, imageInfo?.logoUrl]);
 
   const renderAdditionalTab = React.useCallback(
     (tabId: string, title: string) => {
@@ -242,6 +266,16 @@ const Upsert = ({
       );
       if (meta?.source === "user") {
         basicDirtyRef.current = true;
+      }
+    },
+    [],
+  );
+
+  const handleImagesChange = React.useCallback(
+    (values: EventImagesFormValues, meta?: { source: "user" | "sync" }) => {
+      setImageDraft(values);
+      if (meta?.source === "user") {
+        imageDirtyRef.current = true;
       }
     },
     [],
@@ -440,6 +474,64 @@ const Upsert = ({
     }
   }, [eventInfo?.data?.typeCode, locationInfo?.kind]);
 
+  React.useEffect(() => {
+    const headerUrlFromRecord =
+      eventRecord?.header_url ??
+      eventRecord?.headerUrl ??
+      eventRecord?.header?.url ??
+      null;
+    const logoUrlFromRecord =
+      eventRecord?.icon_url ??
+      eventRecord?.iconUrl ??
+      eventRecord?.icon?.url ??
+      null;
+
+    if (!headerUrlFromRecord && !logoUrlFromRecord) {
+      return;
+    }
+
+    const nextInfo: StoredImagesInfo = {
+      headerUrl: headerUrlFromRecord,
+      logoUrl: logoUrlFromRecord,
+    };
+
+    setImageInfo((prev) =>
+      prev && isSameImagesInfo(prev, nextInfo) ? prev : nextInfo,
+    );
+
+    if (!imageDirtyRef.current) {
+      setImageDraft((prevDraft) => {
+        if (prevDraft?.headerFile || prevDraft?.logoFile) {
+          return prevDraft;
+        }
+
+        if (prevDraft) {
+          const prevInfo: StoredImagesInfo = {
+            headerUrl: prevDraft.headerUrl ?? null,
+            logoUrl: prevDraft.logoUrl ?? null,
+          };
+          if (isSameImagesInfo(prevInfo, nextInfo)) {
+            return prevDraft;
+          }
+        }
+
+        return {
+          headerUrl: nextInfo.headerUrl ?? null,
+          logoUrl: nextInfo.logoUrl ?? null,
+          headerFile: null,
+          logoFile: null,
+        };
+      });
+    }
+  }, [
+    eventRecord?.header_url,
+    eventRecord?.headerUrl,
+    eventRecord?.header,
+    eventRecord?.icon_url,
+    eventRecord?.iconUrl,
+    eventRecord?.icon,
+  ]);
+
   const eventValuesForRender = basicDraft ?? eventInfo?.data ?? null;
   const eventTypeCode = eventValuesForRender?.typeCode ?? null;
   const isWebEvent = eventTypeCode === "WEB";
@@ -448,14 +540,25 @@ const Upsert = ({
       ? locationInfo.data
       : undefined;
   const locationRenderKey = isWebEvent ? "web" : "physical";
+  const imageInitialValues =
+    imageDraft ??
+    (imageInfo
+      ? {
+          headerUrl: imageInfo.headerUrl ?? null,
+          logoUrl: imageInfo.logoUrl ?? null,
+          headerFile: null,
+          logoFile: null,
+        }
+      : undefined);
 
   const handleSave = React.useCallback(
     async (
       data:
         | BasicInformationValues
         | PhysicalLocationFormValues
-        | WebinarLocationFormValues,
-      step: "event" | "location",
+        | WebinarLocationFormValues
+        | EventImagesFormValues,
+      step: "event" | "location" | "images",
     ): Promise<SaveResult> => {
       if (step === "event") {
         const normalized = normalizeEventValues(data as BasicInformationValues);
@@ -527,37 +630,173 @@ const Upsert = ({
         return { success: true, id: eventInfo.id };
       }
 
-      if (!eventInfo?.id) {
-        throw new Error(
-          "Save the basic event information before the location.",
-        );
+      if (step === "images") {
+        if (!eventInfo?.id) {
+          throw new Error(
+            "Save the basic event information before uploading images.",
+          );
+        }
+
+        const eventId = eventInfo.id as string;
+        const values = data as EventImagesFormValues;
+
+        const uploadAsset = async (
+          endpoint: "header" | "icons",
+          file: File | null | undefined,
+        ) => {
+          if (!file) return undefined;
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("event_id", eventId);
+          formData.append("eventId", eventId);
+          const response = await httpClient.post(
+            `/files/${endpoint}`,
+            formData,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            },
+          );
+          const payload = response?.data;
+          return (
+            payload?.data?.url ??
+            payload?.data?.location ??
+            payload?.data?.path ??
+            payload?.url ??
+            payload?.location ??
+            payload?.path ??
+            (typeof payload === "string" ? payload : undefined)
+          );
+        };
+
+        setIsSavingImages(true);
+        try {
+          let nextHeaderUrl = values.headerUrl ?? imageInfo?.headerUrl ?? null;
+          let nextLogoUrl = values.logoUrl ?? imageInfo?.logoUrl ?? null;
+
+          if (values.headerFile) {
+            const uploaded = await uploadAsset("header", values.headerFile);
+            if (uploaded) {
+              nextHeaderUrl = uploaded;
+            }
+          }
+
+          if (values.logoFile) {
+            const uploaded = await uploadAsset("icons", values.logoFile);
+            if (uploaded) {
+              nextLogoUrl = uploaded;
+            }
+          }
+
+          const nextInfo: StoredImagesInfo = {
+            headerUrl: nextHeaderUrl ?? null,
+            logoUrl: nextLogoUrl ?? null,
+          };
+
+          setImageInfo((prev) =>
+            prev && isSameImagesInfo(prev, nextInfo) ? prev : nextInfo,
+          );
+          imageDirtyRef.current = false;
+          setImageDraft({
+            headerUrl: nextInfo.headerUrl ?? null,
+            logoUrl: nextInfo.logoUrl ?? null,
+            headerFile: null,
+            logoFile: null,
+          });
+
+          return { success: true, id: eventInfo.id };
+        } finally {
+          setIsSavingImages(false);
+        }
       }
 
-      const currentEventId = eventInfo.id;
-      const isWeb = eventInfo.data.typeCode === "WEB";
+      if (step === "location") {
+        if (!eventInfo?.id) {
+          throw new Error(
+            "Save the basic event information before the location.",
+          );
+        }
 
-      if (isWeb) {
-        const normalized = normalizeWebinarLocation(
-          data as WebinarLocationFormValues,
+        const currentEventId = eventInfo.id;
+        const isWeb = eventInfo.data.typeCode === "WEB";
+
+        if (isWeb) {
+          const normalized = normalizeWebinarLocation(
+            data as WebinarLocationFormValues,
+          );
+          const existing =
+            locationInfo?.kind === "webinar" ? locationInfo : null;
+          let locationId = existing?.id;
+
+          if (!locationId) {
+            const createPayload: CreateLocationRequest = {
+              name: normalized.name,
+              link: normalized.link,
+            };
+            const response = await createLocation({ values: createPayload });
+            const created = unwrapData<any>(response);
+            locationId = created?.id ?? locationId;
+          } else if (
+            !existing ||
+            !isSameWebinarLocation(existing.data, normalized)
+          ) {
+            const updatePayload: UpdateLocationRequest = {
+              name: normalized.name,
+              link: normalized.link,
+            };
+            await updateLocation({ id: locationId, values: updatePayload });
+          }
+
+          if (locationId && eventInfo.locationId !== locationId) {
+            await updateEvent({
+              id: currentEventId,
+              values: { location_id: locationId },
+            });
+            setEventInfo((prev) => (prev ? { ...prev, locationId } : prev));
+          }
+
+          setLocationInfo({
+            id: locationId,
+            kind: "webinar",
+            data: normalized,
+          });
+
+          return { success: true, id: locationId };
+        }
+
+        const normalized = normalizePhysicalLocation(
+          data as PhysicalLocationFormValues,
         );
-        const existing = locationInfo?.kind === "webinar" ? locationInfo : null;
+        const existing =
+          locationInfo?.kind === "physical" ? locationInfo : null;
         let locationId = existing?.id;
 
         if (!locationId) {
           const createPayload: CreateLocationRequest = {
             name: normalized.name,
-            link: normalized.link,
+            road: toOptionalString(normalized.road),
+            number: toOptionalString(normalized.number),
+            postal_code: toOptionalString(normalized.postalCode),
+            city: toOptionalString(normalized.city),
+            lat: normalized.lat,
+            lng: normalized.lng,
+            country_id: toOptionalString(normalized.countryId),
           };
           const response = await createLocation({ values: createPayload });
           const created = unwrapData<any>(response);
           locationId = created?.id ?? locationId;
         } else if (
           !existing ||
-          !isSameWebinarLocation(existing.data, normalized)
+          !isSamePhysicalLocation(existing.data, normalized)
         ) {
           const updatePayload: UpdateLocationRequest = {
             name: normalized.name,
-            link: normalized.link,
+            road: toOptionalString(normalized.road),
+            number: toOptionalString(normalized.number),
+            postal_code: toOptionalString(normalized.postalCode),
+            city: toOptionalString(normalized.city),
+            lat: normalized.lat,
+            lng: normalized.lng,
+            country_id: toOptionalString(normalized.countryId),
           };
           await updateLocation({ id: locationId, values: updatePayload });
         }
@@ -572,69 +811,19 @@ const Upsert = ({
 
         setLocationInfo({
           id: locationId,
-          kind: "webinar",
+          kind: "physical",
           data: normalized,
         });
 
         return { success: true, id: locationId };
       }
 
-      const normalized = normalizePhysicalLocation(
-        data as PhysicalLocationFormValues,
-      );
-      const existing = locationInfo?.kind === "physical" ? locationInfo : null;
-      let locationId = existing?.id;
-
-      if (!locationId) {
-        const createPayload: CreateLocationRequest = {
-          name: normalized.name,
-          road: toOptionalString(normalized.road),
-          number: toOptionalString(normalized.number),
-          postal_code: toOptionalString(normalized.postalCode),
-          city: toOptionalString(normalized.city),
-          lat: normalized.lat,
-          lng: normalized.lng,
-          country_id: toOptionalString(normalized.countryId),
-        };
-        const response = await createLocation({ values: createPayload });
-        const created = unwrapData<any>(response);
-        locationId = created?.id ?? locationId;
-      } else if (
-        !existing ||
-        !isSamePhysicalLocation(existing.data, normalized)
-      ) {
-        const updatePayload: UpdateLocationRequest = {
-          name: normalized.name,
-          road: toOptionalString(normalized.road),
-          number: toOptionalString(normalized.number),
-          postal_code: toOptionalString(normalized.postalCode),
-          city: toOptionalString(normalized.city),
-          lat: normalized.lat,
-          lng: normalized.lng,
-          country_id: toOptionalString(normalized.countryId),
-        };
-        await updateLocation({ id: locationId, values: updatePayload });
-      }
-
-      if (locationId && eventInfo.locationId !== locationId) {
-        await updateEvent({
-          id: currentEventId,
-          values: { location_id: locationId },
-        });
-        setEventInfo((prev) => (prev ? { ...prev, locationId } : prev));
-      }
-
-      setLocationInfo({
-        id: locationId,
-        kind: "physical",
-        data: normalized,
-      });
-
-      return { success: true, id: locationId };
+      throw new Error(`Unhandled step ${step}`);
     },
     [
       eventInfo,
       locationInfo,
+      imageInfo,
       mode,
       createEvent,
       updateEvent,
@@ -824,9 +1013,23 @@ const Upsert = ({
                     initialValues={locationInitialValues}
                   />
                 </Tabs.Content>
+                <Tabs.Content value="images">
+                  <Images
+                    onNext={goNext}
+                    onPrevious={goPrevious}
+                    onStatus={handleImagesStatus}
+                    onSave={(data) => handleSave(data, "images")}
+                    initialValues={imageInitialValues ?? undefined}
+                    onChange={handleImagesChange}
+                    isSubmitting={isSavingImages}
+                  />
+                </Tabs.Content>
                 {mergedSteps
                   .filter(
-                    (step) => step.id !== "event" && step.id !== "location",
+                    (step) =>
+                      step.id !== "event" &&
+                      step.id !== "location" &&
+                      step.id !== "images",
                   )
                   .map((step) => (
                     <Tabs.Content key={step.id} value={step.id}>

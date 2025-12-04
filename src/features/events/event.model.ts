@@ -22,4 +22,6 @@ export interface Event {
   isPublished: boolean;
   locationId: string;
   categoryId: string;
+  headerUrl?: string | null;
+  logoUrl?: string | null;
 }
