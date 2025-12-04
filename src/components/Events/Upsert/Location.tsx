@@ -20,25 +20,8 @@ import { Country, Location } from "../../../features/locations/location.model";
 import { useList } from "@refinedev/core";
 import { CountryDTO } from "../../../features/locations/location.responses";
 import { mapCountry } from "../../../features/locations/location.mapper";
-
-export type PhysicalLocationFormValues = {
-  name: string;
-  road: string;
-  number: string;
-  postalCode: string;
-  city: string;
-  lat?: number;
-  lng?: number;
-  country: string;
-  countryId: string;
-};
-
-export type WebinarLocationFormValues = {
-  name: string;
-  link: string;
-};
-
-type StepStatus = "done" | "error" | "open";
+import { SaveResult, StepStatus } from "./form-shared";
+import { PhysicalLocationFormValues, WebinarLocationFormValues } from "./types";
 
 type LocationProps = {
   onNext?: () => void;
@@ -52,8 +35,6 @@ type LocationProps = {
     | Partial<PhysicalLocationFormValues>
     | Partial<WebinarLocationFormValues>;
 };
-
-type SaveResult = { success?: boolean; id?: string };
 
 const physicalSchema = z
   .object({
@@ -145,13 +126,12 @@ const LocationPage = ({
     [],
   );
 
-  const { register, handleSubmit, setValue, watch, reset, formState } = useForm<
-    PhysicalLocationFormValues | WebinarLocationFormValues
-  >({
-    mode: "onChange",
-    resolver: zodResolver(schema) as any,
-    defaultValues: defaultValues as any,
-  });
+  const { register, handleSubmit, setValue, watch, reset, trigger, formState } =
+    useForm<PhysicalLocationFormValues | WebinarLocationFormValues>({
+      mode: "onChange",
+      resolver: zodResolver(schema) as any,
+      defaultValues: defaultValues as any,
+    });
 
   useEffect(() => {
     if (!initialValues) return;
@@ -159,7 +139,8 @@ const LocationPage = ({
       ...defaultValues,
       ...initialValues,
     } as any);
-  }, [initialValues, reset, defaultValues]);
+    void trigger();
+  }, [initialValues, reset, defaultValues, trigger]);
 
   const {
     errors,

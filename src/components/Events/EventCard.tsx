@@ -1,5 +1,5 @@
 import { Box, Button, Card, Flex, Heading, Image } from "@chakra-ui/react";
-import { CanAccess, useOne } from "@refinedev/core";
+import { CanAccess, useOne, useNavigation } from "@refinedev/core";
 import { Event } from "../../features/events/event.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { LocationDTO } from "../../features/locations/location.responses";
@@ -18,6 +18,8 @@ export const EventCard = ({
   onCardClick,
   onParticipateClick,
 }: EventCardInterface) => {
+  const { edit } = useNavigation();
+
   const {
     result: locationDTO,
     query: { isLoading, isError },
@@ -87,16 +89,33 @@ export const EventCard = ({
                   {location.name}
                 </Box>
               )}
-              <CanAccess resource="events" action="login">
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onParticipateClick?.();
-                  }}
-                >
-                  Anmelden
-                </Button>
-              </CanAccess>
+              <Flex direction="column" alignItems="flex-end" mt="auto" gap={2}>
+                <CanAccess resource="events" action="participate">
+                  <Button
+                    width={"8vw"}
+                    size="md"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onParticipateClick?.();
+                    }}
+                  >
+                    Anmelden
+                  </Button>
+                </CanAccess>
+                <CanAccess resource="events" action="update">
+                  <Button
+                    width={"8vw"}
+                    size="md"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Navigate to edit page
+                      edit("events", event.id);
+                    }}
+                  >
+                    Bearbeiten
+                  </Button>
+                </CanAccess>
+              </Flex>
             </Flex>
           </Flex>
         </Card.Body>

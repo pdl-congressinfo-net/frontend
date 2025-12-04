@@ -24,7 +24,12 @@ import {
   EventCategoryDTO,
   EventTypeDTO,
 } from "../../../features/events/event.responses";
-import { SaveResult, StepStatus } from "../Upsert/form-shared";
+import {
+  SaveResult,
+  StepStatus,
+  normalizeEventValues,
+  isSameEventValues,
+} from "./form-shared";
 import { BasicInformationValues } from "./types";
 export type { BasicInformationValues } from "./types";
 
@@ -95,6 +100,7 @@ type BasicInformationProps = {
     data: BasicInformationValues,
   ) => Promise<SaveResult | void> | SaveResult | void;
   initialValues?: Partial<BasicInformationValues>;
+  onChange?: (data: BasicInformationValues) => void;
 };
 
 const BasicInformation = ({
@@ -102,6 +108,7 @@ const BasicInformation = ({
   onStatus,
   onSave,
   initialValues,
+  onChange,
 }: BasicInformationProps) => {
   const defaultValues = useMemo<BasicInformationValues>(() => {
     const d = new Date();
@@ -126,6 +133,7 @@ const BasicInformation = ({
     setValue,
     reset,
     getValues,
+    trigger,
     formState: {
       errors,
       isValid,
@@ -157,8 +165,16 @@ const BasicInformation = ({
       typeCode: initialValues.typeCode ?? current.typeCode,
       field: initialValues.field ?? current.field,
     };
+    const normalizedCurrent = normalizeEventValues(
+      current as BasicInformationValues,
+    );
+    const normalizedNext = normalizeEventValues(next);
+    if (isSameEventValues(normalizedCurrent, normalizedNext)) {
+      return;
+    }
     reset(next);
-  }, [initialValues, getValues, reset]);
+    void trigger();
+  }, [initialValues, getValues, reset, trigger]);
 
   // Derive collections from fetched arrays to avoid stale state
 
@@ -267,6 +283,14 @@ const BasicInformation = ({
       });
     }
   }, [oneDay, startDate, setValue]);
+
+  useEffect(() => {
+    if (!onChange) return;
+    const subscription = watch((value) => {
+      onChange(value as BasicInformationValues);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, onChange]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {

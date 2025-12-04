@@ -4,7 +4,14 @@ import { EventCard } from "./EventCard";
 import EventDetailsDialog from "./EventDetailsDialog";
 import EventLoginDialog from "./EventLoginDialog";
 import { EventDetails } from "./EventDetails";
-import { useCan, useList, useMany, useOne } from "@refinedev/core";
+import {
+  useCan,
+  useList,
+  useMany,
+  useOne,
+  useNavigation,
+} from "@refinedev/core";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Event } from "../../features/events/event.model";
 import { EventDTO } from "../../features/events/event.responses";
 import { mapEvent } from "../../features/events/event.mapper";
@@ -19,6 +26,8 @@ export const EventList = () => {
     const dd = String(d.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
   }, []);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { result: eventsDto, query } = useList<EventDTO>({
     resource: "events",
@@ -33,11 +42,6 @@ export const EventList = () => {
 
   const { data: canShow } = useCan({ resource: "events", action: "show" });
   const { data: canUpdate } = useCan({ resource: "events", action: "update" });
-
-  const [detailsDialog, setDetailsDialog] = useState<{
-    isOpen: boolean;
-    event: Event | null;
-  }>({ isOpen: false, event: null });
 
   const [loginDialog, setLoginDialog] = useState<{
     isOpen: boolean;
@@ -55,7 +59,9 @@ export const EventList = () => {
   }
 
   const handleCardClick = (event: any) => {
-    setDetailsDialog({ isOpen: Boolean(canShow?.can), event });
+    navigate(`/events/show/${event.id}`, {
+      state: { background: location, event: event, fallback: "/events" },
+    });
   };
 
   const handleParticipateClick = (event: any) => {
@@ -76,16 +82,6 @@ export const EventList = () => {
           );
         })}
       </Stack>
-
-      {detailsDialog.event && (
-        <EventDetailsDialog
-          isOpen={detailsDialog.isOpen}
-          onClose={() => setDetailsDialog({ isOpen: false, event: null })}
-          title={detailsDialog.event.name}
-        >
-          <EventDetails />
-        </EventDetailsDialog>
-      )}
 
       {loginDialog.event && (
         <EventLoginDialog
