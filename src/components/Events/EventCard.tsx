@@ -4,8 +4,8 @@ import { Event } from "../../features/events/event.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { LocationDTO } from "../../features/locations/location.responses";
 import { mapLocation } from "../../features/locations/location.mapper";
-import { useEffect } from "react";
 import { toDate } from "../../utils/helpers";
+import { ApiResponse } from "../../common/types/api";
 
 export interface EventCardInterface {
   event: Event;
@@ -23,7 +23,7 @@ export const EventCard = ({
   const {
     result: locationDTO,
     query: { isLoading, isError },
-  } = useOne<LocationDTO>({
+  } = useOne<ApiResponse<LocationDTO>>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -31,21 +31,18 @@ export const EventCard = ({
     },
   });
 
-  const location = locationDTO ? mapLocation(locationDTO) : undefined;
+  const location = locationDTO ? mapLocation(locationDTO.data) : undefined;
 
-  const { result: country } = useOne<Country>({
+  const { result: country } = useOne<ApiResponse<Country>>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {
       enabled: !!location?.countryId,
     },
+    meta: {
+      parentmodule: "locations",
+    },
   });
-
-  useEffect(() => {
-    if (isError) {
-      console.error("Error fetching location data");
-    }
-  }, [isError, location]);
 
   const imageUrl =
     "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60";
@@ -70,25 +67,28 @@ export const EventCard = ({
         />
         <Card.Body>
           <Flex direction="row" gap={2} mb={2}>
-            <Flex direction="column">
-              <Heading size="md">{event.name}</Heading>
-              <Box fontSize="sm" color="ui.muted">
-                {(() => {
-                  const s = toDate(event?.startDate);
-                  const e = toDate(event?.endDate);
+            <Flex direction="column" gap={1} justifyContent={"space-between"}>
+              <Flex direction="column">
+                <Heading size="md">{event.name}</Heading>
+                <Box fontSize="sm" color="ui.muted">
+                  {(() => {
+                    const s = toDate(event?.startDate);
+                    const e = toDate(event?.endDate);
 
-                  if (!s && !e) return "";
-                  if (s && e && s === e) return s;
-                  return `${s}${s && e ? " - " : ""}${e}`;
-                })()}
-              </Box>
-            </Flex>
-            <Flex direction="column" justifyContent="space-between" ml="auto">
+                    if (!s && !e) return "";
+                    if (s && e && s === e) return s;
+                    return `${s}${s && e ? " - " : ""}${e}`;
+                  })()}
+                </Box>
+              </Flex>
               {location && (
                 <Box fontSize="sm" color="ui.muted">
                   {location.name}
+                  {country && `, ${country?.data.name}`}
                 </Box>
               )}
+            </Flex>
+            <Flex direction="column" justifyContent="space-between" ml="auto">
               <Flex direction="column" alignItems="flex-end" mt="auto" gap={2}>
                 <CanAccess resource="events" action="participate">
                   <Button
