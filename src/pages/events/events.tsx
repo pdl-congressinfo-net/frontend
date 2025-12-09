@@ -1,8 +1,10 @@
 import { useCan } from "@refinedev/core";
 import EventList from "../../components/Events/EventList";
 import { Button, Flex, Heading } from "@chakra-ui/react";
-import { LuCirclePlus } from "react-icons/lu";
+import { LuCirclePlus, LuArchive } from "react-icons/lu";
 import { Link } from "react-router";
+import { useLayout } from "../../providers/layout-provider";
+import { useEffect } from "react";
 
 type Props = {};
 const EventsPage = ({}: Props) => {
@@ -10,11 +12,27 @@ const EventsPage = ({}: Props) => {
     resource: "events",
     action: "create",
   });
-  return (
-    <>
-      <Flex justify="space-between" mb={4}>
-        <Heading>Events</Heading>
-        {canAccess && (
+  const { setTitle, setActions } = useLayout();
+  useEffect(() => {
+    setTitle("Events");
+    setActions(
+      canAccess ? (
+        <>
+          <Link to="/events/archive">
+            <Button
+              variant="ghost"
+              rounded="full"
+              mb={4}
+              _hover={{
+                transform: "scale(1.2)",
+                transition: "transform 0.15s ease-in-out",
+                backgroundColor: "transparent",
+              }}
+              _active={{ transform: "scale(1.1)" }}
+            >
+              <LuArchive size={44} />
+            </Button>
+          </Link>
           <Link to="/events/create">
             <Button
               variant="ghost"
@@ -30,11 +48,11 @@ const EventsPage = ({}: Props) => {
               <LuCirclePlus size={44} />
             </Button>
           </Link>
-        )}
-      </Flex>
-      <EventList />
-    </>
-  );
+        </>
+      ) : null,
+    );
+  }, [canAccess, setActions, setTitle]);
+  return <EventList />;
 };
 
 export default EventsPage;
