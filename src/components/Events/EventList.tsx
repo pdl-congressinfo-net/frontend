@@ -15,12 +15,22 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Event } from "../../features/events/event.model";
 import { EventDTO } from "../../features/events/event.responses";
 import { mapEvent } from "../../features/events/event.mapper";
+import { boolean } from "zod";
 
-export const EventList = () => {
+type EventListProps = {
+  archive?: boolean;
+};
+
+export const EventList = ({ archive }: EventListProps) => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const startDate = useMemo(() => {
-    const d = new Date();
+    var d: Date;
+    if (archive) {
+      d = new Date(0);
+    } else {
+      d = new Date();
+    }
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
