@@ -7,6 +7,7 @@ import CreateEventPage from "./events/create";
 import EditEventPage from "./events/edit";
 import EventsPage from "./events/events";
 import { EventShow } from "./events/show";
+import EventsArchivePage from "./events/archive";
 
 function AppRoutes() {
   const location = useLocation();
@@ -35,6 +36,7 @@ function AppRoutes() {
             />
             <Route path="create" element={<CreateEventPage />} />
             <Route path="edit/:id" element={<EditEventPage />} />
+            <Route path="archive" element={<EventsArchivePage />} />
           </Route>
 
           <Route index element={<NavigateToResource resource="events" />} />
