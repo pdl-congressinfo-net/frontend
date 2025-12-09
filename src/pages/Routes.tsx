@@ -8,6 +8,7 @@ import EditEventPage from "./events/edit";
 import EventsPage from "./events/events";
 import { EventShow } from "./events/show";
 import EventsArchivePage from "./events/archive";
+import AdminTempPage from "./admin/temp";
 
 function AppRoutes() {
   const location = useLocation();
@@ -40,7 +41,7 @@ function AppRoutes() {
           </Route>
 
           <Route index element={<NavigateToResource resource="events" />} />
-          <Route path="/admin" element={<AdminTemp />} />
+          <Route path="/admin" element={<AdminTempPage />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Route>
       </Routes>
