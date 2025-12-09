@@ -51,6 +51,13 @@ export const EventList = ({ archive }: EventListProps) => {
     ? (eventsDto?.data as EventDTO[]).map(mapEvent)
     : [];
 
+  const { result: eventTypesDto } = useList({
+    resource: "types",
+    meta: {
+      parentmodule: "events",
+    },
+  });
+
   const { data: canShow } = useCan({ resource: "events", action: "show" });
   const { data: canUpdate } = useCan({ resource: "events", action: "update" });
 

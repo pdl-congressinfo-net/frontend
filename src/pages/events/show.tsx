@@ -34,7 +34,7 @@ export const EventShow = () => {
       onClose={close}
       title={eventFromState?.name}
     >
-      <EventDetails />
+      <EventDetails event={eventFromState} />
     </EventDetailsDialog>
   );
 };
