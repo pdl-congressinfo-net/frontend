@@ -1,22 +1,29 @@
-export interface CreateLocationTypeRequest {
+/**
+ * Request DTOs for Location-related API endpoints.
+ * Uses snake_case to match Python backend expectations.
+ */
+
+// LocationType Request DTOs
+export interface LocationTypeCreateRequest {
   name: string;
-  description?: string;
+  description?: string | null;
 }
 
-export interface UpdateLocationTypeRequest {
+export interface LocationTypeUpdateRequest {
   name?: string;
-  description?: string;
+  description?: string | null;
 }
 
-export interface CreateCountryRequest {
+// Country Request DTOs
+export interface CountryCreateRequest {
   name: string;
   code2: string;
   code3: string;
-  devco: boolean;
-  preferred: boolean;
+  devco?: boolean;
+  preferred?: boolean;
 }
 
-export interface UpdateCountryRequest {
+export interface CountryUpdateRequest {
   name?: string;
   code2?: string;
   code3?: string;
@@ -24,31 +31,31 @@ export interface UpdateCountryRequest {
   preferred?: boolean;
 }
 
-export interface CreateLocationRequest {
+// Location Request DTOs
+export interface LocationCreateRequest {
   name: string;
-  road?: string;
-  number?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
-  lat?: number;
-  lng?: number;
-  link?: string;
-  country_id?: string;
-  location_type_id?: string;
+  road?: string | null;
+  number?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  link?: string | null;
+  country_id: string;
+  location_type_id: string;
 }
 
-export interface UpdateLocationRequest {
+export interface LocationUpdateRequest {
   name?: string;
-  road?: string;
-  number?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
-  lat?: number;
-  lng?: number;
-  link?: string;
+  road?: string | null;
+  number?: string | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  link?: string | null;
   country_id?: string;
   location_type_id?: string;
 }
