@@ -16,6 +16,7 @@ import { Event } from "../../features/events/event.model";
 import { EventDTO } from "../../features/events/event.responses";
 import { mapEvent } from "../../features/events/event.mapper";
 import { boolean } from "zod";
+import { EventCardLoading } from "./EventCardLoading";
 
 type EventListProps = {
   archive?: boolean;
@@ -61,7 +62,13 @@ export const EventList = ({ archive }: EventListProps) => {
   const events = eventsData ?? [];
 
   if (query.isLoading) {
-    return <Text>Loading events...</Text>;
+    return (
+      <Stack gap={4} width="100%">
+        <EventCardLoading />
+        <EventCardLoading />
+        <EventCardLoading />
+      </Stack>
+    );
   }
 
   if (query.isError) {
@@ -84,7 +91,7 @@ export const EventList = ({ archive }: EventListProps) => {
 
   return (
     <>
-      <Stack gap={4} width="80%">
+      <Stack gap={4} width="100%">
         {events.map((event, index) => {
           return (
             <EventCard
