@@ -46,18 +46,7 @@ const toYMD = (v: unknown) => {
 const BasicInformationSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
-    startDate: z.preprocess(
-      toYMD,
-      z
-        .string()
-        .min(1, "Start date is required")
-        .refine((s: string) => {
-          // allow today or later; compare yyyy-MM-dd strings
-          const now = new Date();
-          const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-          return s >= today;
-        }, "Start date cannot be in the past"),
-    ),
+    startDate: z.preprocess(toYMD, z.string().min(1, "Start date is required")),
     oneDay: z.preprocess((val) => {
       if (typeof val === "string") return val === "true" || val === "on";
       return Boolean(val);
