@@ -78,6 +78,10 @@ export const EventList = ({ archive }: EventListProps) => {
     setLoginDialog({ isOpen: true, event });
   };
 
+  if (events.length === 0) {
+    return <Text>No upcoming events found. Try to look in the archive.</Text>;
+  }
+
   return (
     <>
       <Stack gap={4} width="80%">
