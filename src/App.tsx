@@ -22,6 +22,7 @@ import {
   eventResource,
 } from "./features/events/event.resource";
 import AppRoutes from "./pages/Routes";
+import { LayoutProvider } from "./providers/layout-provider";
 
 function App() {
   return (
@@ -29,32 +30,34 @@ function App() {
       <ChakraProvider value={defaultSystem}>
         <RefineKbarProvider>
           <DevtoolsProvider>
-            <Refine
-              accessControlProvider={accessControlProvider}
-              authProvider={authProvider}
-              dataProvider={dataProvider(
-                "https://api.dpfurner.xyz/api/v1",
-                httpClient,
-              )}
-              routerProvider={routerProvider}
-              i18nProvider={i18nProvider}
-              notificationProvider={notificationProvider}
-              options={{
-                syncWithLocation: true,
-                warnWhenUnsavedChanges: false,
-                projectId: "vcrr5U-GVoid5-2GKdr3",
-              }}
-              resources={[
-                eventCategoryResource,
-                eventTypeResource,
-                eventResource,
-              ]}
-            >
-              <AppRoutes />
-              <RefineKbar />
-              <DocumentTitleHandler />
-            </Refine>
-            <DevtoolsPanel />
+            <LayoutProvider>
+              <Refine
+                accessControlProvider={accessControlProvider}
+                authProvider={authProvider}
+                dataProvider={dataProvider(
+                  "https://api.dpfurner.xyz/api/v1",
+                  httpClient,
+                )}
+                routerProvider={routerProvider}
+                i18nProvider={i18nProvider}
+                notificationProvider={notificationProvider}
+                options={{
+                  syncWithLocation: true,
+                  warnWhenUnsavedChanges: false,
+                  projectId: "vcrr5U-GVoid5-2GKdr3",
+                }}
+                resources={[
+                  eventCategoryResource,
+                  eventTypeResource,
+                  eventResource,
+                ]}
+              >
+                <AppRoutes />
+                <RefineKbar />
+                <DocumentTitleHandler />
+              </Refine>
+              <DevtoolsPanel />
+            </LayoutProvider>
           </DevtoolsProvider>
         </RefineKbarProvider>
         <Toaster />
