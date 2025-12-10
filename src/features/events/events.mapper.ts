@@ -14,14 +14,14 @@ export default {
     logoUrl: dto.icon_url ?? dto.iconUrl ?? dto.icon?.url ?? null,
   }),
 
-  category: (dto: EventCategoryDTO): EventCategory => ({
+  categories: (dto: EventCategoryDTO): EventCategory => ({
     id: dto.id,
     code: dto.code,
     nameDe: dto.name_de,
     nameEn: dto.name_en,
   }),
 
-  type: (dto: EventTypeDTO): EventType => ({
+  types: (dto: EventTypeDTO): EventType => ({
     id: dto.id,
     code: dto.code,
     nameDe: dto.name_de,
