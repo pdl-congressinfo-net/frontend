@@ -3,7 +3,7 @@ import { CanAccess, useOne, useNavigation } from "@refinedev/core";
 import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { LocationDTO } from "../../features/locations/location.responses";
-import { mapLocation } from "../../features/locations/location.mapper";
+import { mapLocation } from "../../features/locations/locations.mapper";
 import { toDate } from "../../utils/helpers";
 import { ApiResponse } from "../../common/types/api";
 
@@ -82,7 +82,7 @@ export const EventCard = ({
               {location && (
                 <Box fontSize="sm" color="ui.muted">
                   {location.name}
-                  {country && `, ${country?.data.name}`}
+                  {country && `, ${country?.name}`}
                 </Box>
               )}
             </Flex>

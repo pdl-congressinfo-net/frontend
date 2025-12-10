@@ -4,7 +4,6 @@ export function registerMapper(
   feature: string,
   mapper: Record<string, Function>,
 ) {
-  console.log("✅ Registered mapper for feature:", feature);
   registry[feature] = mapper;
 }
 

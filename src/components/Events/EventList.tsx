@@ -1,21 +1,10 @@
 import { Stack, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { EventCard } from "./EventCard";
-import EventDetailsDialog from "./EventDetailsDialog";
 import EventLoginDialog from "./EventLoginDialog";
-import { EventDetails } from "./EventDetails";
-import {
-  useCan,
-  useList,
-  useMany,
-  useOne,
-  useNavigation,
-} from "@refinedev/core";
+import { useCan, useList } from "@refinedev/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Event } from "../../features/events/events.model";
-import { EventDTO } from "../../features/events/events.responses";
-import { mapEvent } from "../../features/events/events.mapper";
-import { boolean } from "zod";
 import { EventCardLoading } from "./EventCardLoading";
 
 type EventListProps = {
@@ -63,7 +52,6 @@ export const EventList = ({ archive }: EventListProps) => {
   }>({ isOpen: false, event: null });
 
   const events = eventsData ?? [];
-  console.log(events);
 
   if (query.isLoading) {
     return (
@@ -89,14 +77,14 @@ export const EventList = ({ archive }: EventListProps) => {
     setLoginDialog({ isOpen: true, event });
   };
 
-  if (events.length === 0) {
+  if (events.total === 0) {
     return <Text>No upcoming events found. Try to look in the archive.</Text>;
   }
 
   return (
     <>
       <Stack gap={4} width="100%">
-        {events.map((event, index) => {
+        {events.data.map((event, index) => {
           return (
             <EventCard
               key={event.id ?? index}
