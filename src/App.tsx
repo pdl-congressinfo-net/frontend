@@ -1,27 +1,28 @@
-import { CanAccess, Refine } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import dataProvider from "@refinedev/simple-rest";
+import { dataProvider } from "./providers/rest-data-provider";
 
-import routerProvider, {
-  DocumentTitleHandler,
-  NavigateToResource,
-} from "@refinedev/react-router";
+import routerProvider, { DocumentTitleHandler } from "@refinedev/react-router";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import "./App.css";
 import { accessControlProvider } from "./providers/access-control-provider";
 import { authProvider } from "./providers/auth-provider";
 import { i18nProvider } from "./providers/i18n-provider";
 import { notificationProvider } from "./providers/notification-provider";
-import { Layout } from "./components/Common/Layout";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { Toaster } from "./components/ui/toaster";
 import { ToasterMobile } from "./components/ui/toasterMobile";
 import "./i18n";
 
-import EventList from "./components/Events/EventList";
-import { AdminTemp } from "./components/Admin/AdminTemp";
 import { httpClient } from "./utils/httpClient";
+import {
+  eventCategoryResource,
+  eventTypeResource,
+  eventResource,
+} from "./features/events/event.resource";
+import AppRoutes from "./pages/Routes";
+import { LayoutProvider } from "./providers/layout-provider";
 
 function App() {
   return (
@@ -29,68 +30,34 @@ function App() {
       <ChakraProvider value={defaultSystem}>
         <RefineKbarProvider>
           <DevtoolsProvider>
-            <Refine
-              accessControlProvider={accessControlProvider}
-              authProvider={authProvider}
-              dataProvider={dataProvider(
-                "https://api.dpfurner.xyz/api/v1",
-                httpClient
-              )}
-              routerProvider={routerProvider}
-              i18nProvider={i18nProvider}
-              notificationProvider={notificationProvider}
-              options={{
-                syncWithLocation: true,
-                warnWhenUnsavedChanges: false,
-                projectId: "vcrr5U-GVoid5-2GKdr3",
-              }}
-              resources={[
-                {
-                  name: "events",
-                  list: "/events",
-                  create: "/events/create",
-                  edit: "/events/edit/:id",
-                  show: "/events/show/:id",
-                  meta: {
-                    canDelete: true,
-                  },
-                },
-              ]}
-            >
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <Layout>
-                      <Outlet />
-                    </Layout>
-                  }
-                >
-                  <Route path="events">
-                    <Route
-                      index
-                      element={
-                        <CanAccess>
-                          <EventList />
-                        </CanAccess>
-                      }
-                    />
-                    <Route path="create" element={<div>Create Event</div>} />
-                    <Route path="edit/:id" element={<div>Edit Event</div>} />
-                    <Route path="show/:id" element={<div>Show Event</div>} />
-                  </Route>
-                  <Route
-                    index
-                    element={<NavigateToResource resource="events" />}
-                  />
-                  <Route path="/admin" element={<AdminTemp />} />
-                  <Route path="*" element={<div>404 Not Found</div>} />
-                </Route>
-              </Routes>
-              <RefineKbar />
-              <DocumentTitleHandler />
-            </Refine>
-            <DevtoolsPanel />
+            <LayoutProvider>
+              <Refine
+                accessControlProvider={accessControlProvider}
+                authProvider={authProvider}
+                dataProvider={dataProvider(
+                  "https://api.dpfurner.xyz/api/v1",
+                  httpClient,
+                )}
+                routerProvider={routerProvider}
+                i18nProvider={i18nProvider}
+                notificationProvider={notificationProvider}
+                options={{
+                  syncWithLocation: true,
+                  warnWhenUnsavedChanges: false,
+                  projectId: "vcrr5U-GVoid5-2GKdr3",
+                }}
+                resources={[
+                  eventCategoryResource,
+                  eventTypeResource,
+                  eventResource,
+                ]}
+              >
+                <AppRoutes />
+                <RefineKbar />
+                <DocumentTitleHandler />
+              </Refine>
+              <DevtoolsPanel />
+            </LayoutProvider>
           </DevtoolsProvider>
         </RefineKbarProvider>
         <Toaster />

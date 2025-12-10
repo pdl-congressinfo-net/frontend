@@ -1,26 +1,39 @@
 import { Box, Heading, Text, DataList, Link } from "@chakra-ui/react";
 import TabsLayout from "./TabsLayout";
+import { useOne } from "@refinedev/core";
+import { ApiResponse } from "../../../common/types/api";
+import { LocationDTO } from "../../../features/locations/location.responses";
+import { mapLocation } from "../../../features/locations/location.mapper";
+import { Country } from "../../../features/locations/location.model";
 
 interface InformationProps {
-  event: {
-    c_veranst: string;
-    c_local: string;
-    c_str: string;
-  };
-  details?: {
-    fachgebiet?: string;
-    zielgruppe?: string;
-    sprachangebot?: string;
-    certficate?: string;
-    aussteller?: string;
-    organisation?: string;
-    more_info?: string;
-    contact?: string;
-    website?: string;
-  };
+  event: any;
 }
 
-export default function Information({ event, details }: InformationProps) {
+export default function Information({ event }: InformationProps) {
+  const {
+    result: locationDTO,
+    query: { isLoading, isError },
+  } = useOne<ApiResponse<LocationDTO>>({
+    resource: "locations",
+    id: event.locationId,
+    queryOptions: {
+      enabled: !!event.locationId,
+    },
+  });
+
+  const location = locationDTO ? mapLocation(locationDTO.data) : undefined;
+
+  const { result: country } = useOne<ApiResponse<Country>>({
+    resource: "countries",
+    id: location?.countryId || "",
+    queryOptions: {
+      enabled: !!location?.countryId,
+    },
+    meta: {
+      parentmodule: "locations",
+    },
+  });
   return (
     <TabsLayout>
       {/* Veranstalter */}
@@ -34,13 +47,16 @@ export default function Information({ event, details }: InformationProps) {
       </Box>
 
       {/* Veranstaltungsadresse */}
-      <Box>
-        <Heading size="md" color="gray.800">
-          Veranstaltungsadresse
-        </Heading>
-        <Text mt={2}>{event.c_local}</Text>
-        <Text whiteSpace="pre-line">{event.c_str}</Text>
-      </Box>
+      {location && (
+        <Box>
+          <Heading size="md" color="gray.800">
+            Veranstaltungsadresse
+          </Heading>
+          <Text mt={2}>{location.name}</Text>
+          {location}
+          <Text whiteSpace="pre-line">{}</Text>
+        </Box>
+      )}
 
       {/* Details */}
       {details && (

@@ -9,6 +9,7 @@ import {
   useGo,
   useGetIdentity,
 } from "@refinedev/core";
+import { User } from "../../features/users/user.model";
 
 interface UserButtonProps {
   className?: string;
@@ -24,7 +25,7 @@ export const UserButton: React.FC<UserButtonProps> = ({
 }) => {
   const { mutate: logout } = useLogout();
   const { isLoading, isSuccess } = useIsAuthenticated();
-  const { data: user } = useGetIdentity();
+  const { data: user } = useGetIdentity<User>();
   const { t } = useTranslation();
   const [internalIsDialogOpen, setInternalIsDialogOpen] = React.useState(false);
   const go = useGo();
@@ -56,7 +57,7 @@ export const UserButton: React.FC<UserButtonProps> = ({
           <Icon>
             <LuCircleUserRound size={20} />
           </Icon>
-          <span>{user.full_name}</span>
+          <span>{user.fullName}</span>
         </Button>
       </Menu.Trigger>
       <Portal>
