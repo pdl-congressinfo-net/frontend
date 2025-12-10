@@ -1,13 +1,17 @@
-import { RolePermissionDTO, RoleDTO } from "./role.responses";
-import { RolePermission, Role } from "./role.model";
+import { RoleDTO, RolePermissionDTO } from "./roles.responses";
+import { Role, RolePermission } from "./roles.model";
+
+export const mapRole = (dto: RoleDTO): Role => ({
+  id: dto.id,
+  name: dto.name,
+});
+
+export const mapRolePermission = (dto: RolePermissionDTO): RolePermission => ({
+  roleId: dto.role_id,
+  permissionId: dto.permission_id,
+});
 
 export default {
-  permissions: (dto: RolePermissionDTO): RolePermission => ({
-    roleId: dto.role_id,
-    permissionId: dto.permission_id,
-  }),
-  roles: (dto: RoleDTO): Role => ({
-    id: dto.id,
-    name: dto.name,
-  }),
+  roles: mapRole,
+  permissions: mapRolePermission,
 };

@@ -1,22 +1,12 @@
-export const eventCategoryResource = {
-  name: "event-categories",
-  list: "/events/categories",
-  create: "/events/categories",
-  edit: "/events/categories/edit/:id",
-  show: "/events/categories/show/:id",
-  meta: {
-    canDelete: true,
-  },
-};
-
 export const eventTypeResource = {
-  name: "event-types",
+  name: "eventtypes",
   list: "/events/types",
   create: "/events/types",
   edit: "/events/types/edit/:id",
   show: "/events/types/show/:id",
   meta: {
     canDelete: true,
+    parent: "events",
   },
 };
 
@@ -30,3 +20,6 @@ export const eventResource = {
     canDelete: true,
   },
 };
+
+// Legacy exports for backward compatibility
+export const eventCategoryResource = eventTypeResource;

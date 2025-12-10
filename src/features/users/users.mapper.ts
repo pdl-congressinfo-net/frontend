@@ -1,5 +1,5 @@
-import { UserDTO, UserRoleDTO, UserPermissionDTO } from "./user.responses";
-import { User, UserRole, UserPermission } from "./user.model";
+import { UserDTO, UserRoleDTO, UserPermissionDTO } from "./users.responses";
+import { User, UserRole, UserPermission } from "./users.model";
 
 export default {
   users: (dto: UserDTO): User => ({

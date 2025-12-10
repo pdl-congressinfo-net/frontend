@@ -1,27 +1,18 @@
-export interface EventCategory {
-  id: string;
-  code: string;
-  nameDe: string;
-  nameEn: string;
-}
-
 export interface EventType {
   id: string;
   code: string;
   nameDe: string;
   nameEn: string;
-  descriptionDe: string;
-  descriptionEn: string;
+  descriptionDe?: string;
+  descriptionEn?: string;
 }
 
 export interface Event {
   id: string;
   name: string;
-  startDate?: Date;
-  endDate?: Date;
-  isPublished: boolean;
-  locationId: string;
-  categoryId: string;
-  headerUrl?: string | null;
-  logoUrl?: string | null;
+  startDate: Date;
+  endDate: Date;
+  isPublic: boolean;
+  eventTypeId?: string;
+  locationId?: string;
 }

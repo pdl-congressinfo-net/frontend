@@ -17,7 +17,7 @@ import {
   UserDTO,
   UserPermissionDTO,
   UserRoleDTO,
-} from "../../features/users/user.responses";
+} from "../../features/users/users.responses";
 import {
   RoleDTO,
   RolePermissionDTO,
@@ -27,7 +27,7 @@ import {
   User,
   UserPermission,
   UserRole,
-} from "../../features/users/user.model";
+} from "../../features/users/users.model";
 
 import { Role, RolePermission } from "../../features/roles/role.model";
 import { TanstackPermissionMatrix } from "../Common/Matrix";

@@ -1,7 +1,7 @@
 import { AuthProvider } from "@refinedev/core";
 import users from "../features/users/users.mapper";
 import { ApiResponse } from "../common/types/api";
-import { UserDTO } from "../features/users/user.responses";
+import { UserDTO } from "../features/users/users.responses";
 import { resetPermissionCache } from "./access-control-provider";
 
 const API_URL = "https://api.dpfurner.xyz/api/v1";

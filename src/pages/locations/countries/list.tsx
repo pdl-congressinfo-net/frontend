@@ -1,51 +1,48 @@
 import { useEffect } from "react";
-import { useCan, useList } from "@refinedev/core";
-import { Button, Box, Text } from "@chakra-ui/react";
-import { LuCirclePlus } from "react-icons/lu";
-import { Link } from "react-router";
 import { useLayout } from "../../../providers/layout-provider";
+import { useList } from "@refinedev/core";
+import { Box, Table } from "@chakra-ui/react";
+import { Country } from "../../../features/locations/location.model";
 
 const CountriesListPage = () => {
-  const { data: canAccess } = useCan({
-    resource: "countries",
-    action: "create",
-  });
   const { setTitle, setActions } = useLayout();
-
-  const { query: { data, isLoading } } = useList({
+  const { result: data, isLoading } = useList<Country>({
     resource: "countries",
+    meta: { parentmodule: "locations" },
+    filters: [{ field: "preferred", operator: "eq", value: true }],
   });
 
   useEffect(() => {
     setTitle("Countries");
-    setActions(
-      canAccess ? (
-        <Link to="/locations/countries/create">
-          <Button
-            variant="ghost"
-            rounded="full"
-            mb={4}
-            _hover={{
-              transform: "scale(1.2)",
-              transition: "transform 0.15s ease-in-out",
-              backgroundColor: "transparent",
-            }}
-            _active={{ transform: "scale(1.1)" }}
-          >
-            <LuCirclePlus size={44} />
-          </Button>
-        </Link>
-      ) : null,
-    );
-  }, [canAccess, setActions, setTitle]);
+    setActions(null);
+  }, [setTitle, setActions]);
 
-  if (isLoading) return <Text>Loading...</Text>;
+  if (isLoading) return <Box>Loading...</Box>;
 
   return (
-    <Box>
-      <Text fontSize="xl" mb={4}>Countries</Text>
-      <Text>TODO: Implement Countries list component with table</Text>
-      <Text>Total: {data?.total}</Text>
+    <Box p={4}>
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>Name</Table.ColumnHeader>
+            <Table.ColumnHeader>Code 2</Table.ColumnHeader>
+            <Table.ColumnHeader>Code 3</Table.ColumnHeader>
+            <Table.ColumnHeader>DevCo</Table.ColumnHeader>
+            <Table.ColumnHeader>Preferred</Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {data?.data.map((country) => (
+            <Table.Row key={country.id}>
+              <Table.Cell>{country.name}</Table.Cell>
+              <Table.Cell>{country.code2}</Table.Cell>
+              <Table.Cell>{country.code3}</Table.Cell>
+              <Table.Cell>{country.devco ? "Yes" : "No"}</Table.Cell>
+              <Table.Cell>{country.preferred ? "Yes" : "No"}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
     </Box>
   );
 };

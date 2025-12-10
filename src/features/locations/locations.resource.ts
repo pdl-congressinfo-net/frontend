@@ -1,15 +1,12 @@
-/**
- * Refine resource configurations for location-related entities.
- */
-
 export const locationTypeResource = {
-  name: "location-types",
+  name: "locationtypes",
   list: "/locations/types",
   create: "/locations/types/create",
   edit: "/locations/types/edit/:id",
   show: "/locations/types/show/:id",
   meta: {
     canDelete: true,
+    parent: "locations",
   },
 };
 
@@ -21,6 +18,7 @@ export const countryResource = {
   show: "/locations/countries/show/:id",
   meta: {
     canDelete: true,
+    parent: "locations",
   },
 };
 

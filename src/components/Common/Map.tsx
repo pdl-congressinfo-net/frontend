@@ -5,7 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Country, Location } from "../../features/locations/location.model";
 import { useList } from "@refinedev/core";
-import { CountryDTO } from "../../features/locations/location.responses";
+import { CountryDTO } from "../../features/locations/locations.responses";
 
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",

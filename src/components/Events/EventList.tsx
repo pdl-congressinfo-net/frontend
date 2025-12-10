@@ -2,7 +2,7 @@ import { Stack, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { EventCard } from "./EventCard";
 import EventLoginDialog from "./EventLoginDialog";
-import { useCan, useList } from "@refinedev/core";
+import { useCan, useList, useCustomMutation } from "@refinedev/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Event } from "../../features/events/events.model";
 import { EventCardLoading } from "./EventCardLoading";
@@ -46,6 +46,8 @@ export const EventList = ({ archive }: EventListProps) => {
   const { data: canShow } = useCan({ resource: "events", action: "show" });
   const { data: canUpdate } = useCan({ resource: "events", action: "update" });
 
+  const { mutate: publishEvent } = useCustomMutation();
+
   const [loginDialog, setLoginDialog] = useState<{
     isOpen: boolean;
     event: Event | null;
@@ -77,6 +79,22 @@ export const EventList = ({ archive }: EventListProps) => {
     setLoginDialog({ isOpen: true, event });
   };
 
+  const handlePublishClick = (eventId: string, shouldPublish: boolean) => {
+    const endpoint = shouldPublish ? "publish" : "unpublish";
+    publishEvent(
+      {
+        url: `/api/v1/events/${eventId}/${endpoint}`,
+        method: "post",
+        values: {},
+      },
+      {
+        onSuccess: () => {
+          query.refetch();
+        },
+      }
+    );
+  };
+
   if (events.total === 0) {
     return <Text>No upcoming events found. Try to look in the archive.</Text>;
   }
@@ -91,6 +109,9 @@ export const EventList = ({ archive }: EventListProps) => {
               event={event}
               onCardClick={() => handleCardClick(event)}
               onParticipateClick={() => handleParticipateClick(event)}
+              onPublishClick={(shouldPublish) =>
+                handlePublishClick(event.id, shouldPublish)
+              }
             />
           );
         })}
