@@ -12,7 +12,10 @@ const EventTypesListPage = () => {
   const location = useLocation();
   const { mutate: deleteEventType } = useDelete();
 
-  const { result: data, isLoading } = useList<EventType>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useList<EventType>({
     resource: "types",
     meta: {
       parentmodule: "events",
@@ -24,7 +27,7 @@ const EventTypesListPage = () => {
     setActions(
       <Button onClick={() => navigate("/events/types/create")}>
         Create Event Type
-      </Button>
+      </Button>,
     );
   }, [setTitle, setActions, navigate]);
 
@@ -65,15 +68,22 @@ const EventTypesListPage = () => {
                 <HStack>
                   <Button
                     size="sm"
-                    onClick={() => navigate(`/events/types/show/${eventType.id}`, {
-                      state: { background: location, fallback: "/events/types" }
-                    })}
+                    onClick={() =>
+                      navigate(`/events/types/show/${eventType.id}`, {
+                        state: {
+                          background: location,
+                          fallback: "/events/types",
+                        },
+                      })
+                    }
                   >
                     View
                   </Button>
                   <Button
                     size="sm"
-                    onClick={() => navigate(`/events/types/edit/${eventType.id}`)}
+                    onClick={() =>
+                      navigate(`/events/types/edit/${eventType.id}`)
+                    }
                   >
                     Edit
                   </Button>

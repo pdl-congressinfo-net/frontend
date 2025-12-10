@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import { useLayout } from "../../providers/layout-provider";
-import { useOne, useNavigation } from "@refinedev/core";
+import { useOne, useNavigation, Link } from "@refinedev/core";
 import { Box, Button, VStack, Text } from "@chakra-ui/react";
 import { Location } from "../../features/locations/location.model";
 
@@ -9,12 +9,15 @@ const LocationShowPage = () => {
   const { id } = useParams<{ id: string }>();
   const { setTitle, setActions } = useLayout();
   const { edit, list } = useNavigation();
-  const { result: data, isLoading } = useOne<Location>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useOne<Location>({
     resource: "locations",
     id: id!,
   });
 
-  const location = data?.data;
+  const location = data;
 
   useEffect(() => {
     setTitle(location?.name || "Location");
@@ -22,7 +25,7 @@ const LocationShowPage = () => {
       <>
         <Button onClick={() => list("locations")}>Back to List</Button>
         <Button onClick={() => edit("locations", id!)}>Edit</Button>
-      </>
+      </>,
     );
   }, [setTitle, setActions, location, edit, list, id]);
 
@@ -56,9 +59,11 @@ const LocationShowPage = () => {
         {location.link && (
           <Box>
             <Text fontWeight="bold">Link:</Text>
-            <Text as="a" href={location.link} target="_blank" color="blue.500">
-              {location.link}
-            </Text>
+            <Link to={location.link} isExternal>
+              <Text as="a" color="blue.500">
+                {location.link}
+              </Text>
+            </Link>
           </Box>
         )}
       </VStack>

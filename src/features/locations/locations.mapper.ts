@@ -1,6 +1,5 @@
-import { LocationDTO, LocationTypeDTO, CountryDTO } from "./locations.responses";
+import { LocationDTO, LocationTypeDTO, CountryDTO } from "./location.responses";
 import { Location, LocationType, Country } from "./location.model";
-
 
 export const mapLocationType = (dto: LocationTypeDTO): LocationType => ({
   id: dto.id,

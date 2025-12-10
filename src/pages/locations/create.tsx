@@ -11,14 +11,18 @@ const LocationCreatePage = () => {
   const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const { mutate: createLocation } = useCreate();
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateLocationRequest>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateLocationRequest>();
 
-  const { data: countries } = useList<Country>({
+  const { result: countries } = useList<Country>({
     resource: "countries",
     meta: { parentmodule: "locations" },
   });
 
-  const { data: locationTypes } = useList<LocationType>({
+  const { result: locationTypes } = useList<LocationType>({
     resource: "locationtypes",
     meta: { parentmodule: "locations" },
   });
@@ -38,7 +42,7 @@ const LocationCreatePage = () => {
         onSuccess: () => {
           navigate("/locations");
         },
-      }
+      },
     );
   };
 
@@ -49,7 +53,9 @@ const LocationCreatePage = () => {
           <Field.Root invalid={!!errors.name}>
             <Field.Label>Name</Field.Label>
             <Input {...register("name", { required: true })} />
-            {errors.name && <Field.ErrorText>This field is required</Field.ErrorText>}
+            {errors.name && (
+              <Field.ErrorText>This field is required</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Field.Root>
@@ -79,12 +85,20 @@ const LocationCreatePage = () => {
 
           <Field.Root>
             <Field.Label>Latitude</Field.Label>
-            <Input type="number" step="any" {...register("latitude", { valueAsNumber: true })} />
+            <Input
+              type="number"
+              step="any"
+              {...register("latitude", { valueAsNumber: true })}
+            />
           </Field.Root>
 
           <Field.Root>
             <Field.Label>Longitude</Field.Label>
-            <Input type="number" step="any" {...register("longitude", { valueAsNumber: true })} />
+            <Input
+              type="number"
+              step="any"
+              {...register("longitude", { valueAsNumber: true })}
+            />
           </Field.Root>
 
           <Field.Root>

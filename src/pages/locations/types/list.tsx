@@ -6,7 +6,10 @@ import { LocationType } from "../../../features/locations/location.model";
 
 const LocationTypesListPage = () => {
   const { setTitle, setActions } = useLayout();
-  const { result: data, isLoading } = useList<LocationType>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useList<LocationType>({
     resource: "types",
     meta: { parentmodule: "locations" },
   });

@@ -11,7 +11,10 @@ const PermissionShowPage = () => {
   const navigate = useNavigate();
   const { mutate: deletePermission } = useDelete();
 
-  const { result: permissionData, isLoading } = useOne<Permission>({
+  const {
+    result: permissionData,
+    query: { isLoading },
+  } = useOne<Permission>({
     resource: "permissions",
     id: id!,
   });
@@ -22,7 +25,9 @@ const PermissionShowPage = () => {
       <Button
         colorScheme="red"
         onClick={() => {
-          if (window.confirm("Are you sure you want to delete this permission?")) {
+          if (
+            window.confirm("Are you sure you want to delete this permission?")
+          ) {
             deletePermission(
               {
                 resource: "permissions",
@@ -32,13 +37,13 @@ const PermissionShowPage = () => {
                 onSuccess: () => {
                   navigate("/permissions");
                 },
-              }
+              },
             );
           }
         }}
       >
         Delete Permission
-      </Button>
+      </Button>,
     );
   }, [setTitle, setActions, id, deletePermission, navigate]);
 

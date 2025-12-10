@@ -7,14 +7,17 @@ import { Location } from "../../features/locations/location.model";
 const LocationsListPage = () => {
   const { setTitle, setActions } = useLayout();
   const { create } = useNavigation();
-  const { result: data, isLoading } = useList<Location>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useList<Location>({
     resource: "locations",
   });
 
   useEffect(() => {
     setTitle("Locations");
     setActions(
-      <Button onClick={() => create("locations")}>Create Location</Button>
+      <Button onClick={() => create("locations")}>Create Location</Button>,
     );
   }, [setTitle, setActions, create]);
 
@@ -40,7 +43,9 @@ const LocationsListPage = () => {
               <Table.Cell>
                 <Button
                   size="sm"
-                  onClick={() => window.location.href = `/locations/show/${location.id}`}
+                  onClick={() =>
+                    (window.location.href = `/locations/show/${location.id}`)
+                  }
                 >
                   View
                 </Button>

@@ -6,16 +6,20 @@ import { Permission } from "../../features/permissions/permissions.model";
 
 const PermissionsListActions = () => {
   const { create } = useNavigation();
-  return <Button onClick={() => create("permissions")}>Create Permission</Button>;
+  return (
+    <Button onClick={() => create("permissions")}>Create Permission</Button>
+  );
 };
 
 const PermissionsListPage = () => {
   const { setTitle, setActions } = useLayout();
   const { edit, show } = useNavigation();
-  const { query, result } = useList<Permission>({
+  const {
+    query: { isLoading },
+    result,
+  } = useList<Permission>({
     resource: "permissions",
   });
-  const { isLoading } = query;
 
   useEffect(() => {
     setTitle("Permissions");

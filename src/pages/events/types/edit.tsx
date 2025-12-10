@@ -13,7 +13,10 @@ const EventTypeEditPage = () => {
   const navigate = useNavigate();
   const { mutate: updateEventType } = useUpdate();
 
-  const { result: data, isLoading } = useOne<EventType>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useOne<EventType>({
     resource: "types",
     id: id!,
     meta: {
@@ -21,7 +24,12 @@ const EventTypeEditPage = () => {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<UpdateEventTypeRequest>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<UpdateEventTypeRequest>();
 
   useEffect(() => {
     setTitle("Edit Event Type");
@@ -54,7 +62,7 @@ const EventTypeEditPage = () => {
         onSuccess: () => {
           navigate("/events/types");
         },
-      }
+      },
     );
   };
 
@@ -79,25 +87,25 @@ const EventTypeEditPage = () => {
               })}
               placeholder="e.g., WRK"
             />
-            {errors.code && <Field.ErrorText>{errors.code.message}</Field.ErrorText>}
+            {errors.code && (
+              <Field.ErrorText>{errors.code.message}</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Field.Root invalid={!!errors.name_de}>
             <Field.Label>Name (German)</Field.Label>
-            <Input
-              {...register("name_de")}
-              placeholder="e.g., Workshop"
-            />
-            {errors.name_de && <Field.ErrorText>{errors.name_de.message}</Field.ErrorText>}
+            <Input {...register("name_de")} placeholder="e.g., Workshop" />
+            {errors.name_de && (
+              <Field.ErrorText>{errors.name_de.message}</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Field.Root invalid={!!errors.name_en}>
             <Field.Label>Name (English)</Field.Label>
-            <Input
-              {...register("name_en")}
-              placeholder="e.g., Workshop"
-            />
-            {errors.name_en && <Field.ErrorText>{errors.name_en.message}</Field.ErrorText>}
+            <Input {...register("name_en")} placeholder="e.g., Workshop" />
+            {errors.name_en && (
+              <Field.ErrorText>{errors.name_en.message}</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Field.Root invalid={!!errors.description_de}>
@@ -106,7 +114,9 @@ const EventTypeEditPage = () => {
               {...register("description_de")}
               placeholder="Optional description in German"
             />
-            {errors.description_de && <Field.ErrorText>{errors.description_de.message}</Field.ErrorText>}
+            {errors.description_de && (
+              <Field.ErrorText>{errors.description_de.message}</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Field.Root invalid={!!errors.description_en}>
@@ -115,7 +125,9 @@ const EventTypeEditPage = () => {
               {...register("description_en")}
               placeholder="Optional description in English"
             />
-            {errors.description_en && <Field.ErrorText>{errors.description_en.message}</Field.ErrorText>}
+            {errors.description_en && (
+              <Field.ErrorText>{errors.description_en.message}</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Button type="submit">Update Event Type</Button>

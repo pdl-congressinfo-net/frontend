@@ -12,11 +12,13 @@ const RoleShowPage = () => {
   const navigate = useNavigate();
   const { mutate: deleteRole } = useDelete();
 
-  const { result: roleData, isLoading } = useOne<Role>({
+  const {
+    result: roleData,
+    query: { isLoading },
+  } = useOne<Role>({
     resource: "roles",
     id: id!,
   });
-
 
   useEffect(() => {
     setTitle("Role Details");
@@ -34,13 +36,13 @@ const RoleShowPage = () => {
                 onSuccess: () => {
                   navigate("/roles");
                 },
-              }
+              },
             );
           }
         }}
       >
         Delete Role
-      </Button>
+      </Button>,
     );
   }, [setTitle, setActions, id, deleteRole, navigate]);
 
@@ -62,9 +64,7 @@ const RoleShowPage = () => {
           <Text>{role.name}</Text>
         </Box>
 
-        <Button onClick={() => navigate(`/roles/edit/${id}`)}>
-          Edit Role
-        </Button>
+        <Button onClick={() => navigate(`/roles/edit/${id}`)}>Edit Role</Button>
       </VStack>
     </Box>
   );

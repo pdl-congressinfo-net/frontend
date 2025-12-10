@@ -4,17 +4,29 @@ import { useUpdate, useOne, useList } from "@refinedev/core";
 import { useLayout } from "../../providers/layout-provider";
 import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { UpdateLocationRequest } from "../../features/locations/locations.requests";
-import { Location, Country, LocationType } from "../../features/locations/location.model";
+import { UpdateLocationRequest } from "../../features/locations/location.requests";
+import {
+  Location,
+  Country,
+  LocationType,
+} from "../../features/locations/location.model";
 
 const LocationEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const { mutate: updateLocation } = useUpdate();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<UpdateLocationRequest>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<UpdateLocationRequest>();
 
-  const { result: locationData, isLoading } = useOne<Location>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useOne<Location>({
     resource: "locations",
     id: id!,
   });
@@ -29,7 +41,7 @@ const LocationEditPage = () => {
     meta: { parentmodule: "locations" },
   });
 
-  const location = locationData?.data;
+  const location = data;
 
   useEffect(() => {
     if (location) {
@@ -65,7 +77,7 @@ const LocationEditPage = () => {
         onSuccess: () => {
           navigate(`/locations/show/${id}`);
         },
-      }
+      },
     );
   };
 
@@ -79,7 +91,9 @@ const LocationEditPage = () => {
           <Field.Root invalid={!!errors.name}>
             <Field.Label>Name</Field.Label>
             <Input {...register("name")} />
-            {errors.name && <Field.ErrorText>This field is required</Field.ErrorText>}
+            {errors.name && (
+              <Field.ErrorText>This field is required</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Field.Root>
@@ -109,12 +123,20 @@ const LocationEditPage = () => {
 
           <Field.Root>
             <Field.Label>Latitude</Field.Label>
-            <Input type="number" step="any" {...register("latitude", { valueAsNumber: true })} />
+            <Input
+              type="number"
+              step="any"
+              {...register("latitude", { valueAsNumber: true })}
+            />
           </Field.Root>
 
           <Field.Root>
             <Field.Label>Longitude</Field.Label>
-            <Input type="number" step="any" {...register("longitude", { valueAsNumber: true })} />
+            <Input
+              type="number"
+              step="any"
+              {...register("longitude", { valueAsNumber: true })}
+            />
           </Field.Root>
 
           <Field.Root>

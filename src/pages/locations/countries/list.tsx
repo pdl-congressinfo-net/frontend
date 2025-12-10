@@ -6,7 +6,10 @@ import { Country } from "../../../features/locations/location.model";
 
 const CountriesListPage = () => {
   const { setTitle, setActions } = useLayout();
-  const { result: data, isLoading } = useList<Country>({
+  const {
+    result: data,
+    query: { isLoading },
+  } = useList<Country>({
     resource: "countries",
     meta: { parentmodule: "locations" },
     filters: [{ field: "preferred", operator: "eq", value: true }],

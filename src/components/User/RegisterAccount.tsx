@@ -35,7 +35,7 @@ const RegisterSchema = z
     path: ["confirmPassword"],
   });
 
-export const RegisterAccount = ({ isOpen, onClose }: AccountDialogProps) => {
+export const RegisterAccount = ({ onClose }: AccountDialogProps) => {
   const { mutate: registerUser } = useRegister<RegisterFormValues>();
   const {
     register,

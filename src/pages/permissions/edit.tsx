@@ -12,9 +12,17 @@ const PermissionEditPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { mutate: updatePermission } = useUpdate();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<UpdatePermissionRequest>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<UpdatePermissionRequest>();
 
-  const { result: permissionData, isLoading } = useOne<Permission>({
+  const {
+    result: permissionData,
+    query: { isLoading },
+  } = useOne<Permission>({
     resource: "permissions",
     id: id!,
   });
@@ -43,7 +51,7 @@ const PermissionEditPage = () => {
         onSuccess: () => {
           navigate("/permissions");
         },
-      }
+      },
     );
   };
 
@@ -56,7 +64,9 @@ const PermissionEditPage = () => {
           <Field.Root invalid={!!errors.name}>
             <Field.Label>Name</Field.Label>
             <Input {...register("name", { required: true })} />
-            {errors.name && <Field.ErrorText>This field is required</Field.ErrorText>}
+            {errors.name && (
+              <Field.ErrorText>This field is required</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Button type="submit">Update Permission</Button>

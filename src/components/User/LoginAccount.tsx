@@ -20,7 +20,7 @@ const RegisterSchema = z.object({
   password: z.string(),
 });
 
-export const LoginAccount = ({ isOpen, onClose }: AccountDialogProps) => {
+export const LoginAccount = ({ onClose }: AccountDialogProps) => {
   const { mutate: login } = useLogin<LoginFormValues>();
   const {
     register,
