@@ -1,22 +1,16 @@
 import { Box, Heading, Text, Table } from "@chakra-ui/react";
 import TabsLayout from "./TabsLayout";
 import { useTranslation } from "react-i18next";
+import { Event } from "../../../features/events/events.model";
 
 interface InformationProps {
-  event: {
-    c_meldeinfo: string;
-  };
-  fees?: Array<{
-    id: number;
-    regular?: string;
-    earlyBird?: string;
-    info?: string;
-    category?: string;
-  }>;
+  event: Event;
 }
 
-export default function Information({ event, fees }: InformationProps) {
+export default function Information({ event }: InformationProps) {
   const { t } = useTranslation();
+
+  return <Heading>Details werden im internen Bereich angezeigt</Heading>;
   return (
     <TabsLayout>
       <Box>
