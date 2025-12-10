@@ -46,11 +46,11 @@ import {
 import {
   CreateEventRequest,
   UpdateEventRequest,
-} from "../../../features/events/event.requests";
+} from "../../../features/events/events.requests";
 import {
   CreateLocationRequest,
   UpdateLocationRequest,
-} from "../../../features/locations/location.requests";
+} from "../../../features/locations/locations.requests";
 import { httpClient } from "../../../utils/httpClient";
 
 export type UpsertMode = "create" | "edit";

@@ -20,14 +20,6 @@ import {
   EventType,
 } from "../../../features/events/events.model";
 import {
-  mapEventCategory,
-  mapEventType,
-} from "../../../features/events/events.mapper";
-import {
-  EventCategoryDTO,
-  EventTypeDTO,
-} from "../../../features/events/events.responses";
-import {
   SaveResult,
   StepStatus,
   normalizeEventValues,
@@ -177,7 +169,7 @@ const BasicInformation = ({
 
   // Derive collections from fetched arrays to avoid stale state
 
-  const { result: eventCategories } = useList<EventCategoryDTO>({
+  const { result: eventCategories } = useList<EventCategory>({
     resource: "categories",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
@@ -185,7 +177,7 @@ const BasicInformation = ({
     },
   });
 
-  const { result: eventTypes } = useList<EventTypeDTO>({
+  const { result: eventTypes } = useList<EventType>({
     resource: "types",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
@@ -193,24 +185,28 @@ const BasicInformation = ({
     },
   });
 
+  console.log("Event Categories:", eventCategories);
+  console.log("Event Types:", eventTypes);
+
   const eventCategoryCollection = useMemo(
     () =>
       createListCollection<{ label: string; value: string }>({
-        items: (Array.isArray(eventCategories) ? eventCategories : []).map(
-          (c: EventCategory) => ({ label: c.nameDe, value: c.id }),
-        ),
+        items: (Array.isArray(eventCategories.data)
+          ? eventCategories.data
+          : []
+        ).map((c: EventCategory) => ({ label: c.nameDe, value: c.id })),
       }),
-    [eventCategories],
+    [eventCategories.data],
   );
 
   const eventTypeCollection = useMemo(
     () =>
       createListCollection<{ label: string; value: string }>({
-        items: (Array.isArray(eventTypes) ? eventTypes : []).map(
+        items: (Array.isArray(eventTypes.data) ? eventTypes.data : []).map(
           (t: EventType) => ({ label: t.nameDe, value: t.id }),
         ),
       }),
-    [eventTypes],
+    [eventTypes.data],
   );
 
   const oneDay = watch("oneDay");
@@ -221,10 +217,10 @@ const BasicInformation = ({
   // Set default category by code 'MED' or first available
   useEffect(() => {
     const preferredCategoryCode = "MED";
-    const preferredCategory = (eventCategories as EventCategory[]).find(
+    const preferredCategory = (eventCategories.data as EventCategory[]).find(
       (c) => c.code === preferredCategoryCode,
     );
-    const fallbackCategory = (eventCategories as EventCategory[])[0];
+    const fallbackCategory = (eventCategories.data as EventCategory[])[0];
     const nextDefault = preferredCategory?.id ?? fallbackCategory?.id;
     if (nextDefault && !selectedField) {
       setValue("field", nextDefault, {
@@ -238,10 +234,10 @@ const BasicInformation = ({
   // Set default type by code 'CON' or first available
   useEffect(() => {
     const preferredTypeCode = "CON";
-    const preferredType = (eventTypes as EventType[]).find(
+    const preferredType = (eventTypes.data as EventType[]).find(
       (t) => t.code === preferredTypeCode,
     );
-    const fallbackType = (eventTypes as EventType[])[0];
+    const fallbackType = (eventTypes.data as EventType[])[0];
     const nextDefault = preferredType?.id ?? fallbackType?.id;
     if (nextDefault && !selectedType) {
       setValue("typeId", nextDefault, {
@@ -414,7 +410,7 @@ const BasicInformation = ({
                       shouldDirty: true,
                       shouldTouch: true,
                     });
-                    const selectedTypeObj = eventTypes.find(
+                    const selectedTypeObj = eventTypes.data.find(
                       (t) => t.id === next,
                     );
                     setValue("typeCode", selectedTypeObj?.code ?? "", {
