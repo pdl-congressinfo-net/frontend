@@ -47,6 +47,7 @@ jobs:
 
           git checkout --orphan "$TARGET_BRANCH"
           git rm -rf .
+          git checkout --orphan build
           cp -r "$BUILD_DIR"/* .
           touch .nojekyll
           git add .
