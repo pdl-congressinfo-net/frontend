@@ -14,6 +14,7 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { Toaster } from "./components/ui/toaster";
 import { ToasterMobile } from "./components/ui/toasterMobile";
 import "./i18n";
+import "./providers/rest-data-provider/mapping/feature.loader";
 
 import { httpClient } from "./utils/httpClient";
 import {
