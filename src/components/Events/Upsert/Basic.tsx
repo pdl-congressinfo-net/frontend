@@ -15,10 +15,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  EventCategory,
-  EventType,
-} from "../../../features/events/events.model";
+import { EventType } from "../../../features/events/events.model";
 import {
   SaveResult,
   StepStatus,
@@ -169,14 +166,6 @@ const BasicInformation = ({
 
   // Derive collections from fetched arrays to avoid stale state
 
-  const { result: eventCategories } = useList<EventCategory>({
-    resource: "categories",
-    sorters: [{ field: "nameDe", order: "asc" }],
-    meta: {
-      parentmodule: "events",
-    },
-  });
-
   const { result: eventTypes } = useList<EventType>({
     resource: "types",
     sorters: [{ field: "nameDe", order: "asc" }],
@@ -185,19 +174,7 @@ const BasicInformation = ({
     },
   });
 
-  console.log("Event Categories:", eventCategories);
   console.log("Event Types:", eventTypes);
-
-  const eventCategoryCollection = useMemo(
-    () =>
-      createListCollection<{ label: string; value: string }>({
-        items: (Array.isArray(eventCategories.data)
-          ? eventCategories.data
-          : []
-        ).map((c: EventCategory) => ({ label: c.nameDe, value: c.id })),
-      }),
-    [eventCategories.data],
-  );
 
   const eventTypeCollection = useMemo(
     () =>
@@ -213,23 +190,6 @@ const BasicInformation = ({
   const startDate = watch("startDate");
   const selectedField = watch("field");
   const selectedType = watch("typeId");
-
-  // Set default category by code 'MED' or first available
-  useEffect(() => {
-    const preferredCategoryCode = "MED";
-    const preferredCategory = (eventCategories.data as EventCategory[]).find(
-      (c) => c.code === preferredCategoryCode,
-    );
-    const fallbackCategory = (eventCategories.data as EventCategory[])[0];
-    const nextDefault = preferredCategory?.id ?? fallbackCategory?.id;
-    if (nextDefault && !selectedField) {
-      setValue("field", nextDefault, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    }
-  }, [eventCategories, selectedField, setValue]);
 
   // Set default type by code 'CON' or first available
   useEffect(() => {
@@ -358,45 +318,6 @@ const BasicInformation = ({
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
             </Field.Root>
             <Flex gap="2vw" wrap={"wrap"} direction="row">
-              {eventCategoryCollection && (
-                <Select.Root
-                  collection={eventCategoryCollection}
-                  size="sm"
-                  width="19vw"
-                  value={selectedField ? [selectedField] : []}
-                  onValueChange={(e) => {
-                    const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                    setValue("field", next ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                  }}
-                >
-                  <Select.HiddenSelect name="field" />
-                  <Select.Label>Select Category</Select.Label>
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select Category" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {eventCategoryCollection.items.map((item) => (
-                          <Select.Item item={item} key={item.value}>
-                            {item.label}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              )}
               {eventTypeCollection && (
                 <Select.Root
                   collection={eventTypeCollection}

@@ -311,6 +311,14 @@ export const dataProvider = (
       payload,
       query,
       headers,
+    }: {
+      url: string;
+      method: MethodTypes | MethodTypesWithBody | string;
+      filters?: CrudFilters;
+      sorters?: CrudSorting;
+      payload?: any;
+      query?: Record<string, any>;
+      headers?: Record<string, string>;
     }) => {
       let requestUrl = `${url}?`;
 

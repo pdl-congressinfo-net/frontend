@@ -418,7 +418,7 @@ const LocationPage = ({
                 bounds={europeBounds}
                 defaultCenter={defaultCenter}
                 onSave={(loc: any) => {
-                  const match = resolveCountryId(loc, countries.data);
+                  const match = resolveCountryId(loc, countries);
 
                   if (match) {
                     setValue("countryId", match.id, {

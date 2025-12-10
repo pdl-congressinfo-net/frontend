@@ -2,34 +2,22 @@ import {
   Box,
   Button,
   Card,
-  Checkbox,
   Flex,
   Heading,
   Input,
   Separator,
-  Table,
   Tabs,
 } from "@chakra-ui/react";
 import { CanAccess, useCreate, useList, useDelete } from "@refinedev/core";
 import { useMemo, useState } from "react";
-import { PermissionDTO } from "../../features/permissions/permission.responses";
-import {
-  UserDTO,
-  UserPermissionDTO,
-  UserRoleDTO,
-} from "../../features/users/users.responses";
-import {
-  RoleDTO,
-  RolePermissionDTO,
-} from "../../features/roles/role.responses";
-import { Permission } from "../../features/permissions/permission.model";
+import { Permission } from "../../features/permissions/permissions.model";
 import {
   User,
   UserPermission,
   UserRole,
 } from "../../features/users/users.model";
 
-import { Role, RolePermission } from "../../features/roles/role.model";
+import { Role, RolePermission } from "../../features/roles/roles.model";
 import { TanstackPermissionMatrix } from "../Common/Matrix";
 
 export const AdminTemp = () => {

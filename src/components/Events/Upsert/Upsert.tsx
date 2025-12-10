@@ -47,11 +47,12 @@ import {
   CreateEventRequest,
   UpdateEventRequest,
 } from "../../../features/events/events.requests";
+
+import { httpClient } from "../../../utils/httpClient";
 import {
   CreateLocationRequest,
   UpdateLocationRequest,
-} from "../../../features/locations/locations.requests";
-import { httpClient } from "../../../utils/httpClient";
+} from "../../../features/locations/location.requests";
 
 export type UpsertMode = "create" | "edit";
 
@@ -572,9 +573,8 @@ const Upsert = ({
             name: normalized.name,
             start_date: new Date(normalized.startDate),
             end_date: new Date(normalized.endDate ?? normalized.startDate),
-            category_id: normalized.field,
-            type_id: normalized.typeId,
             location_id: locationInfo?.id,
+            is_public: false,
           };
 
           const response = await createEvent({ values: createPayload });
@@ -610,9 +610,7 @@ const Upsert = ({
           name: normalized.name,
           start_date: new Date(normalized.startDate),
           end_date: new Date(normalized.endDate ?? normalized.startDate),
-          category_id: normalized.field,
-          type_id: normalized.typeId,
-          location_id: eventInfo.locationId,
+          location_id: locationInfo?.id,
         };
 
         await updateEvent({ id: eventInfo.id, values: updatePayload });
@@ -777,8 +775,8 @@ const Upsert = ({
             number: toOptionalString(normalized.number),
             postal_code: toOptionalString(normalized.postalCode),
             city: toOptionalString(normalized.city),
-            lat: normalized.lat,
-            lng: normalized.lng,
+            latitude: normalized.lat,
+            longitude: normalized.lng,
             country_id: toOptionalString(normalized.countryId),
           };
           const response = await createLocation({ values: createPayload });
@@ -794,8 +792,8 @@ const Upsert = ({
             number: toOptionalString(normalized.number),
             postal_code: toOptionalString(normalized.postalCode),
             city: toOptionalString(normalized.city),
-            lat: normalized.lat,
-            lng: normalized.lng,
+            latitude: normalized.lat,
+            longitude: normalized.lng,
             country_id: toOptionalString(normalized.countryId),
           };
           await updateLocation({ id: locationId, values: updatePayload });
