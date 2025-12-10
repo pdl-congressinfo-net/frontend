@@ -5,8 +5,20 @@ import { useLayout } from "../../providers/layout-provider";
 import { Box, Button, VStack, Spinner } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { UpdateEventRequest } from "../../features/events/events.requests";
-import { Event } from "../../features/events/events.model";
+import { Event, EventType } from "../../features/events/events.model";
 import { Location } from "../../features/locations/location.model";
+import { LuArrowLeft } from "react-icons/lu";
+
+const EventEditActions = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Button onClick={() => navigate("/events")} variant="ghost">
+      <LuArrowLeft />
+      Back to Events
+    </Button>
+  );
+};
 
 const EventEditPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +26,10 @@ const EventEditPage = () => {
   const navigate = useNavigate();
   const { mutate: updateEvent } = useUpdate();
 
-  const { result: event, query: { isLoading } } = useOne<Event>({
+  const {
+    result: event,
+    query: { isLoading },
+  } = useOne<Event>({
     resource: "events",
     id: id!,
   });
@@ -23,11 +38,21 @@ const EventEditPage = () => {
     resource: "locations",
   });
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<UpdateEventRequest>();
+  const { result: eventTypes } = useList<EventType>({
+    resource: "types",
+    meta: { parentmodule: "events" },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<UpdateEventRequest>();
 
   useEffect(() => {
     setTitle("Edit Event");
-    setActions(null);
+    setActions(<EventEditActions />);
   }, [setTitle, setActions]);
 
   useEffect(() => {
@@ -54,7 +79,7 @@ const EventEditPage = () => {
         onSuccess: () => {
           navigate("/events");
         },
-      }
+      },
     );
   };
 
@@ -95,7 +120,14 @@ const EventEditPage = () => {
 
           <div>
             <label>Event Type ID (optional)</label>
-            <input {...register("event_type_id")} />
+            <select {...register("event_type_id")}>
+              <option value="">Select a event type</option>
+              {eventTypes?.data?.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.nameDe}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

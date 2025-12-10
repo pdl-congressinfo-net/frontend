@@ -1,4 +1,12 @@
-import { Box, Button, Card, Flex, Heading, Image } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Image,
+  Skeleton,
+} from "@chakra-ui/react";
 import { CanAccess, useOne, useNavigation } from "@refinedev/core";
 import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
@@ -21,7 +29,7 @@ export const EventCard = ({
 
   const {
     result: location,
-    query: { isLoading, isError },
+    query: { isLoading: locationLoading },
   } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
@@ -30,7 +38,10 @@ export const EventCard = ({
     },
   });
 
-  const { result: country } = useOne<Country>({
+  const {
+    result: country,
+    query: { isLoading: countryLoading },
+  } = useOne<Country>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {
@@ -78,7 +89,13 @@ export const EventCard = ({
                   })()}
                 </Box>
               </Flex>
-              {location && (
+              {locationLoading ||
+                (countryLoading && (
+                  <Box fontSize="sm" mt={2}>
+                    <Skeleton height="14px" width="30%" />
+                  </Box>
+                ))}
+              {location && country && (
                 <Box fontSize="sm" color="ui.muted">
                   {location.name}
                   {country && `, ${country?.name}`}
