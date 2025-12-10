@@ -6,7 +6,7 @@ export const locationTypeResource = {
   show: "/locations/types/show/:id",
   meta: {
     canDelete: true,
-    parent: "locations",
+    parentmodule: "locations",
   },
 };
 
@@ -18,7 +18,7 @@ export const countryResource = {
   show: "/locations/countries/show/:id",
   meta: {
     canDelete: true,
-    parent: "locations",
+    parentmodule: "locations",
   },
 };
 
