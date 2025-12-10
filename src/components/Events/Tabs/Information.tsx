@@ -1,20 +1,18 @@
 import { Box, Heading, Text, DataList, Link } from "@chakra-ui/react";
 import TabsLayout from "./TabsLayout";
 import { useOne } from "@refinedev/core";
-import { ApiResponse } from "../../../common/types/api";
-import { LocationDTO } from "../../../features/locations/location.responses";
-import { mapLocation } from "../../../features/locations/location.mapper";
-import { Country } from "../../../features/locations/location.model";
+import { Country, Location } from "../../../features/locations/location.model";
+import { Event } from "../../../features/events/events.model";
 
 interface InformationProps {
-  event: any;
+  event: Event;
 }
 
 export default function Information({ event }: InformationProps) {
   const {
-    result: locationDTO,
+    result: location,
     query: { isLoading, isError },
-  } = useOne<ApiResponse<LocationDTO>>({
+  } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -22,9 +20,7 @@ export default function Information({ event }: InformationProps) {
     },
   });
 
-  const location = locationDTO ? mapLocation(locationDTO.data) : undefined;
-
-  const { result: country } = useOne<ApiResponse<Country>>({
+  const { result: country } = useOne<Country>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {
@@ -42,7 +38,8 @@ export default function Information({ event }: InformationProps) {
           Veranstalter
         </Heading>
         <Text mt={2} whiteSpace="pre-line">
-          {event.c_veranst}
+          {event.startDate?.toLocaleDateString()} -{" "}
+          {event.endDate?.toLocaleDateString()}
         </Text>
       </Box>
 
@@ -52,14 +49,22 @@ export default function Information({ event }: InformationProps) {
           <Heading size="md" color="gray.800">
             Veranstaltungsadresse
           </Heading>
-          <Text mt={2}>{location.name}</Text>
-          {location}
-          <Text whiteSpace="pre-line">{}</Text>
+          <Text mt={2} fontWeight={"bold"}>
+            {location.name}
+          </Text>
+          {location?.road && (
+            <Text>
+              {location.road} {location.number}
+            </Text>
+          )}
+          <Text whiteSpace="pre-line">
+            {location?.postalCode} {location?.city}
+          </Text>
         </Box>
       )}
 
       {/* Details */}
-      {details && (
+      {/* {details && (
         <Box>
           <Heading size="md" color="gray.800" mb={3}>
             Details
@@ -133,7 +138,7 @@ export default function Information({ event }: InformationProps) {
             )}
           </DataList.Root>
         </Box>
-      )}
+      )} */}
     </TabsLayout>
   );
 }

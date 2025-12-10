@@ -1,21 +1,10 @@
 import { Stack, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { EventCard } from "./EventCard";
-import EventDetailsDialog from "./EventDetailsDialog";
 import EventLoginDialog from "./EventLoginDialog";
-import { EventDetails } from "./EventDetails";
-import {
-  useCan,
-  useList,
-  useMany,
-  useOne,
-  useNavigation,
-} from "@refinedev/core";
+import { useCan, useList, useCustomMutation } from "@refinedev/core";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Event } from "../../features/events/event.model";
-import { EventDTO } from "../../features/events/event.responses";
-import { mapEvent } from "../../features/events/event.mapper";
-import { boolean } from "zod";
+import { Event } from "../../features/events/events.model";
 import { EventCardLoading } from "./EventCardLoading";
 
 type EventListProps = {
@@ -40,16 +29,12 @@ export const EventList = ({ archive }: EventListProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { result: eventsDto, query } = useList<EventDTO>({
+  const { result: eventsData, query } = useList<Event>({
     resource: "events",
     pagination: { pageSize: 10, currentPage: 1, mode: "server" },
     sorters: [{ field: "start_date", order: order }],
     filters: [{ field: "end_date", operator: "gte", value: startDate }],
   });
-
-  const eventsData: Event[] = Array.isArray(eventsDto?.data)
-    ? (eventsDto?.data as EventDTO[]).map(mapEvent)
-    : [];
 
   const { result: eventTypesDto } = useList({
     resource: "types",
@@ -60,6 +45,8 @@ export const EventList = ({ archive }: EventListProps) => {
 
   const { data: canShow } = useCan({ resource: "events", action: "show" });
   const { data: canUpdate } = useCan({ resource: "events", action: "update" });
+
+  const { mutate: publishEvent } = useCustomMutation();
 
   const [loginDialog, setLoginDialog] = useState<{
     isOpen: boolean;
@@ -92,20 +79,39 @@ export const EventList = ({ archive }: EventListProps) => {
     setLoginDialog({ isOpen: true, event });
   };
 
-  if (events.length === 0) {
+  const handlePublishClick = (eventId: string, shouldPublish: boolean) => {
+    const endpoint = shouldPublish ? "publish" : "unpublish";
+    publishEvent(
+      {
+        url: `/api/v1/events/${eventId}/${endpoint}`,
+        method: "post",
+        values: {},
+      },
+      {
+        onSuccess: () => {
+          query.refetch();
+        },
+      }
+    );
+  };
+
+  if (events.total === 0) {
     return <Text>No upcoming events found. Try to look in the archive.</Text>;
   }
 
   return (
     <>
       <Stack gap={4} width="100%">
-        {events.map((event, index) => {
+        {events.data.map((event, index) => {
           return (
             <EventCard
               key={event.id ?? index}
               event={event}
               onCardClick={() => handleCardClick(event)}
               onParticipateClick={() => handleParticipateClick(event)}
+              onPublishClick={(shouldPublish) =>
+                handlePublishClick(event.id, shouldPublish)
+              }
             />
           );
         })}

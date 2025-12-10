@@ -9,7 +9,7 @@ import {
   useGo,
   useGetIdentity,
 } from "@refinedev/core";
-import { User } from "../../features/users/user.model";
+import { User } from "../../features/users/users.model";
 
 interface UserButtonProps {
   className?: string;

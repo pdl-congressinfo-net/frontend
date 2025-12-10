@@ -3,6 +3,7 @@ import { stringify } from "query-string";
 import type { AxiosInstance } from "axios";
 import type { CrudFilters, CrudSorting, DataProvider } from "@refinedev/core";
 import { ApiResponse } from "../../common/types/api";
+import { getMapper } from "../rest-data-provider/mapping/mapper.registry";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
@@ -95,8 +96,17 @@ export const dataProvider = (
         mode = "server",
       } = pagination ?? {};
 
-      const { headers: headersFromMeta, method, parentmodule } = meta ?? {};
+      const { headers: headersFromMeta, method } = meta ?? {};
+      let parentmodule = meta?.parentmodule;
+
       const requestMethod = (method as MethodTypes) ?? "get";
+
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}`
@@ -128,23 +138,32 @@ export const dataProvider = (
         ? `${url}?${stringify(combinedQuery)}`
         : url;
 
-      const { data, headers } = await httpClient[requestMethod]<
-        ApiResponse<any>
-      >(urlWithQuery, {
+      const { data, headers } = await httpClient[requestMethod](urlWithQuery, {
         headers: headersFromMeta,
       });
 
       const total = +headers["x-total-count"];
 
+      const mappedData = mapper ? data.map((item: any) => mapper(item)) : data;
+
       return {
-        data: data,
+        data: mappedData,
         total: total,
       };
     },
 
     getMany: async ({ resource, ids, meta }: GetManyParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method } = meta ?? {};
+      let parentmodule = meta?.parentmodule;
+
       const requestMethod = (method as MethodTypes) ?? "get";
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
+
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}?${stringify({ id: ids })}`
         : `${apiUrl}/${resource}?${stringify({ id: ids })}`;
@@ -153,14 +172,27 @@ export const dataProvider = (
         headers,
       });
 
+      const mappedData = mapper
+        ? data.data.map((item: any) => mapper(item))
+        : data.data;
+
       return {
-        data: data.data,
+        data: mappedData,
       };
     },
 
     create: async ({ resource, variables, meta }: CreateParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "post";
+
+      let parentmodule = meta?.parentmodule;
+
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}`
@@ -174,14 +206,25 @@ export const dataProvider = (
         },
       );
 
+      const mappedData = mapper ? mapper(data.data) : data.data;
+
       return {
-        data: data,
+        data: mappedData,
       };
     },
 
     update: async ({ resource, id, variables, meta }: UpdateParams) => {
-      const { headers, method, parentmodule, relation_ids } = meta ?? {};
-      const requestMethod = (method as MethodTypesWithBody) ?? "put";
+      const { headers, method, relation_ids } = meta ?? {};
+      const requestMethod = (method as MethodTypesWithBody) ?? "patch";
+
+      let parentmodule = meta?.parentmodule;
+
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
 
@@ -197,14 +240,24 @@ export const dataProvider = (
         },
       );
 
+      const mappedData = mapper ? mapper(data.data) : data.data;
+
       return {
-        data: data,
+        data: mappedData,
       };
     },
 
     getOne: async ({ resource, id, meta }: GetOneParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
+      let parentmodule = meta?.parentmodule;
+
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}/${id}`
@@ -214,16 +267,23 @@ export const dataProvider = (
         headers,
       });
 
+      const mappedData = mapper ? mapper(data.data) : data.data;
+
       return {
-        data: data,
+        data: mappedData,
       };
     },
 
     deleteOne: async ({ resource, id, variables, meta }: DeleteOneParams) => {
-      const { headers, method, parentmodule, relation_ids } = meta ?? {};
+      const { headers, method, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "delete";
+      let parentmodule = meta?.parentmodule;
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}/${selector}`
@@ -251,6 +311,14 @@ export const dataProvider = (
       payload,
       query,
       headers,
+    }: {
+      url: string;
+      method: MethodTypes | MethodTypesWithBody | string;
+      filters?: CrudFilters;
+      sorters?: CrudSorting;
+      payload?: any;
+      query?: Record<string, any>;
+      headers?: Record<string, string>;
     }) => {
       let requestUrl = `${url}?`;
 

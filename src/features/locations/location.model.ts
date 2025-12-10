@@ -1,7 +1,6 @@
 export interface LocationType {
   id: string;
   name: string;
-  description?: string;
 }
 
 export interface Country {
@@ -19,10 +18,11 @@ export interface Location {
   road?: string;
   number?: string;
   city?: string;
+  state?: string;
   postalCode?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;
+  longitude?: number;
   link?: string;
-  countryId: string;
-  locationTypeId: string;
+  countryId?: string;
+  locationTypeId?: string;
 }

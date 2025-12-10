@@ -1,29 +1,28 @@
 import { Box, Button, Card, Flex, Heading, Image } from "@chakra-ui/react";
 import { CanAccess, useOne, useNavigation } from "@refinedev/core";
-import { Event } from "../../features/events/event.model";
+import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
-import { LocationDTO } from "../../features/locations/location.responses";
-import { mapLocation } from "../../features/locations/location.mapper";
 import { toDate } from "../../utils/helpers";
-import { ApiResponse } from "../../common/types/api";
 
 export interface EventCardInterface {
   event: Event;
   onCardClick?: () => void;
   onParticipateClick?: () => void;
+  onPublishClick?: (isPublic: boolean) => void;
 }
 
 export const EventCard = ({
   event,
   onCardClick,
   onParticipateClick,
+  onPublishClick,
 }: EventCardInterface) => {
   const { edit } = useNavigation();
 
   const {
-    result: locationDTO,
+    result: location,
     query: { isLoading, isError },
-  } = useOne<ApiResponse<LocationDTO>>({
+  } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -31,9 +30,7 @@ export const EventCard = ({
     },
   });
 
-  const location = locationDTO ? mapLocation(locationDTO.data) : undefined;
-
-  const { result: country } = useOne<ApiResponse<Country>>({
+  const { result: country } = useOne<Country>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {
@@ -56,7 +53,7 @@ export const EventCard = ({
       onClick={onCardClick}
       cursor="pointer"
       _hover={{ dropShadow: "lg" }}
-      backgroundColor={event.isPublished ? "inherit" : "red.100"}
+      backgroundColor={event.isPublic ? "inherit" : "red.100"}
     >
       <Flex direction="row" justifyContent="space-between" gap={4} padding={4}>
         <Image
@@ -84,7 +81,7 @@ export const EventCard = ({
               {location && (
                 <Box fontSize="sm" color="ui.muted">
                   {location.name}
-                  {country && `, ${country?.data.name}`}
+                  {country && `, ${country?.name}`}
                 </Box>
               )}
             </Flex>
@@ -108,11 +105,23 @@ export const EventCard = ({
                     size="md"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Navigate to edit page
                       edit("events", event.id);
                     }}
                   >
                     Bearbeiten
+                  </Button>
+                </CanAccess>
+                <CanAccess resource="events" action="publish">
+                  <Button
+                    width={"8vw"}
+                    size="md"
+                    colorPalette={event.isPublic ? "yellow" : "green"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPublishClick?.(!event.isPublic);
+                    }}
+                  >
+                    {event.isPublic ? "Unpublish" : "Publish"}
                   </Button>
                 </CanAccess>
               </Flex>

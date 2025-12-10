@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-table";
 import { Box, Checkbox, Heading, Table } from "@chakra-ui/react";
 import { useMemo } from "react";
-import { Permission } from "../../features/permissions/permission.model";
+import { Permission } from "../../features/permissions/permissions.model";
 
 type MatrixTableProps<T> = {
   title: string;

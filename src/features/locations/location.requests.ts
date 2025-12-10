@@ -1,19 +1,17 @@
 export interface CreateLocationTypeRequest {
   name: string;
-  description?: string;
 }
 
 export interface UpdateLocationTypeRequest {
   name?: string;
-  description?: string;
 }
 
 export interface CreateCountryRequest {
   name: string;
   code2: string;
   code3: string;
-  devco: boolean;
-  preferred: boolean;
+  devco?: boolean;
+  preferred?: boolean;
 }
 
 export interface UpdateCountryRequest {
@@ -28,12 +26,11 @@ export interface CreateLocationRequest {
   name: string;
   road?: string;
   number?: string;
-  address?: string;
   city?: string;
   state?: string;
   postal_code?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;
+  longitude?: number;
   link?: string;
   country_id?: string;
   location_type_id?: string;
@@ -46,8 +43,8 @@ export interface UpdateLocationRequest {
   city?: string;
   state?: string;
   postal_code?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;
+  longitude?: number;
   link?: string;
   country_id?: string;
   location_type_id?: string;

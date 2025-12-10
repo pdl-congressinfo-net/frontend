@@ -14,15 +14,23 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { Toaster } from "./components/ui/toaster";
 import { ToasterMobile } from "./components/ui/toasterMobile";
 import "./i18n";
+import "./providers/rest-data-provider/mapping/feature.loader";
 
 import { httpClient } from "./utils/httpClient";
 import {
   eventCategoryResource,
   eventTypeResource,
   eventResource,
-} from "./features/events/event.resource";
+} from "./features/events/events.resource";
+import {
+  locationResource,
+  locationTypeResource,
+  countryResource,
+} from "./features/locations/locations.resource";
 import AppRoutes from "./pages/Routes";
 import { LayoutProvider } from "./providers/layout-provider";
+import { rolePermissionResource, roleResource } from "./features/roles/roles.resource";
+import { permissionResource } from "./features/permissions/permissions.resource";
 
 function App() {
   return (
@@ -50,6 +58,12 @@ function App() {
                   eventCategoryResource,
                   eventTypeResource,
                   eventResource,
+                  locationResource,
+                  locationTypeResource,
+                  countryResource,
+                  roleResource,
+                  rolePermissionResource,
+                  permissionResource,
                 ]}
               >
                 <AppRoutes />

@@ -1,40 +1,46 @@
-import { useShow } from "@refinedev/core";
-import { useState } from "react";
-import { EventDetails } from "../../components/Events/EventDetails";
+import { useParams, useNavigate, useLocation } from "react-router";
+import { useOne } from "@refinedev/core";
 import EventDetailsDialog from "../../components/Events/EventDetailsDialog";
-import { useLocation, useNavigate } from "react-router-dom";
+import { EventDetails } from "../../components/Events/EventDetails";
+import { Event } from "../../features/events/events.model";
+import { Spinner } from "@chakra-ui/react";
 
-export const EventShow = () => {
-  const location = useLocation();
+const EventShowPage = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const eventFromState = location.state?.event;
-  const close = () => {
-    // if there's a history index (React Router v6 stores idx) go back, otherwise go to /events
-    const bg = location.state?.background;
-    const fallback = location.state?.fallback ?? "/events";
+  const location = useLocation();
+  const state = location.state as { fallback?: string };
 
-    if (bg) {
-      // Return to the background location
-      navigate(bg.pathname + bg.search + bg.hash, { replace: true });
-    } else {
-      // Fallback for direct URL visits
-      navigate(fallback, { replace: true });
-    }
+  const { result, query } = useOne<Event>({
+    resource: "events",
+    id: id!,
+  });
 
-    setDetailsDialog({ isOpen: false, event: null });
+  const handleClose = () => {
+    navigate(state?.fallback || "/events");
   };
-  const [detailsDialog, setDetailsDialog] = useState<{
-    isOpen: boolean;
-    event: Event | null;
-  }>({ isOpen: true, event: null });
+
+  if (!id) {
+    return null;
+  }
+
+  if (query.isLoading) {
+    return <Spinner />;
+  }
+
+  if (!result) {
+    return null;
+  }
 
   return (
     <EventDetailsDialog
-      isOpen={detailsDialog.isOpen}
-      onClose={close}
-      title={eventFromState?.name}
+      isOpen={true}
+      onClose={handleClose}
+      title={result.name || "Event Details"}
     >
-      <EventDetails event={eventFromState} />
+      <EventDetails event={result} />
     </EventDetailsDialog>
   );
 };
+
+export default EventShowPage;

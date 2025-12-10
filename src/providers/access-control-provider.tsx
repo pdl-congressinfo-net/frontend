@@ -50,12 +50,14 @@ async function fetchPermissions(): Promise<Set<string>> {
 
   const data = await response.json();
 
-  const permission_names = data.map((perm: { name: string }) => perm.name);
+  const permission_names: string[] = Array.isArray(data)
+    ? data.map((perm: { name: string }) => perm.name)
+    : [];
 
-  const permissions = Array.isArray(data.permissions)
-    ? data.permissions
-    : Array.isArray(permission_names)
-      ? [].concat(permission_names)
+  const permissions = Array.isArray(data?.permissions)
+    ? (data.permissions as string[])
+    : permission_names.length > 0
+      ? [...permission_names]
       : [];
 
   saveToCache(permissions);

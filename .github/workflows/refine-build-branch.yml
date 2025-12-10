@@ -1,4 +1,4 @@
-name: Build Refine App & Publish Branch
+name: Frontend Build, Docker & Pages
 
 on:
   push:
@@ -6,51 +6,103 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
+
+# -----------------------
+# 1) Build frontend
+# -----------------------
   build:
     runs-on: ubuntu-latest
+    outputs:
+      dist-path: dist
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "npm"
+          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npx refine build
 
-      - name: Build with Refine
-        run: npx refine build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+
+# -----------------------
+# 2) Build Docker image
+# -----------------------
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+
+# -----------------------
+# 3) Publish to build branch
+# -----------------------
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
 
       - name: Publish dist to build branch
         run: |
-          set -e
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
 
-          TARGET_BRANCH="build"
-          BUILD_DIR="dist"
-
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          # Create orphan build branch
-          git checkout --orphan "$TARGET_BRANCH"
-
-          # Remove everything
+          git checkout --orphan build
           git rm -rf .
-
-          # Copy build output
-          cp -r "$BUILD_DIR"/* .
-
-          # Required for GitHub Pages
+          cp -r dist/* .
           touch .nojekyll
 
-          # Commit and force push
           git add .
-          git commit -m "Refine build from $GITHUB_SHA"
-          git push origin "$TARGET_BRANCH" --force
+          git commit -m "Build $GITHUB_SHA"
+          git push origin build --force

@@ -18,10 +18,9 @@ import L from "leaflet";
 import { MapPicker } from "../../Common/Map";
 import { Country, Location } from "../../../features/locations/location.model";
 import { useList } from "@refinedev/core";
-import { CountryDTO } from "../../../features/locations/location.responses";
-import { mapCountry } from "../../../features/locations/location.mapper";
 import { SaveResult, StepStatus } from "./form-shared";
 import { PhysicalLocationFormValues, WebinarLocationFormValues } from "./types";
+import { ApiResponse } from "../../../common/types/api";
 
 type LocationProps = {
   onNext?: () => void;
@@ -80,7 +79,7 @@ const LocationPage = ({
     [isWeb],
   );
 
-  const { result: locationsCountriesResult } = useList<CountryDTO>({
+  const { result: countries } = useList<Country>({
     resource: "countries",
     pagination: { pageSize: 1000 },
     sorters: [{ field: "name", order: "asc" }],
@@ -89,26 +88,17 @@ const LocationPage = ({
     },
   });
 
-  const countriesDto =
-    (locationsCountriesResult?.data as any)?.data ??
-    locationsCountriesResult?.data ??
-    [];
-
-  const countries: Country[] = Array.isArray(countriesDto)
-    ? (countriesDto as CountryDTO[]).map(mapCountry)
-    : [];
-
   const countryCollection = useMemo(
     () =>
       createListCollection<{ label: string; value: string }>({
-        items: (Array.isArray(countries) ? countries : []).map(
+        items: (Array.isArray(countries.data) ? countries.data : []).map(
           (c: Country) => ({
             label: c.name,
             value: c.id,
           }),
         ),
       }),
-    [countries],
+    [countries.data],
   );
   const defaultValues = useMemo(
     () => ({
@@ -220,13 +210,13 @@ const LocationPage = ({
 
   function resolveCountryId(
     loc: any,
-    countries: Country[],
+    countries: ApiResponse<Country[]>,
   ): Country | undefined {
-    const byCode = countries.find((c) => c.code2 == loc.___countryCode);
+    const byCode = countries.data.find((c) => c.code2 == loc.___countryCode);
 
     if (byCode) return byCode;
 
-    return countries.find(
+    return countries.data.find(
       (c) => c.name.toLowerCase() === loc.___countryName?.toLowerCase(),
     );
   }
@@ -343,7 +333,7 @@ const LocationPage = ({
                       const nextId = Array.isArray(e.value)
                         ? e.value[0]
                         : e.value;
-                      const nextCountry = countries.find(
+                      const nextCountry = countries.data.find(
                         (c) => c.id === nextId,
                       );
                       setValue("countryId", nextId ?? "", {
@@ -371,7 +361,7 @@ const LocationPage = ({
                         <Select.Content>
                           {countryCollection.items
                             .filter((item) => {
-                              const country = countries.find(
+                              const country = countries.data.find(
                                 (c) => c.id === item.value,
                               );
                               return country?.preferred;
@@ -385,7 +375,7 @@ const LocationPage = ({
                           <Separator size={"lg"} />
                           {countryCollection.items
                             .filter((item) => {
-                              const country = countries.find(
+                              const country = countries.data.find(
                                 (c) => c.id === item.value,
                               );
                               return !country?.preferred;
@@ -421,7 +411,7 @@ const LocationPage = ({
                     country: country,
                     countryId: selectedCountry,
                     locationTypeId: "",
-                  } as Location
+                  } as unknown as Location
                 }
                 title="Adjust Location"
                 previewHeight={180}

@@ -15,15 +15,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { EventCategory, EventType } from "../../../features/events/event.model";
-import {
-  mapEventCategory,
-  mapEventType,
-} from "../../../features/events/event.mapper";
-import {
-  EventCategoryDTO,
-  EventTypeDTO,
-} from "../../../features/events/event.responses";
+import { EventType } from "../../../features/events/events.model";
 import {
   SaveResult,
   StepStatus,
@@ -174,15 +166,7 @@ const BasicInformation = ({
 
   // Derive collections from fetched arrays to avoid stale state
 
-  const { result: eventCategoriesResult } = useList<EventCategoryDTO>({
-    resource: "categories",
-    sorters: [{ field: "nameDe", order: "asc" }],
-    meta: {
-      parentmodule: "events",
-    },
-  });
-
-  const { result: eventTypesResult } = useList<EventTypeDTO>({
+  const { result: eventTypes } = useList<EventType>({
     resource: "types",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
@@ -190,39 +174,16 @@ const BasicInformation = ({
     },
   });
 
-  // Some data providers return shape { data: [...] } while others return [...]
-  const eventCategoriesDto =
-    (eventCategoriesResult?.data as any)?.data ??
-    eventCategoriesResult?.data ??
-    [];
-  const eventTypesDto =
-    (eventTypesResult?.data as any)?.data ?? eventTypesResult?.data ?? [];
-
-  const eventCategories: EventCategory[] = Array.isArray(eventCategoriesDto)
-    ? (eventCategoriesDto as EventCategoryDTO[]).map(mapEventCategory)
-    : [];
-  const eventTypes: EventType[] = Array.isArray(eventTypesDto)
-    ? (eventTypesDto as EventTypeDTO[]).map(mapEventType)
-    : [];
-
-  const eventCategoryCollection = useMemo(
-    () =>
-      createListCollection<{ label: string; value: string }>({
-        items: (Array.isArray(eventCategories) ? eventCategories : []).map(
-          (c: EventCategory) => ({ label: c.nameDe, value: c.id }),
-        ),
-      }),
-    [eventCategories],
-  );
+  console.log("Event Types:", eventTypes);
 
   const eventTypeCollection = useMemo(
     () =>
       createListCollection<{ label: string; value: string }>({
-        items: (Array.isArray(eventTypes) ? eventTypes : []).map(
+        items: (Array.isArray(eventTypes.data) ? eventTypes.data : []).map(
           (t: EventType) => ({ label: t.nameDe, value: t.id }),
         ),
       }),
-    [eventTypes],
+    [eventTypes.data],
   );
 
   const oneDay = watch("oneDay");
@@ -230,30 +191,13 @@ const BasicInformation = ({
   const selectedField = watch("field");
   const selectedType = watch("typeId");
 
-  // Set default category by code 'MED' or first available
-  useEffect(() => {
-    const preferredCategoryCode = "MED";
-    const preferredCategory = (eventCategories as EventCategory[]).find(
-      (c) => c.code === preferredCategoryCode,
-    );
-    const fallbackCategory = (eventCategories as EventCategory[])[0];
-    const nextDefault = preferredCategory?.id ?? fallbackCategory?.id;
-    if (nextDefault && !selectedField) {
-      setValue("field", nextDefault, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    }
-  }, [eventCategories, selectedField, setValue]);
-
   // Set default type by code 'CON' or first available
   useEffect(() => {
     const preferredTypeCode = "CON";
-    const preferredType = (eventTypes as EventType[]).find(
+    const preferredType = (eventTypes.data as EventType[]).find(
       (t) => t.code === preferredTypeCode,
     );
-    const fallbackType = (eventTypes as EventType[])[0];
+    const fallbackType = (eventTypes.data as EventType[])[0];
     const nextDefault = preferredType?.id ?? fallbackType?.id;
     if (nextDefault && !selectedType) {
       setValue("typeId", nextDefault, {
@@ -374,45 +318,6 @@ const BasicInformation = ({
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
             </Field.Root>
             <Flex gap="2vw" wrap={"wrap"} direction="row">
-              {eventCategoryCollection && (
-                <Select.Root
-                  collection={eventCategoryCollection}
-                  size="sm"
-                  width="19vw"
-                  value={selectedField ? [selectedField] : []}
-                  onValueChange={(e) => {
-                    const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                    setValue("field", next ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                  }}
-                >
-                  <Select.HiddenSelect name="field" />
-                  <Select.Label>Select Category</Select.Label>
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select Category" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {eventCategoryCollection.items.map((item) => (
-                          <Select.Item item={item} key={item.value}>
-                            {item.label}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              )}
               {eventTypeCollection && (
                 <Select.Root
                   collection={eventTypeCollection}
@@ -426,7 +331,7 @@ const BasicInformation = ({
                       shouldDirty: true,
                       shouldTouch: true,
                     });
-                    const selectedTypeObj = eventTypes.find(
+                    const selectedTypeObj = eventTypes.data.find(
                       (t) => t.id === next,
                     );
                     setValue("typeCode", selectedTypeObj?.code ?? "", {

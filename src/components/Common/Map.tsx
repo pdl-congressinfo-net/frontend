@@ -3,9 +3,7 @@ import { Box, Card, Dialog, Text, Flex, Button } from "@chakra-ui/react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Country, Location } from "../../features/locations/location.model";
-import { useList } from "@refinedev/core";
-import { CountryDTO } from "../../features/locations/location.responses";
+import { Location } from "../../features/locations/location.model";
 
 const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -107,8 +105,8 @@ export function MapPicker({
         number: prev?.number,
         postalCode: prev?.postalCode,
         city: prev?.city,
-        lat,
-        lng,
+        latitude: lat,
+        longitude: lng,
         countryId: prev?.countryId ?? "",
         locationTypeId: prev?.locationTypeId ?? "",
       };
@@ -153,7 +151,8 @@ export function MapPicker({
           <Text fontSize="sm" color="fg.muted" mb={2}>
             Preview
           </Text>
-          {locationState?.lat != null && locationState?.lng != null ? (
+          {locationState?.latitude != null &&
+          locationState?.longitude != null ? (
             <Box
               width={previewWidth}
               height={previewHeight}
@@ -161,8 +160,8 @@ export function MapPicker({
               cursor="pointer"
             >
               <MapContainer
-                key={`preview-${locationState?.lat ?? "null"}-${locationState?.lng ?? "null"}`}
-                center={[locationState.lat, locationState.lng]}
+                key={`preview-${locationState?.latitude ?? "null"}-${locationState?.longitude ?? "null"}`}
+                center={[locationState.latitude, locationState.longitude]}
                 zoom={15}
                 style={{
                   width: `calc(${previewWidth} - 8vw)`,
@@ -177,7 +176,7 @@ export function MapPicker({
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <Marker
-                  position={[locationState.lat, locationState.lng]}
+                  position={[locationState.latitude, locationState.longitude]}
                   icon={markerIcon}
                 />
               </MapContainer>
@@ -217,17 +216,20 @@ export function MapPicker({
               <MapContainer
                 // change key when center coords change so the map remounts and recenters
                 key={
-                  locationState?.lat != null && locationState?.lng != null
-                    ? `loc-${locationState.lat}-${locationState.lng}`
+                  locationState?.latitude != null &&
+                  locationState?.longitude != null
+                    ? `loc-${locationState.latitude}-${locationState.longitude}`
                     : `center-${center[0]}-${center[1]}`
                 }
                 center={
-                  locationState?.lat != null && locationState?.lng != null
-                    ? [locationState.lat, locationState.lng]
+                  locationState?.latitude != null &&
+                  locationState?.longitude != null
+                    ? [locationState.latitude, locationState.longitude]
                     : center
                 }
                 zoom={
-                  locationState?.lat != null && locationState?.lng != null
+                  locationState?.latitude != null &&
+                  locationState?.longitude != null
                     ? 15
                     : 5
                 }
@@ -239,10 +241,11 @@ export function MapPicker({
                 <MapClickHandler
                   onChange={(a, b) => handlePositionChange(a, b)}
                 />
-                {locationState?.lat != null && locationState?.lng != null ? (
+                {locationState?.latitude != null &&
+                locationState?.longitude != null ? (
                   <DraggableMarker
-                    lat={locationState.lat}
-                    lng={locationState.lng}
+                    lat={locationState.latitude}
+                    lng={locationState.longitude}
                     onChange={(a, b) => handlePositionChange(a, b)}
                   />
                 ) : null}
@@ -255,11 +258,12 @@ export function MapPicker({
                 </Button>
                 <Button
                   onClick={async () => {
-                    if (!locationState?.lat || !locationState?.lng) return;
+                    if (!locationState?.latitude || !locationState?.longitude)
+                      return;
 
                     const updated = await reverseGeocode(
-                      locationState.lat,
-                      locationState.lng,
+                      locationState.latitude,
+                      locationState.longitude,
                     );
                     onSave?.(updated);
                     setOpen(false);

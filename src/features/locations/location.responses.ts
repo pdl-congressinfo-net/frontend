@@ -1,7 +1,6 @@
 export interface LocationTypeDTO {
   id: string;
   name: string;
-  description?: string;
 }
 
 export interface CountryDTO {
@@ -21,9 +20,9 @@ export interface LocationDTO {
   city?: string;
   state?: string;
   postal_code?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;
+  longitude?: number;
   link?: string;
-  country_id: string;
-  location_type_id: string;
+  country_id?: string;
+  location_type_id?: string;
 }
