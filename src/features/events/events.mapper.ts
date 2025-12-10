@@ -1,8 +1,8 @@
-import { EventDTO, EventCategoryDTO, EventTypeDTO } from "./event.responses";
-import { Event, EventCategory, EventType } from "./event.model";
+import { EventDTO, EventCategoryDTO, EventTypeDTO } from "./events.responses";
+import { Event, EventCategory, EventType } from "./events.model";
 
-export const eventMapper = {
-  event: (dto: EventDTO): Event => ({
+export default {
+  events: (dto: EventDTO): Event => ({
     id: dto.id,
     name: dto.name,
     startDate: dto.start_date ? new Date(dto.start_date) : undefined,
@@ -30,5 +30,3 @@ export const eventMapper = {
     descriptionEn: dto.description_en,
   }),
 };
-
-export default eventMapper;

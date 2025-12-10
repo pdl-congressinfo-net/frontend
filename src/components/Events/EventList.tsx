@@ -12,9 +12,9 @@ import {
   useNavigation,
 } from "@refinedev/core";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Event } from "../../features/events/event.model";
-import { EventDTO } from "../../features/events/event.responses";
-import { mapEvent } from "../../features/events/event.mapper";
+import { Event } from "../../features/events/events.model";
+import { EventDTO } from "../../features/events/events.responses";
+import { mapEvent } from "../../features/events/events.mapper";
 import { boolean } from "zod";
 import { EventCardLoading } from "./EventCardLoading";
 
@@ -40,16 +40,12 @@ export const EventList = ({ archive }: EventListProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { result: eventsDto, query } = useList<EventDTO>({
+  const { result: eventsData, query } = useList<Event>({
     resource: "events",
     pagination: { pageSize: 10, currentPage: 1, mode: "server" },
     sorters: [{ field: "start_date", order: order }],
     filters: [{ field: "end_date", operator: "gte", value: startDate }],
   });
-
-  const eventsData: Event[] = Array.isArray(eventsDto?.data)
-    ? (eventsDto?.data as EventDTO[]).map(mapEvent)
-    : [];
 
   const { result: eventTypesDto } = useList({
     resource: "types",
@@ -67,6 +63,7 @@ export const EventList = ({ archive }: EventListProps) => {
   }>({ isOpen: false, event: null });
 
   const events = eventsData ?? [];
+  console.log(events);
 
   if (query.isLoading) {
     return (

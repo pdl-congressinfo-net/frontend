@@ -21,7 +21,7 @@ import {
   eventCategoryResource,
   eventTypeResource,
   eventResource,
-} from "./features/events/event.resource";
+} from "./features/events/events.resource";
 import AppRoutes from "./pages/Routes";
 import { LayoutProvider } from "./providers/layout-provider";
 

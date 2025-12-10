@@ -10,30 +10,21 @@ import {
 } from "./location.responses";
 import { LocationType, Country, Location } from "./location.model";
 
-// LocationType Mappers
-export function mapLocationTypeResponse(dto: LocationTypeResponse): LocationType {
-  return {
+export default {
+  types: (dto: LocationTypeResponse): LocationType => ({
     id: dto.id,
     name: dto.name,
     description: dto.description,
-  };
-}
-
-// Country Mappers
-export function mapCountryResponse(dto: CountryResponse): Country {
-  return {
+  }),
+  countries: (dto: CountryResponse): Country => ({
     id: dto.id,
     name: dto.name,
     code2: dto.code2,
     code3: dto.code3,
     devco: dto.devco,
     preferred: dto.preferred,
-  };
-}
-
-// Location Mappers
-export function mapLocationResponse(dto: LocationResponse): Location {
-  return {
+  }),
+  locations: (dto: LocationResponse): Location => ({
     id: dto.id,
     name: dto.name,
     road: dto.road,
@@ -46,5 +37,5 @@ export function mapLocationResponse(dto: LocationResponse): Location {
     link: dto.link,
     countryId: dto.country_id,
     locationTypeId: dto.location_type_id,
-  };
-}
+  }),
+};

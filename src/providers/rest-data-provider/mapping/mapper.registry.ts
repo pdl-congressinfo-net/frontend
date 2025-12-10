@@ -1,14 +1,13 @@
-type MapperFn = (dto: any) => any;
-
-const registry: Record<string, Record<string, MapperFn>> = {};
+const registry: Record<string, Record<string, Function>> = {};
 
 export function registerMapper(
   feature: string,
-  mapper: Record<string, MapperFn>,
+  mapper: Record<string, Function>,
 ) {
+  console.log("✅ Registered mapper for feature:", feature);
   registry[feature] = mapper;
 }
 
-export function getMapper(feature: string, resource: string): MapperFn | null {
-  return registry[feature]?.[resource] ?? null;
+export function getMapper(feature: string, entity: string) {
+  return registry[feature]?.[entity] ?? null;
 }

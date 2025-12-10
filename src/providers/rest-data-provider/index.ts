@@ -96,11 +96,17 @@ export const dataProvider = (
         mode = "server",
       } = pagination ?? {};
 
-      const { headers: headersFromMeta, method, parentmodule } = meta ?? {};
+      const { headers: headersFromMeta, method } = meta ?? {};
+      let parentmodule = meta?.parentmodule;
+
       const requestMethod = (method as MethodTypes) ?? "get";
 
       const featureName = meta?.parentmodule || resource;
       const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}`
@@ -132,17 +138,13 @@ export const dataProvider = (
         ? `${url}?${stringify(combinedQuery)}`
         : url;
 
-      const { data, headers } = await httpClient[requestMethod]<
-        ApiResponse<any>
-      >(urlWithQuery, {
+      const { data, headers } = await httpClient[requestMethod](urlWithQuery, {
         headers: headersFromMeta,
       });
 
       const total = +headers["x-total-count"];
 
-      const mappedData = mapper
-        ? data.data.map((item: any) => mapper(item))
-        : data.data;
+      const mappedData = mapper ? data.map((item: any) => mapper(item)) : data;
 
       return {
         data: mappedData,
@@ -151,10 +153,16 @@ export const dataProvider = (
     },
 
     getMany: async ({ resource, ids, meta }: GetManyParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method } = meta ?? {};
+      let parentmodule = meta?.parentmodule;
+
       const requestMethod = (method as MethodTypes) ?? "get";
       const featureName = meta?.parentmodule || resource;
       const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}?${stringify({ id: ids })}`
@@ -174,8 +182,17 @@ export const dataProvider = (
     },
 
     create: async ({ resource, variables, meta }: CreateParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "post";
+
+      let parentmodule = meta?.parentmodule;
+
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}`
@@ -189,14 +206,25 @@ export const dataProvider = (
         },
       );
 
+      const mappedData = mapper ? mapper(data.data) : data.data;
+
       return {
-        data: data,
+        data: mappedData,
       };
     },
 
     update: async ({ resource, id, variables, meta }: UpdateParams) => {
-      const { headers, method, parentmodule, relation_ids } = meta ?? {};
+      const { headers, method, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "put";
+
+      let parentmodule = meta?.parentmodule;
+
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
 
@@ -212,17 +240,24 @@ export const dataProvider = (
         },
       );
 
+      const mappedData = mapper ? mapper(data.data) : data.data;
+
       return {
-        data: data,
+        data: mappedData,
       };
     },
 
     getOne: async ({ resource, id, meta }: GetOneParams) => {
-      const { headers, method, parentmodule } = meta ?? {};
+      const { headers, method } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
+      let parentmodule = meta?.parentmodule;
 
       const featureName = meta?.parentmodule || resource;
       const mapper = getMapper(featureName, resource);
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}/${id}`
@@ -240,10 +275,15 @@ export const dataProvider = (
     },
 
     deleteOne: async ({ resource, id, variables, meta }: DeleteOneParams) => {
-      const { headers, method, parentmodule, relation_ids } = meta ?? {};
+      const { headers, method, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "delete";
+      let parentmodule = meta?.parentmodule;
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
+
+      if (parentmodule === resource) {
+        parentmodule = undefined;
+      }
 
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}/${selector}`

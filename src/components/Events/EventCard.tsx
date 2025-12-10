@@ -1,6 +1,6 @@
 import { Box, Button, Card, Flex, Heading, Image } from "@chakra-ui/react";
 import { CanAccess, useOne, useNavigation } from "@refinedev/core";
-import { Event } from "../../features/events/event.model";
+import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { LocationDTO } from "../../features/locations/location.responses";
 import { mapLocation } from "../../features/locations/location.mapper";
@@ -21,9 +21,9 @@ export const EventCard = ({
   const { edit } = useNavigation();
 
   const {
-    result: locationDTO,
+    result: location,
     query: { isLoading, isError },
-  } = useOne<ApiResponse<LocationDTO>>({
+  } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -31,9 +31,7 @@ export const EventCard = ({
     },
   });
 
-  const location = locationDTO ? mapLocation(locationDTO.data) : undefined;
-
-  const { result: country } = useOne<ApiResponse<Country>>({
+  const { result: country } = useOne<Country>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {

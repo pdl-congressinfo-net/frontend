@@ -2,9 +2,7 @@ import { Box, Heading, Text, DataList, Link } from "@chakra-ui/react";
 import TabsLayout from "./TabsLayout";
 import { useOne } from "@refinedev/core";
 import { ApiResponse } from "../../../common/types/api";
-import { LocationDTO } from "../../../features/locations/location.responses";
-import { mapLocation } from "../../../features/locations/location.mapper";
-import { Country } from "../../../features/locations/location.model";
+import { Country, Location } from "../../../features/locations/location.model";
 
 interface InformationProps {
   event: any;
@@ -12,9 +10,9 @@ interface InformationProps {
 
 export default function Information({ event }: InformationProps) {
   const {
-    result: locationDTO,
+    result: location,
     query: { isLoading, isError },
-  } = useOne<ApiResponse<LocationDTO>>({
+  } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -22,9 +20,7 @@ export default function Information({ event }: InformationProps) {
     },
   });
 
-  const location = locationDTO ? mapLocation(locationDTO.data) : undefined;
-
-  const { result: country } = useOne<ApiResponse<Country>>({
+  const { result: country } = useOne<Country>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {

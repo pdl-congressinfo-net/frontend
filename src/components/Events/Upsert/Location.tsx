@@ -18,8 +18,6 @@ import L from "leaflet";
 import { MapPicker } from "../../Common/Map";
 import { Country, Location } from "../../../features/locations/location.model";
 import { useList } from "@refinedev/core";
-import { CountryDTO } from "../../../features/locations/location.responses";
-import { mapCountry } from "../../../features/locations/location.mapper";
 import { SaveResult, StepStatus } from "./form-shared";
 import { PhysicalLocationFormValues, WebinarLocationFormValues } from "./types";
 
@@ -80,7 +78,7 @@ const LocationPage = ({
     [isWeb],
   );
 
-  const { result: locationsCountriesResult } = useList<CountryDTO>({
+  const { result: countries } = useList<CountryDTO>({
     resource: "countries",
     pagination: { pageSize: 1000 },
     sorters: [{ field: "name", order: "asc" }],
@@ -88,15 +86,6 @@ const LocationPage = ({
       parentmodule: "locations",
     },
   });
-
-  const countriesDto =
-    (locationsCountriesResult?.data as any)?.data ??
-    locationsCountriesResult?.data ??
-    [];
-
-  const countries: Country[] = Array.isArray(countriesDto)
-    ? (countriesDto as CountryDTO[]).map(mapCountry)
-    : [];
 
   const countryCollection = useMemo(
     () =>

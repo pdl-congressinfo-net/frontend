@@ -1,9 +1,9 @@
 import { PermissionDTO } from "./permission.responses";
 import { Permission } from "./permission.model";
 
-export const mapPermission = (dtos: PermissionDTO): Permission => {
-  return {
-    id: dtos.id,
-    name: dtos.name,
-  };
+export default {
+  permissions: (dto: PermissionDTO): Permission => ({
+    id: dto.id,
+    name: dto.name,
+  }),
 };

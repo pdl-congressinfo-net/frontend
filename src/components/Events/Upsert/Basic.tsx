@@ -15,15 +15,18 @@ import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { EventCategory, EventType } from "../../../features/events/event.model";
+import {
+  EventCategory,
+  EventType,
+} from "../../../features/events/events.model";
 import {
   mapEventCategory,
   mapEventType,
-} from "../../../features/events/event.mapper";
+} from "../../../features/events/events.mapper";
 import {
   EventCategoryDTO,
   EventTypeDTO,
-} from "../../../features/events/event.responses";
+} from "../../../features/events/events.responses";
 import {
   SaveResult,
   StepStatus,
@@ -174,7 +177,7 @@ const BasicInformation = ({
 
   // Derive collections from fetched arrays to avoid stale state
 
-  const { result: eventCategoriesResult } = useList<EventCategoryDTO>({
+  const { result: eventCategories } = useList<EventCategoryDTO>({
     resource: "categories",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
@@ -182,28 +185,13 @@ const BasicInformation = ({
     },
   });
 
-  const { result: eventTypesResult } = useList<EventTypeDTO>({
+  const { result: eventTypes } = useList<EventTypeDTO>({
     resource: "types",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
       parentmodule: "events",
     },
   });
-
-  // Some data providers return shape { data: [...] } while others return [...]
-  const eventCategoriesDto =
-    (eventCategoriesResult?.data as any)?.data ??
-    eventCategoriesResult?.data ??
-    [];
-  const eventTypesDto =
-    (eventTypesResult?.data as any)?.data ?? eventTypesResult?.data ?? [];
-
-  const eventCategories: EventCategory[] = Array.isArray(eventCategoriesDto)
-    ? (eventCategoriesDto as EventCategoryDTO[]).map(mapEventCategory)
-    : [];
-  const eventTypes: EventType[] = Array.isArray(eventTypesDto)
-    ? (eventTypesDto as EventTypeDTO[]).map(mapEventType)
-    : [];
 
   const eventCategoryCollection = useMemo(
     () =>
