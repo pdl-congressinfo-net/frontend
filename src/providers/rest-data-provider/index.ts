@@ -3,6 +3,7 @@ import { stringify } from "query-string";
 import type { AxiosInstance } from "axios";
 import type { CrudFilters, CrudSorting, DataProvider } from "@refinedev/core";
 import { ApiResponse } from "../../common/types/api";
+import { getMapper } from "../rest-data-provider/mapping/mapper.registry";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
@@ -98,6 +99,9 @@ export const dataProvider = (
       const { headers: headersFromMeta, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
 
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}`
         : `${apiUrl}/${resource}`;
@@ -136,8 +140,12 @@ export const dataProvider = (
 
       const total = +headers["x-total-count"];
 
+      const mappedData = mapper
+        ? data.data.map((item: any) => mapper(item))
+        : data.data;
+
       return {
-        data: data,
+        data: mappedData,
         total: total,
       };
     },
@@ -145,6 +153,9 @@ export const dataProvider = (
     getMany: async ({ resource, ids, meta }: GetManyParams) => {
       const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}?${stringify({ id: ids })}`
         : `${apiUrl}/${resource}?${stringify({ id: ids })}`;
@@ -153,8 +164,12 @@ export const dataProvider = (
         headers,
       });
 
+      const mappedData = mapper
+        ? data.data.map((item: any) => mapper(item))
+        : data.data;
+
       return {
-        data: data.data,
+        data: mappedData,
       };
     },
 
@@ -206,6 +221,9 @@ export const dataProvider = (
       const { headers, method, parentmodule } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
 
+      const featureName = meta?.parentmodule || resource;
+      const mapper = getMapper(featureName, resource);
+
       const url = parentmodule
         ? `${apiUrl}/${parentmodule}/${resource}/${id}`
         : `${apiUrl}/${resource}/${id}`;
@@ -214,8 +232,10 @@ export const dataProvider = (
         headers,
       });
 
+      const mappedData = mapper ? mapper(data.data) : data.data;
+
       return {
-        data: data,
+        data: mappedData,
       };
     },
 
