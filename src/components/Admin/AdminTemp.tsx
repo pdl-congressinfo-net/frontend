@@ -23,19 +23,13 @@ import {
   RolePermissionDTO,
 } from "../../features/roles/role.responses";
 import { Permission } from "../../features/permissions/permission.model";
-import { mapPermission } from "../../features/permissions/permission.mapper";
 import {
   User,
   UserPermission,
   UserRole,
 } from "../../features/users/user.model";
-import {
-  mapUser,
-  mapUserPermission,
-  mapUserRole,
-} from "../../features/users/user.mapper";
+
 import { Role, RolePermission } from "../../features/roles/role.model";
-import { mapRole, mapRolePermission } from "../../features/roles/role.mapper";
 import { TanstackPermissionMatrix } from "../Common/Matrix";
 
 export const AdminTemp = () => {
@@ -61,56 +55,29 @@ export const AdminTemp = () => {
 
   const { mutateAsync: del } = useDelete();
 
-  const { result: permissionsDto } = useList<PermissionDTO>({
+  const { result: permissions } = useList<Permission>({
     resource: "permissions",
     pagination: { pageSize: 1000 },
   });
-  const { result: usersDto } = useList<UserDTO>({ resource: "users" });
-  const { result: userPermissionsDto } = useList<UserPermissionDTO>({
+  const { result: users } = useList<User>({ resource: "users" });
+  const { result: userPermissions } = useList<UserPermission>({
     resource: "permissions",
     meta: { parentmodule: "users" },
   });
-  const { result: userRolesDto } = useList<UserRoleDTO>({
+  const { result: userRoles } = useList<UserRole>({
     resource: "roles",
     meta: { parentmodule: "users" },
   });
 
-  const { result: rolesDto } = useList<RoleDTO>({ resource: "roles" });
-  const { result: rolePermissionsDto } = useList<RolePermissionDTO>({
+  const { result: roles } = useList<Role>({ resource: "roles" });
+  const { result: rolePermissions } = useList<RolePermission>({
     resource: "permissions",
     meta: { parentmodule: "roles" },
     pagination: { pageSize: 1000 },
   });
 
-  const permissions: Permission[] = Array.isArray(permissionsDto?.data)
-    ? (permissionsDto?.data).map(mapPermission)
-    : [];
-  const users: User[] = Array.isArray(usersDto?.data)
-    ? (usersDto?.data).map(mapUser)
-    : [];
-
-  const userPermissions: UserPermission[] = Array.isArray(
-    userPermissionsDto?.data,
-  )
-    ? (userPermissionsDto?.data).map(mapUserPermission)
-    : [];
-
-  const userRoles: UserRole[] = Array.isArray(userRolesDto?.data)
-    ? (userRolesDto?.data).map(mapUserRole)
-    : [];
-
-  const roles: Role[] = Array.isArray(rolesDto?.data)
-    ? (rolesDto?.data).map(mapRole)
-    : [];
-
-  const rolePermissions: RolePermission[] = Array.isArray(
-    rolePermissionsDto?.data,
-  )
-    ? (rolePermissionsDto?.data).map(mapRolePermission)
-    : [];
-
   const groupedPermissions = useMemo(() => {
-    return permissions.reduce<Record<string, Permission[]>>((acc, p) => {
+    return permissions.data.reduce<Record<string, Permission[]>>((acc, p) => {
       const group = p.name.split(":")[0] || "General";
       acc[group] ??= [];
       acc[group].push(p);
@@ -120,7 +87,7 @@ export const AdminTemp = () => {
 
   const userPermissionSet = useMemo(() => {
     const set = new Set<string>();
-    for (const up of userPermissions) {
+    for (const up of userPermissions.data) {
       set.add(`${up.userId}|${up.permissionId}`);
     }
     return set;
@@ -128,7 +95,7 @@ export const AdminTemp = () => {
 
   const rolePermissionSet = useMemo(() => {
     const set = new Set<string>();
-    for (const rp of rolePermissions) {
+    for (const rp of rolePermissions.data) {
       set.add(`${rp.roleId}|${rp.permissionId}`);
     }
     return set;
@@ -147,7 +114,7 @@ export const AdminTemp = () => {
   }, [changes.remove]);
 
   const getRoleIdsForUser = (userId: string): string[] => {
-    return userRoles
+    return userRoles.data
       .filter((ur) => ur.userId === userId)
       .map((ur) => ur.roleId);
   };
@@ -156,7 +123,7 @@ export const AdminTemp = () => {
     const roleIds = getRoleIdsForUser(userId);
 
     return new Set(
-      rolePermissions
+      rolePermissions.data
         .filter((rp) => roleIds.includes(rp.roleId))
         .map((rp) => rp.permissionId),
     );
@@ -194,7 +161,7 @@ export const AdminTemp = () => {
     // Role based permissions are read-only in user view
     if (source === "role") return;
 
-    const original = userPermissions.some(
+    const original = userPermissions.data.some(
       (p) => p.userId === userId && p.permissionId === permissionId,
     );
 
@@ -215,7 +182,7 @@ export const AdminTemp = () => {
     permissionId: string,
     checked: boolean,
   ) => {
-    const original = rolePermissions.some(
+    const original = rolePermissions.data.some(
       (p) => p.roleId === roleId && p.permissionId === permissionId,
     );
 
@@ -296,8 +263,8 @@ export const AdminTemp = () => {
         changes.add.map(async ({ entityId, permissionId }) => {
           if (!entityId) return;
 
-          const isUser = users.some((u) => u.id === entityId);
-          const isRole = roles.some((r) => r.id === entityId);
+          const isUser = users.data.some((u) => u.id === entityId);
+          const isRole = roles.data.some((r) => r.id === entityId);
 
           if (isUser) {
             await create({
@@ -322,11 +289,11 @@ export const AdminTemp = () => {
         changes.remove.map(async ({ entityId, permissionId }) => {
           if (!entityId) return;
 
-          const isUser = users.some((u) => u.id === entityId);
-          const isRole = roles.some((r) => r.id === entityId);
+          const isUser = users.data.some((u) => u.id === entityId);
+          const isRole = roles.data.some((r) => r.id === entityId);
 
           if (isUser) {
-            const userPermission = userPermissions.find(
+            const userPermission = userPermissions.data.find(
               (up) =>
                 up.userId === entityId && up.permissionId === permissionId,
             );
@@ -341,7 +308,7 @@ export const AdminTemp = () => {
               });
             }
           } else if (isRole) {
-            const rolePermission = rolePermissions.find(
+            const rolePermission = rolePermissions.data.find(
               (rp) =>
                 rp.roleId === entityId && rp.permissionId === permissionId,
             );
@@ -421,7 +388,7 @@ export const AdminTemp = () => {
           <Tabs.Content value="users">
             <TanstackPermissionMatrix
               title="Users × Permissions"
-              rows={users}
+              rows={users.data}
               rowKey="id"
               rowLabel={(u) => u.fullName}
               groupedPermissions={groupedPermissions}
@@ -436,7 +403,7 @@ export const AdminTemp = () => {
           <Tabs.Content value="roles">
             <TanstackPermissionMatrix
               title="Roles × Permissions"
-              rows={roles}
+              rows={roles.data}
               rowKey="id"
               rowLabel={(r) => r.name}
               groupedPermissions={groupedPermissions}
