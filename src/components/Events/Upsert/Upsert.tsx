@@ -16,19 +16,16 @@ import { LuArrowLeft } from "react-icons/lu";
 
 import BasicInformation from "./Basic";
 import Location from "./Location";
-import Images from "./Images";
 import {
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
-  EventImagesFormValues,
 } from "./types";
 import {
   StepStatus,
   SaveResult,
   StoredEventInfo,
   StoredLocationInfo,
-  StoredImagesInfo,
   steps,
   getStatusIndicator,
   normalizeEventValues,
@@ -37,7 +34,6 @@ import {
   isSamePhysicalLocation,
   normalizeWebinarLocation,
   isSameWebinarLocation,
-  isSameImagesInfo,
   toOptionalString,
   unwrapData,
   EventDetail,
@@ -48,7 +44,6 @@ import {
   UpdateEventRequest,
 } from "../../../features/events/events.requests";
 
-import { httpClient } from "../../../utils/httpClient";
 import {
   CreateLocationRequest,
   UpdateLocationRequest,
@@ -118,13 +113,6 @@ const Upsert = ({
   const basicDirtyRef = React.useRef(false);
   const [locationInfo, setLocationInfo] =
     React.useState<StoredLocationInfo | null>(null);
-  const [imageInfo, setImageInfo] = React.useState<StoredImagesInfo | null>(
-    null,
-  );
-  const [imageDraft, setImageDraft] =
-    React.useState<EventImagesFormValues | null>(null);
-  const imageDirtyRef = React.useRef(false);
-  const [isSavingImages, setIsSavingImages] = React.useState(false);
   const [status, setStatus] = React.useState<Record<string, StepStatus>>(() => {
     const initial: Record<string, StepStatus> = {};
     mergedSteps.forEach((step) => {
@@ -176,11 +164,6 @@ const Upsert = ({
     [],
   );
 
-  const handleImagesStatus = React.useCallback(
-    (s: StepStatus) => setStatus((prev) => ({ ...prev, images: s })),
-    [],
-  );
-
   React.useEffect(() => {
     if (!eventInfo?.data) return;
     setStatus((prev) =>
@@ -194,13 +177,6 @@ const Upsert = ({
       prev.location === "open" ? { ...prev, location: "done" } : prev,
     );
   }, [locationInfo?.data]);
-
-  React.useEffect(() => {
-    if (!imageInfo?.headerUrl || !imageInfo.logoUrl) return;
-    setStatus((prev) =>
-      prev.images === "done" ? prev : { ...prev, images: "done" },
-    );
-  }, [imageInfo?.headerUrl, imageInfo?.logoUrl]);
 
   const renderAdditionalTab = React.useCallback(
     (tabId: string, title: string) => {
@@ -245,7 +221,7 @@ const Upsert = ({
   }, [eventResult]);
 
   const locationIdFromEvent =
-    eventRecord?.location_id ?? eventRecord?.location?.id ?? undefined;
+    eventRecord?.locationId ?? eventRecord?.location?.id ?? undefined;
 
   const { result: locationResult } = useOne<LocationDetail>({
     resource: "locations",
@@ -260,6 +236,9 @@ const Upsert = ({
     return unwrapData<LocationDetail>(locationResult) ?? locationResult;
   }, [locationResult]);
 
+  console.log("Upsert Rendered", locationResult);
+  console.log("locationId", locationIdFromEvent);
+
   const handleBasicChange = React.useCallback(
     (values: BasicInformationValues, meta?: { source: "user" | "sync" }) => {
       setBasicDraft((prev) =>
@@ -272,41 +251,6 @@ const Upsert = ({
     [],
   );
 
-  const handleImagesChange = React.useCallback(
-    (values: EventImagesFormValues, meta?: { source: "user" | "sync" }) => {
-      setImageDraft(values);
-      if (meta?.source === "user") {
-        imageDirtyRef.current = true;
-      }
-    },
-    [],
-  );
-
-  const typeIdForFetch = React.useMemo(() => {
-    if (!shouldLoadEvent) return undefined;
-    if (eventRecord?.type_code) return undefined;
-    return eventRecord?.type_id ?? eventRecord?.type?.id ?? undefined;
-  }, [
-    shouldLoadEvent,
-    eventRecord?.type_code,
-    eventRecord?.type_id,
-    eventRecord?.type?.id,
-  ]);
-
-  const { result: typeResult } = useOne<{ id: string; code?: string }>({
-    resource: "types",
-    id: typeIdForFetch ?? "",
-    meta: { parentmodule: "events" },
-    queryOptions: {
-      enabled: Boolean(typeIdForFetch),
-    },
-  });
-
-  const typeRecord = React.useMemo(() => {
-    if (!typeResult) return undefined;
-    return unwrapData<any>(typeResult) ?? typeResult;
-  }, [typeResult]);
-
   React.useEffect(() => {
     if (!isEdit || !eventRecord?.id) return;
 
@@ -318,9 +262,13 @@ const Upsert = ({
       startDate: safeStart,
       endDate: endDate ?? undefined,
       oneDay: !endDate || endDate === safeStart,
-      typeId: eventRecord.type_id ?? eventRecord.type?.id ?? "",
-      typeCode: eventRecord.type_code ?? eventRecord.type?.code ?? "",
-      field: eventRecord.category_id ?? "",
+      eventTypeId:
+        eventRecord.event_type_id ??
+        eventRecord.eventTypeId ??
+        eventRecord.event_type?.id ??
+        eventRecord.eventType?.id ??
+        "",
+      isPublic: eventRecord.is_public ?? eventRecord.isPublic ?? false,
     } as BasicInformationValues);
 
     const resolvedLocationId =
@@ -347,57 +295,6 @@ const Upsert = ({
   }, [isEdit, eventRecord, locationIdFromEvent, eventInfo?.locationId]);
 
   React.useEffect(() => {
-    if (!isEdit || !typeRecord) return;
-
-    setEventInfo((prev) => {
-      if (!prev) return prev;
-      const hasCode = prev.data.typeCode && prev.data.typeId;
-      if (hasCode) return prev;
-      const normalized = normalizeEventValues({
-        ...prev.data,
-        typeCode: (typeRecord as any)?.code ?? prev.data.typeCode,
-        typeId: (typeRecord as any)?.id ?? prev.data.typeId,
-      });
-      if (!basicDirtyRef.current) {
-        setBasicDraft((draftPrev) =>
-          draftPrev && isSameEventValues(draftPrev, normalized)
-            ? draftPrev
-            : normalized,
-        );
-      }
-      return { ...prev, data: normalized };
-    });
-  }, [isEdit, typeRecord]);
-
-  React.useEffect(() => {
-    if (!eventInfo?.data?.typeCode) {
-      const fallbackTypeCode =
-        eventRecord?.type_code ?? eventRecord?.type?.code ?? undefined;
-      if (fallbackTypeCode) {
-        setEventInfo((prev) => {
-          if (!prev) return prev;
-          const updated = normalizeEventValues({
-            ...prev.data,
-            typeCode: fallbackTypeCode,
-            typeId:
-              prev.data.typeId ??
-              eventRecord?.type_id ??
-              eventRecord?.type?.id ??
-              "",
-          });
-          if (!basicDirtyRef.current) {
-            setBasicDraft((draftPrev) =>
-              draftPrev && isSameEventValues(draftPrev, updated)
-                ? draftPrev
-                : updated,
-            );
-          }
-          return { ...prev, data: updated };
-        });
-      }
-      return;
-    }
-
     const candidateLocation =
       locationRecord ?? eventRecord?.location ?? undefined;
 
@@ -409,7 +306,7 @@ const Upsert = ({
       return { ...prev, locationId: candidateLocation.id ?? prev.locationId };
     });
 
-    const isWeb = eventInfo.data.typeCode === "WEB";
+    const isWeb = Boolean(candidateLocation.link);
 
     setLocationInfo((prev) => {
       if (prev && prev.kind === (isWeb ? "webinar" : "physical")) {
@@ -430,23 +327,19 @@ const Upsert = ({
 
       const physicalValues = normalizePhysicalLocation({
         name: candidateLocation.name ?? "",
-        road: candidateLocation.road ?? "",
-        number: candidateLocation.number ?? "",
+        road: candidateLocation.road,
+        number: candidateLocation.number,
         postalCode:
-          candidateLocation.postal_code ?? candidateLocation.postalCode ?? "",
-        city: candidateLocation.city ?? "",
-        lat:
-          typeof candidateLocation.lat === "number"
-            ? candidateLocation.lat
+          candidateLocation.postal_code ?? candidateLocation.postalCode,
+        city: candidateLocation.city,
+        latitude:
+          candidateLocation.latitude != null
+            ? candidateLocation.latitude
             : undefined,
-        lng:
-          typeof candidateLocation.lng === "number"
-            ? candidateLocation.lng
+        longitude:
+          candidateLocation.longitude != null
+            ? candidateLocation.longitude
             : undefined,
-        country:
-          typeof candidateLocation.country === "string"
-            ? candidateLocation.country
-            : (candidateLocation.country?.name ?? ""),
         countryId:
           candidateLocation.country_id ??
           candidateLocation.countryId ??
@@ -461,105 +354,19 @@ const Upsert = ({
         data: physicalValues,
       };
     });
-  }, [eventInfo?.data?.typeCode, locationRecord, eventRecord?.location]);
-
-  React.useEffect(() => {
-    if (!eventInfo?.data?.typeCode || !locationInfo) return;
-    const expectedKind =
-      eventInfo.data.typeCode === "WEB" ? "webinar" : "physical";
-    if (locationInfo.kind !== expectedKind) {
-      setLocationInfo(null);
-      setEventInfo((prev) =>
-        prev ? { ...prev, locationId: undefined } : prev,
-      );
-    }
-  }, [eventInfo?.data?.typeCode, locationInfo?.kind]);
-
-  React.useEffect(() => {
-    const headerUrlFromRecord =
-      eventRecord?.header_url ??
-      eventRecord?.headerUrl ??
-      eventRecord?.header?.url ??
-      null;
-    const logoUrlFromRecord =
-      eventRecord?.icon_url ??
-      eventRecord?.iconUrl ??
-      eventRecord?.icon?.url ??
-      null;
-
-    if (!headerUrlFromRecord && !logoUrlFromRecord) {
-      return;
-    }
-
-    const nextInfo: StoredImagesInfo = {
-      headerUrl: headerUrlFromRecord,
-      logoUrl: logoUrlFromRecord,
-    };
-
-    setImageInfo((prev) =>
-      prev && isSameImagesInfo(prev, nextInfo) ? prev : nextInfo,
-    );
-
-    if (!imageDirtyRef.current) {
-      setImageDraft((prevDraft) => {
-        if (prevDraft?.headerFile || prevDraft?.logoFile) {
-          return prevDraft;
-        }
-
-        if (prevDraft) {
-          const prevInfo: StoredImagesInfo = {
-            headerUrl: prevDraft.headerUrl ?? null,
-            logoUrl: prevDraft.logoUrl ?? null,
-          };
-          if (isSameImagesInfo(prevInfo, nextInfo)) {
-            return prevDraft;
-          }
-        }
-
-        return {
-          headerUrl: nextInfo.headerUrl ?? null,
-          logoUrl: nextInfo.logoUrl ?? null,
-          headerFile: null,
-          logoFile: null,
-        };
-      });
-    }
-  }, [
-    eventRecord?.header_url,
-    eventRecord?.headerUrl,
-    eventRecord?.header,
-    eventRecord?.icon_url,
-    eventRecord?.iconUrl,
-    eventRecord?.icon,
-  ]);
+  }, [locationRecord, eventRecord?.location]);
 
   const eventValuesForRender = basicDraft ?? eventInfo?.data ?? null;
-  const eventTypeCode = eventValuesForRender?.typeCode ?? null;
-  const isWebEvent = eventTypeCode === "WEB";
-  const locationInitialValues =
-    locationInfo && locationInfo.kind === (isWebEvent ? "webinar" : "physical")
-      ? locationInfo.data
-      : undefined;
-  const locationRenderKey = isWebEvent ? "web" : "physical";
-  const imageInitialValues =
-    imageDraft ??
-    (imageInfo
-      ? {
-          headerUrl: imageInfo.headerUrl ?? null,
-          logoUrl: imageInfo.logoUrl ?? null,
-          headerFile: null,
-          logoFile: null,
-        }
-      : undefined);
+  const locationInitialValues = locationInfo?.data;
+  const locationRenderKey = locationInfo?.kind ?? "physical";
 
   const handleSave = React.useCallback(
     async (
       data:
         | BasicInformationValues
         | PhysicalLocationFormValues
-        | WebinarLocationFormValues
-        | EventImagesFormValues,
-      step: "event" | "location" | "images",
+        | WebinarLocationFormValues,
+      step: "event" | "location",
     ): Promise<SaveResult> => {
       if (step === "event") {
         const normalized = normalizeEventValues(data as BasicInformationValues);
@@ -574,7 +381,8 @@ const Upsert = ({
             start_date: new Date(normalized.startDate),
             end_date: new Date(normalized.endDate ?? normalized.startDate),
             location_id: locationInfo?.id,
-            is_public: false,
+            is_public: normalized.isPublic,
+            event_type_id: normalized.eventTypeId || undefined,
           };
 
           const response = await createEvent({ values: createPayload });
@@ -611,6 +419,8 @@ const Upsert = ({
           start_date: new Date(normalized.startDate),
           end_date: new Date(normalized.endDate ?? normalized.startDate),
           location_id: locationInfo?.id,
+          is_public: normalized.isPublic,
+          event_type_id: normalized.eventTypeId || undefined,
         };
 
         await updateEvent({ id: eventInfo.id, values: updatePayload });
@@ -628,85 +438,6 @@ const Upsert = ({
         return { success: true, id: eventInfo.id };
       }
 
-      if (step === "images") {
-        if (!eventInfo?.id) {
-          throw new Error(
-            "Save the basic event information before uploading images.",
-          );
-        }
-
-        const eventId = eventInfo.id as string;
-        const values = data as EventImagesFormValues;
-
-        const uploadAsset = async (
-          endpoint: "header" | "icons",
-          file: File | null | undefined,
-        ) => {
-          if (!file) return undefined;
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("event_id", eventId);
-          formData.append("eventId", eventId);
-          const response = await httpClient.post(
-            `/files/${endpoint}`,
-            formData,
-            {
-              headers: { "Content-Type": "multipart/form-data" },
-            },
-          );
-          const payload = response?.data;
-          return (
-            payload?.data?.url ??
-            payload?.data?.location ??
-            payload?.data?.path ??
-            payload?.url ??
-            payload?.location ??
-            payload?.path ??
-            (typeof payload === "string" ? payload : undefined)
-          );
-        };
-
-        setIsSavingImages(true);
-        try {
-          let nextHeaderUrl = values.headerUrl ?? imageInfo?.headerUrl ?? null;
-          let nextLogoUrl = values.logoUrl ?? imageInfo?.logoUrl ?? null;
-
-          if (values.headerFile) {
-            const uploaded = await uploadAsset("header", values.headerFile);
-            if (uploaded) {
-              nextHeaderUrl = uploaded;
-            }
-          }
-
-          if (values.logoFile) {
-            const uploaded = await uploadAsset("icons", values.logoFile);
-            if (uploaded) {
-              nextLogoUrl = uploaded;
-            }
-          }
-
-          const nextInfo: StoredImagesInfo = {
-            headerUrl: nextHeaderUrl ?? null,
-            logoUrl: nextLogoUrl ?? null,
-          };
-
-          setImageInfo((prev) =>
-            prev && isSameImagesInfo(prev, nextInfo) ? prev : nextInfo,
-          );
-          imageDirtyRef.current = false;
-          setImageDraft({
-            headerUrl: nextInfo.headerUrl ?? null,
-            logoUrl: nextInfo.logoUrl ?? null,
-            headerFile: null,
-            logoFile: null,
-          });
-
-          return { success: true, id: eventInfo.id };
-        } finally {
-          setIsSavingImages(false);
-        }
-      }
-
       if (step === "location") {
         if (!eventInfo?.id) {
           throw new Error(
@@ -715,7 +446,7 @@ const Upsert = ({
         }
 
         const currentEventId = eventInfo.id;
-        const isWeb = eventInfo.data.typeCode === "WEB";
+        const isWeb = locationInfo?.kind === "webinar";
 
         if (isWeb) {
           const normalized = normalizeWebinarLocation(
@@ -775,8 +506,8 @@ const Upsert = ({
             number: toOptionalString(normalized.number),
             postal_code: toOptionalString(normalized.postalCode),
             city: toOptionalString(normalized.city),
-            latitude: normalized.lat,
-            longitude: normalized.lng,
+            latitude: normalized.latitude,
+            longitude: normalized.longitude,
             country_id: toOptionalString(normalized.countryId),
           };
           const response = await createLocation({ values: createPayload });
@@ -792,8 +523,8 @@ const Upsert = ({
             number: toOptionalString(normalized.number),
             postal_code: toOptionalString(normalized.postalCode),
             city: toOptionalString(normalized.city),
-            latitude: normalized.lat,
-            longitude: normalized.lng,
+            latitude: normalized.latitude,
+            longitude: normalized.longitude,
             country_id: toOptionalString(normalized.countryId),
           };
           await updateLocation({ id: locationId, values: updatePayload });
@@ -821,7 +552,6 @@ const Upsert = ({
     [
       eventInfo,
       locationInfo,
-      imageInfo,
       mode,
       createEvent,
       updateEvent,
@@ -914,28 +644,7 @@ const Upsert = ({
 
   return (
     <>
-      <Flex justify="space-between" mb={4} align="center">
-        <Heading>{isEdit ? "Edit Event" : "Create Event"}</Heading>
-        <Link to={backHref}>
-          <Button
-            variant="ghost"
-            rounded="full"
-            mb={4}
-            _hover={{
-              transform: "scale(1.05)",
-              transition: "transform 0.15s ease-in-out",
-              backgroundColor: "transparent",
-            }}
-            _active={{ transform: "scale(1.02)" }}
-          >
-            <Flex align="center" gap={2}>
-              <LuArrowLeft size={20} />
-              <span>Back</span>
-            </Flex>
-          </Button>
-        </Link>
-      </Flex>
-      <Card.Root>
+      <Card.Root shadow="md" border="1px solid" borderColor="gray.200">
         <Card.Body>
           <Tabs.Root
             orientation="vertical"
@@ -1007,27 +716,12 @@ const Upsert = ({
                     onPrevious={goPrevious}
                     onStatus={handleLocationStatus}
                     onSave={(data) => handleSave(data, "location")}
-                    eventTypeCode={eventTypeCode}
                     initialValues={locationInitialValues}
-                  />
-                </Tabs.Content>
-                <Tabs.Content value="images">
-                  <Images
-                    onNext={goNext}
-                    onPrevious={goPrevious}
-                    onStatus={handleImagesStatus}
-                    onSave={(data) => handleSave(data, "images")}
-                    initialValues={imageInitialValues ?? undefined}
-                    onChange={handleImagesChange}
-                    isSubmitting={isSavingImages}
                   />
                 </Tabs.Content>
                 {mergedSteps
                   .filter(
-                    (step) =>
-                      step.id !== "event" &&
-                      step.id !== "location" &&
-                      step.id !== "images",
+                    (step) => step.id !== "event" && step.id !== "location",
                   )
                   .map((step) => (
                     <Tabs.Content key={step.id} value={step.id}>

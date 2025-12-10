@@ -47,12 +47,11 @@ const BasicInformationSchema = z
       if (v === "" || v == null) return undefined;
       return toYMD(v);
     }, z.string().optional()),
-    typeId: z.string().min(1, "Event type is required"),
-    typeCode: z.string().min(1, "Event type code is required").default("CON"),
-    field: z.string().default("MED"),
+    eventTypeId: z.string().min(1, "Event type is required"),
+    isPublic: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
-    const start = data.startDate; // yyyy-MM-dd
+    const start = data.startDate;
     if (!data.oneDay) {
       if (!data.endDate) {
         ctx.addIssue({
@@ -61,7 +60,7 @@ const BasicInformationSchema = z
           code: z.ZodIssueCode.custom,
         });
       } else {
-        const end = data.endDate; // yyyy-MM-dd
+        const end = data.endDate;
         if (end < start) {
           ctx.addIssue({
             path: ["endDate"],
@@ -105,9 +104,8 @@ const BasicInformation = ({
       startDate: `${y}-${m}-${day}`,
       oneDay: false,
       endDate: undefined,
-      typeId: "",
-      typeCode: "CON",
-      field: "",
+      eventTypeId: "",
+      isPublic: false,
     };
   }, []);
 
@@ -146,9 +144,8 @@ const BasicInformation = ({
         (initialValues.oneDay ?? current.oneDay)
           ? (initialValues.startDate ?? current.startDate)
           : (initialValues.endDate ?? current.endDate),
-      typeId: initialValues.typeId ?? current.typeId,
-      typeCode: initialValues.typeCode ?? current.typeCode,
-      field: initialValues.field ?? current.field,
+      eventTypeId: initialValues.eventTypeId ?? current.eventTypeId,
+      isPublic: initialValues.isPublic ?? current.isPublic,
     };
     const normalizedCurrent = normalizeEventValues(
       current as BasicInformationValues,
@@ -188,31 +185,7 @@ const BasicInformation = ({
 
   const oneDay = watch("oneDay");
   const startDate = watch("startDate");
-  const selectedField = watch("field");
-  const selectedType = watch("typeId");
-
-  // Set default type by code 'CON' or first available
-  useEffect(() => {
-    const preferredTypeCode = "CON";
-    const preferredType = (eventTypes.data as EventType[]).find(
-      (t) => t.code === preferredTypeCode,
-    );
-    const fallbackType = (eventTypes.data as EventType[])[0];
-    const nextDefault = preferredType?.id ?? fallbackType?.id;
-    if (nextDefault && !selectedType) {
-      setValue("typeId", nextDefault, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      const nextCode = preferredType?.code ?? fallbackType?.code ?? "";
-      setValue("typeCode", nextCode, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    }
-  }, [eventTypes, selectedType, setValue]);
+  const selectedEventType = watch("eventTypeId");
 
   useEffect(() => {
     if (oneDay && startDate) {
@@ -317,55 +290,45 @@ const BasicInformation = ({
               <Input type="date" disabled={oneDay} {...register("endDate")} />
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
             </Field.Root>
-            <Flex gap="2vw" wrap={"wrap"} direction="row">
-              {eventTypeCollection && (
-                <Select.Root
-                  collection={eventTypeCollection}
-                  size="sm"
-                  width="19vw"
-                  value={selectedType ? [selectedType] : []}
-                  onValueChange={(e) => {
-                    const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                    setValue("typeId", next ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                    const selectedTypeObj = eventTypes.data.find(
-                      (t) => t.id === next,
-                    );
-                    setValue("typeCode", selectedTypeObj?.code ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                  }}
-                >
-                  <Select.HiddenSelect name="typeId" />
-                  <Select.Label>Select Type</Select.Label>
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select Type" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {eventTypeCollection.items.map((item) => (
-                          <Select.Item item={item} key={item.value}>
-                            {item.label}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              )}
-            </Flex>
+            {eventTypeCollection && (
+              <Select.Root
+                collection={eventTypeCollection}
+                size="sm"
+                width="19vw"
+                value={selectedEventType ? [selectedEventType] : []}
+                onValueChange={(e) => {
+                  const next = Array.isArray(e.value) ? e.value[0] : e.value;
+                  setValue("eventTypeId", next ?? "", {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
+                }}
+              >
+                <Select.HiddenSelect name="eventTypeId" />
+                <Select.Label>Event Type</Select.Label>
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText placeholder="Select event type" />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {eventTypeCollection.items.map((item) => (
+                        <Select.Item item={item} key={item.value}>
+                          {item.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+            )}
             <Flex gap="2">
               <Button type="submit" disabled={!isValid}>
                 Next

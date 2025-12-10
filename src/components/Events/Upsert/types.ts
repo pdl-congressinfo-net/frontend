@@ -3,21 +3,19 @@ export interface BasicInformationValues {
   startDate: string;
   oneDay: boolean;
   endDate?: string;
-  typeId: string;
-  typeCode: string;
-  field: string;
+  eventTypeId: string;
+  isPublic: boolean;
 }
 
 export type PhysicalLocationFormValues = {
   name: string;
-  road: string;
-  number: string;
-  postalCode: string;
-  city: string;
-  lat?: number;
-  lng?: number;
-  country: string;
-  countryId: string;
+  road?: string;
+  number?: string;
+  postalCode?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  countryId?: string;
 };
 
 export type WebinarLocationFormValues = {
@@ -25,9 +23,3 @@ export type WebinarLocationFormValues = {
   link: string;
 };
 
-export type EventImagesFormValues = {
-  headerFile?: File | null;
-  headerUrl?: string | null;
-  logoFile?: File | null;
-  logoUrl?: string | null;
-};

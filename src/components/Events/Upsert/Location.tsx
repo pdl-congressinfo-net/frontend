@@ -29,7 +29,6 @@ type LocationProps = {
   onSave?: (
     data: PhysicalLocationFormValues | WebinarLocationFormValues,
   ) => Promise<SaveResult | void> | SaveResult | void;
-  eventTypeCode?: string | null;
   initialValues?:
     | Partial<PhysicalLocationFormValues>
     | Partial<WebinarLocationFormValues>;
@@ -38,23 +37,19 @@ type LocationProps = {
 const physicalSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
-    road: z.string().min(1, "Street is required"),
-    number: z.number().min(1, "Number is required").or(z.string().min(1)),
-    postalCode: z
-      .number()
-      .min(1, "Postal code is required")
-      .or(z.string().min(1)),
-    city: z.string().min(1, "City is required"),
-    country: z.string().min(1, "Country is required"),
-    countryId: z.string().min(1, "CountryId is required"),
-    lat: z.number().optional(),
-    lng: z.number().optional(),
+    road: z.string().optional(),
+    number: z.string().optional(),
+    postalCode: z.string().optional(),
+    city: z.string().optional(),
+    countryId: z.string().optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.lat == null || data.lng == null) {
+    if (data.latitude == null || data.longitude == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["lat"],
+        path: ["latitude"],
         message: "Please locate the address on the map",
       });
     }
@@ -70,10 +65,9 @@ const LocationPage = ({
   onPrevious,
   onStatus,
   onSave,
-  eventTypeCode,
   initialValues,
 }: LocationProps) => {
-  const isWeb = eventTypeCode === "WEB";
+  const isWeb = initialValues && "link" in initialValues;
   const schema = useMemo(
     () => (isWeb ? webinarSchema : physicalSchema),
     [isWeb],
@@ -107,9 +101,8 @@ const LocationPage = ({
       number: "",
       postalCode: "",
       city: "",
-      lat: undefined,
-      lng: undefined,
-      country: "",
+      latitude: undefined,
+      longitude: undefined,
       countryId: "",
       link: "",
     }),
@@ -142,14 +135,13 @@ const LocationPage = ({
   } = formState as any;
 
   const name = watch("name");
-  const lat = watch("lat");
-  const lng = watch("lng");
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
   const road = watch("road");
   const number = watch("number");
   const postalCode = watch("postalCode");
   const city = watch("city");
   const selectedCountry = watch("countryId");
-  const country = watch("country");
   const europeBounds = useMemo(() => L.latLngBounds([34, -25], [72, 45]), []);
   const defaultCenter = useMemo<[number, number]>(() => [54, 15], []);
 
@@ -158,8 +150,10 @@ const LocationPage = ({
     const house = (number || "").trim();
     const postal = (postalCode || "").trim();
     const cityTrimmed = (city || "").trim();
-    const countryTrimmed = (country || "").trim();
-    const query = [street, house, postal, cityTrimmed, countryTrimmed]
+    const countryName = selectedCountry
+      ? countries.data.find((c) => c.id === selectedCountry)?.name
+      : "";
+    const query = [street, house, postal, cityTrimmed, countryName]
       .filter(Boolean)
       .join(", ");
     if (!query) return;
@@ -182,11 +176,11 @@ const LocationPage = ({
         const nlat = parseFloat(lat);
         const nlng = parseFloat(lon);
         if (!isNaN(nlat) && !isNaN(nlng)) {
-          setValue("lat", nlat, {
+          setValue("latitude", nlat, {
             shouldValidate: true,
             shouldDirty: true,
           });
-          setValue("lng", nlng, {
+          setValue("longitude", nlng, {
             shouldValidate: true,
             shouldDirty: true,
           });
@@ -333,15 +327,7 @@ const LocationPage = ({
                       const nextId = Array.isArray(e.value)
                         ? e.value[0]
                         : e.value;
-                      const nextCountry = countries.data.find(
-                        (c) => c.id === nextId,
-                      );
-                      setValue("countryId", nextId ?? "", {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                        shouldTouch: true,
-                      });
-                      setValue("country", nextCountry?.name || "", {
+                        setValue("countryId", nextId ?? "", {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true,
@@ -406,9 +392,8 @@ const LocationPage = ({
                     number: (number || "").trim(),
                     postalCode: (postalCode || "").trim(),
                     city: (city || "").trim(),
-                    lat: lat,
-                    lng: lng,
-                    country: country,
+                    latitude: latitude,
+                    longitude: longitude,
                     countryId: selectedCountry,
                     locationTypeId: "",
                   } as unknown as Location
@@ -425,10 +410,6 @@ const LocationPage = ({
                       shouldValidate: true,
                       shouldDirty: true,
                     });
-                    setValue("country", match.name, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    });
                   }
 
                   setValue("name", loc.name || "");
@@ -437,10 +418,10 @@ const LocationPage = ({
                   setValue("postalCode", loc.postalCode || "");
                   setValue("city", loc.city || "");
 
-                  if (loc.lat != null)
-                    setValue("lat", loc.lat, { shouldDirty: true });
-                  if (loc.lng != null)
-                    setValue("lng", loc.lng, { shouldDirty: true });
+                  if (loc.latitude != null)
+                    setValue("latitude", loc.latitude, { shouldDirty: true });
+                  if (loc.longitude != null)
+                    setValue("longitude", loc.longitude, { shouldDirty: true });
                 }}
               />
               <Flex gap="2">

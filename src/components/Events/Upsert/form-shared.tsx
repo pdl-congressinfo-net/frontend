@@ -3,7 +3,6 @@ import {
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
-  EventImagesFormValues,
 } from "./types";
 
 type StepStatus = "done" | "error" | "open";
@@ -20,28 +19,20 @@ type StoredLocationInfo =
   | { id?: string; kind: "physical"; data: PhysicalLocationFormValues }
   | { id?: string; kind: "webinar"; data: WebinarLocationFormValues };
 
-type StoredImagesInfo = {
-  headerUrl?: string | null;
-  logoUrl?: string | null;
-};
-
 type EventDetail = {
   id: string;
   name?: string;
   start_date?: string | Date;
   end_date?: string | Date;
-  category_id?: string;
-  type_id?: string;
-  type_code?: string;
-  type?: { id?: string; code?: string } | null;
+  event_type_id?: string;
+  eventTypeId?: string;
+  event_type?: { id?: string; code?: string } | null;
+  eventType?: { id?: string; code?: string } | null;
   location_id?: string;
+  locationId?: string;
   location?: LocationDetail | null;
-  header_url?: string | null;
-  headerUrl?: string | null;
-  header?: { url?: string | null } | null;
-  icon_url?: string | null;
-  iconUrl?: string | null;
-  icon?: { url?: string | null } | null;
+  is_public?: boolean;
+  isPublic?: boolean;
   [key: string]: unknown;
 };
 
@@ -53,8 +44,8 @@ type LocationDetail = {
   postal_code?: string;
   postalCode?: string;
   city?: string;
-  lat?: number;
-  lng?: number;
+  latitude?: number;
+  longitude?: number;
   link?: string;
   country?: { id?: string; name?: string } | string | null;
   country_id?: string;
@@ -65,9 +56,6 @@ type LocationDetail = {
 const steps: { id: string; title: string }[] = [
   { id: "event", title: "Basic Information" },
   { id: "location", title: "Location" },
-  { id: "images", title: "Images" },
-  { id: "tickets", title: "Tickets" },
-  { id: "review", title: "Review & Submit" },
 ];
 
 const getStatusIndicator = (status: StepStatus) => {
@@ -96,22 +84,20 @@ const isSameEventValues = (
   a.startDate === b.startDate &&
   (a.endDate ?? "") === (b.endDate ?? "") &&
   a.oneDay === b.oneDay &&
-  a.typeId === b.typeId &&
-  a.typeCode === b.typeCode &&
-  a.field === b.field;
+  a.eventTypeId === b.eventTypeId &&
+  a.isPublic === b.isPublic;
 
 const normalizePhysicalLocation = (
   data: PhysicalLocationFormValues,
 ): PhysicalLocationFormValues => ({
   name: data.name?.trim() ?? "",
-  road: data.road?.trim() ?? "",
-  number: data.number?.trim() ?? "",
-  postalCode: data.postalCode?.trim() ?? "",
-  city: data.city?.trim() ?? "",
-  lat: data.lat,
-  lng: data.lng,
-  country: data.country?.trim() ?? "",
-  countryId: data.countryId?.trim() ?? "",
+  road: data.road?.trim(),
+  number: data.number?.trim(),
+  postalCode: data.postalCode?.trim(),
+  city: data.city?.trim(),
+  latitude: data.latitude,
+  longitude: data.longitude,
+  countryId: data.countryId?.trim(),
 });
 
 const isSamePhysicalLocation = (
@@ -119,14 +105,13 @@ const isSamePhysicalLocation = (
   b: PhysicalLocationFormValues,
 ) =>
   a.name === b.name &&
-  a.road === b.road &&
-  a.number === b.number &&
-  a.postalCode === b.postalCode &&
-  a.city === b.city &&
-  a.country === b.country &&
-  a.countryId === b.countryId &&
-  (a.lat ?? null) === (b.lat ?? null) &&
-  (a.lng ?? null) === (b.lng ?? null);
+  (a.road ?? "") === (b.road ?? "") &&
+  (a.number ?? "") === (b.number ?? "") &&
+  (a.postalCode ?? "") === (b.postalCode ?? "") &&
+  (a.city ?? "") === (b.city ?? "") &&
+  (a.countryId ?? "") === (b.countryId ?? "") &&
+  (a.latitude ?? null) === (b.latitude ?? null) &&
+  (a.longitude ?? null) === (b.longitude ?? null);
 
 const normalizeWebinarLocation = (
   data: WebinarLocationFormValues,
@@ -139,10 +124,6 @@ const isSameWebinarLocation = (
   a: WebinarLocationFormValues,
   b: WebinarLocationFormValues,
 ) => a.name === b.name && a.link === b.link;
-
-const isSameImagesInfo = (a: StoredImagesInfo, b: StoredImagesInfo) =>
-  (a.headerUrl ?? "") === (b.headerUrl ?? "") &&
-  (a.logoUrl ?? "") === (b.logoUrl ?? "");
 
 const toOptionalString = (value?: string) => {
   const trimmed = value?.trim();
@@ -166,11 +147,9 @@ export type {
   SaveResult,
   StoredEventInfo,
   StoredLocationInfo,
-  StoredImagesInfo,
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
-  EventImagesFormValues,
   EventDetail,
   LocationDetail,
 };
@@ -184,7 +163,6 @@ export {
   isSamePhysicalLocation,
   normalizeWebinarLocation,
   isSameWebinarLocation,
-  isSameImagesInfo,
   toOptionalString,
   unwrapData,
 };
