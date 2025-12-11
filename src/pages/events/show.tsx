@@ -1,11 +1,12 @@
 import { useParams, useNavigate, useLocation } from "react-router";
-import { useOne } from "@refinedev/core";
+import { useOne, useTranslation } from "@refinedev/core";
 import EventDetailsDialog from "../../components/Events/EventDetailsDialog";
 import { EventDetails } from "../../components/Events/EventDetails";
 import { Event } from "../../features/events/events.model";
 import { Spinner } from "@chakra-ui/react";
 
 const EventShowPage = () => {
+  const { translate: t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,7 +37,7 @@ const EventShowPage = () => {
     <EventDetailsDialog
       isOpen={true}
       onClose={handleClose}
-      title={result.name || "Event Details"}
+      title={result.name || t("events.details.title")}
     >
       <EventDetails event={result} />
     </EventDetailsDialog>

@@ -3,9 +3,156 @@
     "projectName": "Congressinfo.net",
     "loading": "Laden...",
     "login": "Login",
-    "allRightsReserved": "Alle Rechte vorbehalten"
+    "allRightsReserved": "Alle Rechte vorbehalten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "search": "Suchen",
+    "undo": "Rückgängig",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "close": "Schließen",
+    "yes": "Ja",
+    "no": "Nein",
+    "actions": {
+      "view": "Ansehen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    },
+    "table": {
+      "actions": "Aktionen"
+    },
+    "validation": {
+      "required": "Dieses Feld ist erforderlich"
+    },
+    "notFound": {
+      "pageNotFound": "Seite nicht gefunden",
+      "description": "Entschuldigung, wir konnten die von Ihnen gesuchte Seite nicht finden. Die Seite wurde möglicherweise verschoben oder existiert nicht.",
+      "goBack": "Zurück",
+      "goToHome": "Zur Startseite"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Registrieren",
+    "submit": "Absenden",
+    "forgotPassword": "Passwort vergessen?",
+    "fields": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "name": "Name",
+      "confirmPassword": "Passwort bestätigen"
+    },
+    "validation": {
+      "invalidEmail": "Ungültige E-Mail-Adresse",
+      "nameRequired": "Name ist erforderlich",
+      "passwordMinLength": "Passwort muss mindestens 6 Zeichen lang sein",
+      "passwordsNoMatch": "Passwörter stimmen nicht überein"
+    }
+  },
+  "events": {
+    "title": "Veranstaltungen",
+    "actions": {
+      "addEvent": "Veranstaltung hinzufügen",
+      "register": "Anmelden",
+      "edit": "Bearbeiten",
+      "publish": "Veröffentlichen",
+      "unpublish": "Veröffentlichung aufheben"
+    },
+    "details": {
+      "title": "Veranstaltungsdetails",
+      "organizer": "Veranstalter",
+      "eventAddress": "Veranstaltungsadresse"
+    },
+    "messages": {
+      "noUpcomingEvents": "Keine bevorstehenden Veranstaltungen gefunden. Schauen Sie im Archiv nach.",
+      "detailsInInternalArea": "Details werden im internen Bereich angezeigt",
+      "programInInternalArea": "Programm wird im internen Bereich angezeigt"
+    },
+    "errors": {
+      "loadingError": "Fehler beim Laden der Veranstaltungen.",
+      "missingId": "Veranstaltungskennung fehlt.",
+      "unableToLoad": "Veranstaltungsdetails konnten nicht geladen werden.",
+      "noEditPermission": "Sie haben keine Berechtigung zum Bearbeiten von Veranstaltungen.",
+      "noCreatePermission": "Sie haben keine Berechtigung zum Erstellen von Veranstaltungen."
+    },
+    "form": {
+      "sections": {
+        "basicInformation": "Grundinformationen",
+        "basicInformationHelp": "Geben Sie die grundlegenden Details Ihrer Veranstaltung an."
+      },
+      "fields": {
+        "eventName": "Veranstaltungsname",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "oneDay": "Ein Tag",
+        "eventType": "Veranstaltungstyp"
+      },
+      "placeholders": {
+        "selectEventType": "Veranstaltungstyp auswählen"
+      },
+      "validation": {
+        "nameRequired": "Name ist erforderlich",
+        "startDateRequired": "Startdatum ist erforderlich",
+        "endDateRequired": "Enddatum ist für mehrtägige Veranstaltungen erforderlich",
+        "endDateAfterStart": "Enddatum muss nach dem Startdatum liegen"
+      }
+    },
+    "registration": {
+      "title": "Anmeldung - ",
+      "register": "Anmelden",
+      "formFor": "Anmeldeformular für "
+    }
+  },
+  "locations": {
+    "form": {
+      "sections": {
+        "location": "Standort",
+        "webinarHelp": "Webinar-Link angeben",
+        "physicalHelp": "Geben Sie die Adresse ein und verfeinern Sie sie auf der Karte."
+      },
+      "fields": {
+        "name": "Name",
+        "road": "Straße",
+        "webinarName": "Webinar-Name",
+        "webinarLink": "Webinar-Link",
+        "street": "Straße",
+        "number": "Nr.",
+        "postalCode": "Postleitzahl",
+        "city": "Stadt",
+        "state": "Bundesland",
+        "country": "Land",
+        "selectCountry": "Land auswählen",
+        "locationType": "Standorttyp",
+        "latitude": "Breitengrad",
+        "longitude": "Längengrad",
+        "link": "Link"
+      },
+      "placeholders": {
+        "selectCountry": "Land auswählen",
+        "selectType": "Typ auswählen"
+      },
+      "actions": {
+        "findOnMap": "Auf Karte finden",
+        "adjustLocation": "Standort anpassen"
+      },
+      "validation": {
+        "locateOnMap": "Bitte lokalisieren Sie die Adresse auf der Karte",
+        "webinarNameRequired": "Webinar-Name ist erforderlich",
+        "webinarLinkRequired": "Webinar-Link ist erforderlich"
+      }
+    },
+    "map": {
+      "preview": "Vorschau",
+      "noLocationSelected": "Kein Standort ausgewählt — klicken Sie, um die Karte zu öffnen"
+    }
   },
   "admin": {
+    "dashboard": {
+      "title": "Admin-Dashboard",
+      "welcome": "Willkommen im Admin-Dashboard"
+    },
     "links": {
       "users": "Benutzer",
       "companies": "Unternehmen",
@@ -13,7 +160,8 @@
       "roles": "Rollen",
       "permissions": "Berechtigungen",
       "settings": "Einstellungen",
-      "logs": "Protokolle"
+      "logs": "Protokolle",
+      "event-types": "Veranstaltungsarten"
     },
     "folder": {
       "events": "Kongresse",
@@ -21,6 +169,77 @@
       "accesscontrol": "Zugriffskontrolle",
       "settings": "Einstellungen",
       "logs": "Protokolle"
+    },
+    "locations": {
+      "title": "Standorte",
+      "create": {
+        "title": "Standort erstellen"
+      },
+      "actions": {
+        "create": "Standort erstellen"
+      },
+      "table": {
+        "name": "Name",
+        "city": "Stadt",
+        "state": "Bundesland",
+        "actions": "Aktionen"
+      }
+    },
+    "companies": {
+      "title": "Unternehmen",
+      "actions": {
+        "create": "Unternehmen erstellen"
+      },
+      "table": {
+        "name": "Name",
+        "sponsoring": "Sponsoring"
+      }
+    },
+    "roles": {
+      "title": "Rollen",
+      "searchPlaceholder": "Rollen/Benutzer suchen...",
+      "actions": {
+        "add": "Rolle hinzufügen",
+        "viewPermissions": "Berechtigungen anzeigen"
+      },
+      "fields": {
+        "role": "Rolle"
+      },
+      "form": {
+        "roleName": "Rolle"
+      },
+      "assignedUsers": "Zugewiesene Benutzer:",
+      "messages": {
+        "noUsersAssigned": "Dieser Rolle sind keine Benutzer zugewiesen."
+      }
+    },
+    "eventTypes": {
+      "title": "Veranstaltungsarten",
+      "actions": {
+        "create": "Veranstaltungsart erstellen"
+      },
+      "confirmDelete": "Sind Sie sicher, dass Sie diese Veranstaltungsart löschen möchten?",
+      "table": {
+        "code": "Code",
+        "nameDe": "Name (DE)",
+        "nameEn": "Name (EN)"
+      }
+    },
+    "permissions": {
+      "title": "Berechtigungen",
+      "userPermissions": "Benutzerberechtigungen",
+      "rolePermissions": "Rollenberechtigungen",
+      "addPermission": "Berechtigung hinzufügen",
+      "searchPermissions": "Berechtigungen suchen…",
+      "unsavedChanges": "Sie haben ungespeicherte Änderungen",
+      "saveChanges": "Änderungen speichern",
+      "undo": "Rückgängig",
+      "permissionPlaceholder": "ressource:aktion",
+      "usersPermissionsMatrix": "Benutzer × Berechtigungen",
+      "rolesPermissionsMatrix": "Rollen × Berechtigungen",
+      "actions": {
+        "create": "Berechtigung erstellen"
+      }
     }
   }
 }

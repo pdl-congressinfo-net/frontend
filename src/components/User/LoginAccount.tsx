@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { PasswordInput } from "../ui/password-input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLogin } from "@refinedev/core";
+import { useLogin, useTranslation } from "@refinedev/core";
 
 interface AccountDialogProps {
   isOpen: boolean;
@@ -15,13 +15,15 @@ interface LoginFormValues {
   password: string;
 }
 
-const RegisterSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string(),
-});
-
 export const LoginAccount = ({ onClose }: AccountDialogProps) => {
+  const { translate: t } = useTranslation();
   const { mutate: login } = useLogin<LoginFormValues>();
+
+  const RegisterSchema = z.object({
+    email: z.string().email(t("auth.validation.invalidEmail")),
+    password: z.string(),
+  });
+
   const {
     register,
     handleSubmit,
@@ -44,26 +46,26 @@ export const LoginAccount = ({ onClose }: AccountDialogProps) => {
     <form onSubmit={onSubmit}>
       <Stack gap="4" align="flex-start" maxW="sm">
         <Field.Root invalid={!!errors.email}>
-          <Field.Label>Email</Field.Label>
+          <Field.Label>{t("auth.fields.email")}</Field.Label>
           <Input {...register("email")} />
           <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.password}>
-          <Field.Label>Password</Field.Label>
+          <Field.Label>{t("auth.fields.password")}</Field.Label>
           <PasswordInput {...register("password")} />
           <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
         </Field.Root>
 
         <Button type="submit" disabled={!isValid}>
-          Submit
+          {t("auth.submit")}
         </Button>
         <Button
           variant="ghost"
           size="xs"
           onClick={() => alert("Forgot password flow")}
         >
-          Forgot password?
+          {t("auth.forgotPassword")}
         </Button>
       </Stack>
     </form>

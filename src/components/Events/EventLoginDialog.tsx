@@ -1,4 +1,5 @@
 import { Button, Dialog, Text } from "@chakra-ui/react";
+import { useTranslation } from "@refinedev/core";
 import { EventDialog } from "./EventDialog";
 
 interface EventLoginDialogProps {
@@ -12,23 +13,25 @@ const EventLoginDialog = ({
   onClose,
   title,
 }: EventLoginDialogProps) => {
+  const { translate: t } = useTranslation();
+
   return (
     <EventDialog
       isOpen={isOpen}
       onClose={onClose}
-      title={`Anmeldung - ${title}`}
+      title={`${t("events.registration.title")}${title}`}
       footer={
         <>
           <Dialog.ActionTrigger asChild>
             <Button variant="outline" onClick={onClose}>
-              Abbrechen
+              {t("common.cancel")}
             </Button>
           </Dialog.ActionTrigger>
-          <Button>Anmelden</Button>
+          <Button>{t("events.registration.register")}</Button>
         </>
       }
     >
-      <Text>Anmeldeformular für {title}</Text>
+      <Text>{t("events.registration.formFor")}{title}</Text>
     </EventDialog>
   );
 };

@@ -3,9 +3,156 @@
     "projectName": "Congressinfo.net",
     "loading": "Loading...",
     "login": "Login",
-    "allRightsReserved": "All rights reserved"
+    "allRightsReserved": "All rights reserved",
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "search": "Search",
+    "undo": "Undo",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "table": {
+      "actions": "Actions"
+    },
+    "validation": {
+      "required": "This field is required"
+    },
+    "notFound": {
+      "pageNotFound": "Page Not Found",
+      "description": "Sorry, we couldn't find the page you're looking for. The page may have been moved or doesn't exist.",
+      "goBack": "Go Back",
+      "goToHome": "Go to Home"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "submit": "Submit",
+    "forgotPassword": "Forgot password?",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "confirmPassword": "Confirm Password"
+    },
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "nameRequired": "Name is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsNoMatch": "Passwords do not match"
+    }
+  },
+  "events": {
+    "title": "Events",
+    "actions": {
+      "addEvent": "Add Event",
+      "register": "Register",
+      "edit": "Edit",
+      "publish": "Publish",
+      "unpublish": "Unpublish"
+    },
+    "details": {
+      "title": "Event Details",
+      "organizer": "Organizer",
+      "eventAddress": "Event Address"
+    },
+    "messages": {
+      "noUpcomingEvents": "No upcoming events found. Try to look in the archive.",
+      "detailsInInternalArea": "Details will be displayed in the internal area",
+      "programInInternalArea": "Program will be displayed in the internal area"
+    },
+    "errors": {
+      "loadingError": "Error loading events.",
+      "missingId": "Event identifier is missing.",
+      "unableToLoad": "Unable to load event details.",
+      "noEditPermission": "You do not have permission to edit events.",
+      "noCreatePermission": "You do not have permission to create events."
+    },
+    "form": {
+      "sections": {
+        "basicInformation": "Basic Information",
+        "basicInformationHelp": "Provide the basic details of your event."
+      },
+      "fields": {
+        "eventName": "Event Name",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "oneDay": "One Day",
+        "eventType": "Event Type"
+      },
+      "placeholders": {
+        "selectEventType": "Select event type"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "startDateRequired": "Start date is required",
+        "endDateRequired": "End date is required for multi-day events",
+        "endDateAfterStart": "End date must be after start date"
+      }
+    },
+    "registration": {
+      "title": "Registration - ",
+      "register": "Register",
+      "formFor": "Registration form for "
+    }
+  },
+  "locations": {
+    "form": {
+      "sections": {
+        "location": "Location",
+        "webinarHelp": "Provide webinar link",
+        "physicalHelp": "Enter the address and fine-tune it on the map."
+      },
+      "fields": {
+        "name": "Name",
+        "road": "Road",
+        "webinarName": "Webinar Name",
+        "webinarLink": "Webinar Link",
+        "street": "Street",
+        "number": "No.",
+        "postalCode": "Postal Code",
+        "city": "City",
+        "state": "State",
+        "country": "Country",
+        "selectCountry": "Select Country",
+        "locationType": "Location Type",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "link": "Link"
+      },
+      "placeholders": {
+        "selectCountry": "Select country",
+        "selectType": "Select a type"
+      },
+      "actions": {
+        "findOnMap": "Find on map",
+        "adjustLocation": "Adjust Location"
+      },
+      "validation": {
+        "locateOnMap": "Please locate the address on the map",
+        "webinarNameRequired": "Webinar name is required",
+        "webinarLinkRequired": "Webinar link is required"
+      }
+    },
+    "map": {
+      "preview": "Preview",
+      "noLocationSelected": "No location selected — click to open map"
+    }
   },
   "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "welcome": "Welcome to the Admin Dashboard"
+    },
     "links": {
       "users": "Users",
       "companies": "Companies",
@@ -13,7 +160,8 @@
       "roles": "Roles",
       "permissions": "Permissions",
       "settings": "Settings",
-      "logs": "Logs"
+      "logs": "Logs",
+      "event-types": "Event Types"
     },
     "folder": {
       "events": "Events",
@@ -21,6 +169,77 @@
       "accesscontrol": "Access Control",
       "settings": "Settings",
       "logs": "Logs"
+    },
+    "locations": {
+      "title": "Locations",
+      "create": {
+        "title": "Create Location"
+      },
+      "actions": {
+        "create": "Create Location"
+      },
+      "table": {
+        "name": "Name",
+        "city": "City",
+        "state": "State",
+        "actions": "Actions"
+      }
+    },
+    "companies": {
+      "title": "Companies",
+      "actions": {
+        "create": "Create Company"
+      },
+      "table": {
+        "name": "Name",
+        "sponsoring": "Sponsoring"
+      }
+    },
+    "roles": {
+      "title": "Roles",
+      "searchPlaceholder": "Search roles/users...",
+      "actions": {
+        "add": "Add Role",
+        "viewPermissions": "View Permissions"
+      },
+      "fields": {
+        "role": "Role"
+      },
+      "form": {
+        "roleName": "Role"
+      },
+      "assignedUsers": "Assigned Users:",
+      "messages": {
+        "noUsersAssigned": "No users assigned to this role."
+      }
+    },
+    "eventTypes": {
+      "title": "Event Types",
+      "actions": {
+        "create": "Create Event Type"
+      },
+      "confirmDelete": "Are you sure you want to delete this event type?",
+      "table": {
+        "code": "Code",
+        "nameDe": "Name (DE)",
+        "nameEn": "Name (EN)"
+      }
+    },
+    "permissions": {
+      "title": "Permissions",
+      "userPermissions": "User Permissions",
+      "rolePermissions": "Role Permissions",
+      "addPermission": "Add Permission",
+      "searchPermissions": "Search permissions…",
+      "unsavedChanges": "You have unsaved changes",
+      "saveChanges": "Save changes",
+      "undo": "Undo",
+      "permissionPlaceholder": "resource:action",
+      "usersPermissionsMatrix": "Users × Permissions",
+      "rolesPermissionsMatrix": "Roles × Permissions",
+      "actions": {
+        "create": "Create Permission"
+      }
     }
   }
 }

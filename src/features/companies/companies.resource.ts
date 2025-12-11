@@ -1,9 +1,9 @@
 export const companyResource = {
   name: "companies",
-  list: "/companies",
-  create: "/companies/create",
-  edit: "/companies/edit/:id",
-  show: "/companies/show/:id",
+  list: "/admin/companies",
+  create: "/admin/companies/create",
+  edit: "/admin/companies/edit/:id",
+  show: "/admin/companies/show/:id",
   meta: {
     canDelete: true,
   },
@@ -11,10 +11,10 @@ export const companyResource = {
 
 export const companyEmployeeResource = {
   name: "companyemployees",
-  list: "/companies/employees",
-  create: "/companies/employees/create",
-  edit: "/companies/employees/edit/:id",
-  show: "/companies/employees/show/:id",
+  list: "/admin/companies/employees",
+  create: "/admin/companies/employees/create",
+  edit: "/admin/companies/employees/edit/:id",
+  show: "/admin/companies/employees/show/:id",
   meta: {
     canDelete: true,
     parentmodule: "companies",

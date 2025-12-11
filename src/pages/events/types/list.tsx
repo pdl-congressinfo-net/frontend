@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useList, useDelete } from "@refinedev/core";
+import { useList, useDelete, useTranslation } from "@refinedev/core";
 import { useNavigate, useLocation } from "react-router";
 import { useLayout } from "../../../providers/layout-provider";
 import { Box, Button, Table, Spinner, HStack } from "@chakra-ui/react";
@@ -7,6 +7,7 @@ import { EventType } from "../../../features/events/events.model";
 import { ApiResponse } from "../../../common/types/api";
 
 const EventTypesListPage = () => {
+  const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,16 +24,16 @@ const EventTypesListPage = () => {
   });
 
   useEffect(() => {
-    setTitle("Event Types");
+    setTitle(t("admin.eventTypes.title"));
     setActions(
       <Button onClick={() => navigate("/events/types/create")}>
-        Create Event Type
+        {t("admin.eventTypes.actions.create")}
       </Button>,
     );
-  }, [setTitle, setActions, navigate]);
+  }, [setTitle, setActions, navigate, t]);
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this event type?")) {
+    if (window.confirm(t("admin.eventTypes.confirmDelete"))) {
       deleteEventType({
         resource: "eventtypes",
         id,
@@ -52,10 +53,10 @@ const EventTypesListPage = () => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Code</Table.ColumnHeader>
-            <Table.ColumnHeader>Name (DE)</Table.ColumnHeader>
-            <Table.ColumnHeader>Name (EN)</Table.ColumnHeader>
-            <Table.ColumnHeader>Actions</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.eventTypes.table.code")}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.eventTypes.table.nameDe")}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.eventTypes.table.nameEn")}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.eventTypes.table.actions")}</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -77,7 +78,7 @@ const EventTypesListPage = () => {
                       })
                     }
                   >
-                    View
+                    {t("common.actions.view")}
                   </Button>
                   <Button
                     size="sm"
@@ -85,14 +86,14 @@ const EventTypesListPage = () => {
                       navigate(`/events/types/edit/${eventType.id}`)
                     }
                   >
-                    Edit
+                    {t("common.actions.edit")}
                   </Button>
                   <Button
                     size="sm"
                     colorPalette="red"
                     onClick={() => handleDelete(eventType.id)}
                   >
-                    Delete
+                    {t("common.actions.delete")}
                   </Button>
                 </HStack>
               </Table.Cell>

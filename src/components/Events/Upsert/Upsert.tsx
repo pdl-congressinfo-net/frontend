@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import { useCan, useCreate, useOne, useUpdate } from "@refinedev/core";
+import { useCan, useCreate, useOne, useUpdate, useTranslation } from "@refinedev/core";
 import {
   Box,
   Button,
@@ -76,6 +76,7 @@ const Upsert = ({
   backHref = "/events",
   extraTabs,
 }: UpsertProps) => {
+  const { translate: t } = useTranslation();
   const isEdit = mode === "edit";
   const permissionAction = isEdit ? "update" : "create";
   const { data: canAccess } = useCan({
@@ -635,13 +636,13 @@ const Upsert = ({
         minH="60vh"
       >
         <Text fontSize="lg" color="red.500">
-          Event identifier is missing.
+          {t("events.errors.missingId")}
         </Text>
         <Link to={backHref}>
           <Button>
             <Flex align="center" gap={2}>
               <LuArrowLeft />
-              <span>Back</span>
+              <span>{t("common.back")}</span>
             </Flex>
           </Button>
         </Link>
@@ -659,13 +660,13 @@ const Upsert = ({
         minH="60vh"
       >
         <Text fontSize="lg" color="red.500">
-          {eventError?.message ?? "Unable to load event details."}
+          {eventError?.message ?? t("events.errors.unableToLoad")}
         </Text>
         <Link to={backHref}>
           <Button>
             <Flex align="center" gap={2}>
               <LuArrowLeft />
-              <span>Back</span>
+              <span>{t("common.back")}</span>
             </Flex>
           </Button>
         </Link>
@@ -684,14 +685,14 @@ const Upsert = ({
       >
         <Text fontSize="lg">
           {isEdit
-            ? "You do not have permission to edit events."
-            : "You do not have permission to create events."}
+            ? t("events.errors.noEditPermission")
+            : t("events.errors.noCreatePermission")}
         </Text>
         <Link to={backHref}>
           <Button>
             <Flex align="center" gap={2}>
               <LuArrowLeft />
-              <span>Back</span>
+              <span>{t("common.back")}</span>
             </Flex>
           </Button>
         </Link>

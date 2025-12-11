@@ -3,6 +3,7 @@ import { Box, Card, Dialog, Text, Flex, Button } from "@chakra-ui/react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTranslation } from "@refinedev/core";
 import { Location } from "../../features/locations/location.model";
 
 const markerIcon = new L.Icon({
@@ -76,6 +77,7 @@ export function MapPicker({
   onSave,
   saveDisabled,
 }: MapPickerProps) {
+  const { translate: t } = useTranslation();
   const [locationState, setLocationState] = useState<Location | undefined>(
     location,
   );
@@ -149,7 +151,7 @@ export function MapPicker({
       <Card.Root width="md">
         <Card.Body>
           <Text fontSize="sm" color="fg.muted" mb={2}>
-            Preview
+            {t("locations.map.preview")}
           </Text>
           {locationState?.latitude != null &&
           locationState?.longitude != null ? (
@@ -194,7 +196,7 @@ export function MapPicker({
               cursor="pointer"
             >
               <Text color="fg.muted">
-                No location selected — click to open map
+                {t("locations.map.noLocationSelected")}
               </Text>
             </Box>
           )}
@@ -254,7 +256,7 @@ export function MapPicker({
             <Flex justify="space-between" align="center" mt={3}>
               <Flex gap={2}>
                 <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={async () => {
@@ -270,7 +272,7 @@ export function MapPicker({
                   }}
                   disabled={saveDisabled}
                 >
-                  Save
+                  {t("common.save")}
                 </Button>
               </Flex>
             </Flex>

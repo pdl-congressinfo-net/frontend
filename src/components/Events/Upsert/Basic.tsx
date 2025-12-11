@@ -10,7 +10,7 @@ import {
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-import { useList } from "@refinedev/core";
+import { useList, useTranslation } from "@refinedev/core";
 import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,16 +35,16 @@ const toYMD = (v: unknown) => {
   return v;
 };
 
-const BasicInformationSchema = z
+const createBasicInformationSchema = (t: (key: string) => string) => z
   .object({
-    name: z.string().min(1, "Name is required"),
-    startDate: z.preprocess(toYMD, z.string().min(1, "Start date is required")),
+    name: z.string().min(1, t("events.form.validation.nameRequired")),
+    startDate: z.preprocess(toYMD, z.string().min(1, t("events.form.validation.startDateRequired"))),
     oneDay: z.boolean().default(false),
     endDate: z.preprocess((v) => {
       if (v === "" || v == null) return undefined;
       return toYMD(v);
     }, z.string().optional()),
-    eventTypeId: z.string().min(1, "Event type is required"),
+    eventTypeId: z.string().min(1, t("common.validation.required")),
     isPublic: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
@@ -53,7 +53,7 @@ const BasicInformationSchema = z
       if (!data.endDate) {
         ctx.addIssue({
           path: ["endDate"],
-          message: "End date is required for multi-day events",
+          message: t("events.form.validation.endDateRequired"),
           code: z.ZodIssueCode.custom,
         });
       } else {
@@ -61,7 +61,7 @@ const BasicInformationSchema = z
         if (end < start) {
           ctx.addIssue({
             path: ["endDate"],
-            message: "End date must be after start date",
+            message: t("events.form.validation.endDateAfterStart"),
             code: z.ZodIssueCode.custom,
           });
         }
@@ -90,6 +90,7 @@ const BasicInformation = ({
   initialValues,
   onChange,
 }: BasicInformationProps) => {
+  const { translate: t } = useTranslation();
   const syncingRef = useRef(false);
   const defaultValues = useMemo<BasicInformationValues>(() => {
     const d = new Date();
@@ -105,6 +106,8 @@ const BasicInformation = ({
       isPublic: false,
     };
   }, []);
+
+  const BasicInformationSchema = useMemo(() => createBasicInformationSchema(t), [t]);
 
   const {
     watch,
@@ -230,21 +233,21 @@ const BasicInformation = ({
     <form onSubmit={onSubmit}>
       <Fieldset.Root size="lg">
         <Stack>
-          <Fieldset.Legend>Basic Information</Fieldset.Legend>
+          <Fieldset.Legend>{t("events.form.sections.basicInformation")}</Fieldset.Legend>
           <Fieldset.HelperText>
-            Provide the basic details of your event.
+            {t("events.form.sections.basicInformationHelp")}
           </Fieldset.HelperText>
         </Stack>
         <Fieldset.Content mt={4}>
           <Stack gap="4" align="flex-start">
             <Field.Root invalid={!!errors.name} width={"40vw"}>
-              <Field.Label>Event Name</Field.Label>
+              <Field.Label>{t("events.form.fields.eventName")}</Field.Label>
               <Input size="md" {...register("name")} />
               <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
             </Field.Root>
             <Flex gap="2vw">
               <Field.Root invalid={!!errors.startDate} width="19vw">
-                <Field.Label>Start Date</Field.Label>
+                <Field.Label>{t("events.form.fields.startDate")}</Field.Label>
                 <Input type="date" {...register("startDate")} />
                 <Field.ErrorText>
                   {errors.startDate?.message || errors.oneDay?.message}
@@ -277,13 +280,13 @@ const BasicInformation = ({
                     }}
                   />
                   <Checkbox.Control />
-                  <Checkbox.Label>One Day</Checkbox.Label>
+                  <Checkbox.Label>{t("events.form.fields.oneDay")}</Checkbox.Label>
                 </Checkbox.Root>
               </Flex>
             </Flex>
 
             <Field.Root invalid={!!errors.endDate} width={"19vw"}>
-              <Field.Label>End Date</Field.Label>
+              <Field.Label>{t("events.form.fields.endDate")}</Field.Label>
               <Input type="date" disabled={oneDay} {...register("endDate")} />
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
             </Field.Root>
@@ -303,10 +306,10 @@ const BasicInformation = ({
                 }}
               >
                 <Select.HiddenSelect name="eventTypeId" />
-                <Select.Label>Event Type</Select.Label>
+                <Select.Label>{t("events.form.fields.eventType")}</Select.Label>
                 <Select.Control>
                   <Select.Trigger>
-                    <Select.ValueText placeholder="Select event type" />
+                    <Select.ValueText placeholder={t("events.form.placeholders.selectEventType")} />
                   </Select.Trigger>
                   <Select.IndicatorGroup>
                     <Select.Indicator />
@@ -328,7 +331,7 @@ const BasicInformation = ({
             )}
             <Flex gap="2">
               <Button type="submit" disabled={!isValid}>
-                Next
+                {t("common.next")}
               </Button>
             </Flex>
           </Stack>

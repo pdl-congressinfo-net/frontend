@@ -2,7 +2,7 @@ import { Stack, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { EventCard } from "./EventCard";
 import EventLoginDialog from "./EventLoginDialog";
-import { useCan, useList, useCustomMutation } from "@refinedev/core";
+import { useCan, useList, useCustomMutation, useTranslation } from "@refinedev/core";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Event } from "../../features/events/events.model";
 import { EventCardLoading } from "./EventCardLoading";
@@ -12,6 +12,7 @@ type EventListProps = {
 };
 
 export const EventList = ({ archive }: EventListProps) => {
+  const { translate: t } = useTranslation();
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const startDate = useMemo(() => {
@@ -66,7 +67,7 @@ export const EventList = ({ archive }: EventListProps) => {
   }
 
   if (query.isError) {
-    return <Text>Error loading events.</Text>;
+    return <Text>{t("events.errors.loadingError")}</Text>;
   }
 
   const handleCardClick = (event: any) => {
@@ -96,7 +97,7 @@ export const EventList = ({ archive }: EventListProps) => {
   };
 
   if (events.total === 0) {
-    return <Text>No upcoming events found. Try to look in the archive.</Text>;
+    return <Text>{t("events.messages.noUpcomingEvents")}</Text>;
   }
 
   return (

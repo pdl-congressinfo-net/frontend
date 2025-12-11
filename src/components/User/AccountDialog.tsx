@@ -1,4 +1,5 @@
 import { Dialog, Portal, Tabs } from "@chakra-ui/react";
+import { useTranslation } from "@refinedev/core";
 import { LoginAccount } from "./LoginAccount";
 import { RegisterAccount } from "./RegisterAccount";
 
@@ -8,6 +9,8 @@ interface AccountDialogProps {
 }
 
 export const AccountDialog = ({ isOpen, onClose }: AccountDialogProps) => {
+  const { translate: t } = useTranslation();
+
   return (
     <Dialog.Root
       open={isOpen}
@@ -20,17 +23,17 @@ export const AccountDialog = ({ isOpen, onClose }: AccountDialogProps) => {
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>Login</Dialog.Title>
+              <Dialog.Title>{t("auth.login")}</Dialog.Title>
             </Dialog.Header>
             <Dialog.CloseTrigger />
             <Dialog.Body>
               <Tabs.Root defaultValue="login" variant="enclosed" fitted>
                 <Tabs.List>
                   <Tabs.Trigger value="login" transition="all 0.2s">
-                    Login
+                    {t("auth.login")}
                   </Tabs.Trigger>
                   <Tabs.Trigger value="register" transition="all 0.2s">
-                    Register
+                    {t("auth.register")}
                   </Tabs.Trigger>
                 </Tabs.List>
                 {/* Login Content */}

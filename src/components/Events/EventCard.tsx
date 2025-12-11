@@ -7,7 +7,7 @@ import {
   Image,
   Skeleton,
 } from "@chakra-ui/react";
-import { CanAccess, useOne, useNavigation } from "@refinedev/core";
+import { CanAccess, useOne, useNavigation, useTranslation } from "@refinedev/core";
 import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { toDate } from "../../utils/helpers";
@@ -25,6 +25,7 @@ export const EventCard = ({
   onParticipateClick,
   onPublishClick,
 }: EventCardInterface) => {
+  const { translate: t } = useTranslation();
   const { edit } = useNavigation();
 
   const {
@@ -113,7 +114,7 @@ export const EventCard = ({
                       onParticipateClick?.();
                     }}
                   >
-                    Anmelden
+                    {t("events.actions.register")}
                   </Button>
                 </CanAccess>
                 <CanAccess resource="events" action="update">
@@ -125,7 +126,7 @@ export const EventCard = ({
                       edit("events", event.id);
                     }}
                   >
-                    Bearbeiten
+                    {t("events.actions.edit")}
                   </Button>
                 </CanAccess>
                 <CanAccess resource="events" action="publish">
@@ -138,7 +139,7 @@ export const EventCard = ({
                       onPublishClick?.(!event.isPublic);
                     }}
                   >
-                    {event.isPublic ? "Unpublish" : "Publish"}
+                    {event.isPublic ? t("events.actions.unpublish") : t("events.actions.publish")}
                   </Button>
                 </CanAccess>
               </Flex>

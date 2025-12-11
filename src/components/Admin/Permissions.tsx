@@ -11,7 +11,7 @@ import {
   Portal,
   Tabs,
 } from "@chakra-ui/react";
-import { CanAccess, useCreate, useList, useDelete } from "@refinedev/core";
+import { CanAccess, useCreate, useList, useDelete, useTranslation } from "@refinedev/core";
 import { useMemo, useRef, useState } from "react";
 import { Permission } from "../../features/permissions/permissions.model";
 import { useMask } from "@react-input/mask";
@@ -26,6 +26,7 @@ import { TanstackPermissionMatrix } from "../Common/Matrix";
 import { LuCirclePlus } from "react-icons/lu";
 
 export const Permissions = () => {
+  const { translate: t } = useTranslation();
   const HISTORY_LIMIT = 20;
 
   const [changes, setChanges] = useState<{
@@ -350,17 +351,17 @@ export const Permissions = () => {
   return (
     <Flex direction="column" gap={6}>
       <Flex direction="row" align="center" justify="space-between">
-        <Heading size="lg">Permissions</Heading>
+        <Heading size="lg">{t("admin.permissions.title")}</Heading>
       </Flex>
 
       <Tabs.Root defaultValue="userpermissions">
         <Flex flex={1} gap={4} align="center" justify="space-between">
           <Tabs.List>
             <Tabs.Trigger value="userpermissions">
-              User Permissions
+              {t("admin.permissions.userPermissions")}
             </Tabs.Trigger>
             <Tabs.Trigger value="rolepermissions">
-              Role Permissions
+              {t("admin.permissions.rolePermissions")}
             </Tabs.Trigger>
           </Tabs.List>
           <Flex gap={2} align="center">
@@ -368,7 +369,7 @@ export const Permissions = () => {
               <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
                 <Popover.Trigger
                   as={IconButton}
-                  aria-label="Add Permission"
+                  aria-label={t("admin.permissions.addPermission")}
                   onClick={() => setOpen(true)}
                   type="button"
                 >
@@ -380,10 +381,10 @@ export const Permissions = () => {
                     <Popover.Body>
                       <form onSubmit={submitHandler}>
                         <Group attached w="full">
-                          <Input name="name" placeholder="resource:action" />
+                          <Input name="name" placeholder={t("admin.permissions.permissionPlaceholder")} />
 
                           <Button type="submit" colorScheme="blue">
-                            Create
+                            {t("common.create")}
                           </Button>
                         </Group>
                       </form>
@@ -394,7 +395,7 @@ export const Permissions = () => {
             </CanAccess>
             <Input
               variant="flushed"
-              placeholder="Search permissions…"
+              placeholder={t("admin.permissions.searchPermissions")}
               value={permissionSearch}
               onChange={(e) => setPermissionSearch(e.target.value)}
             />
@@ -403,7 +404,7 @@ export const Permissions = () => {
 
         <Tabs.Content value="userpermissions">
           <TanstackPermissionMatrix
-            title="Users × Permissions"
+            title={t("admin.permissions.usersPermissionsMatrix")}
             rows={users.data}
             rowKey="id"
             rowLabel={(u) => u.fullName}
@@ -418,7 +419,7 @@ export const Permissions = () => {
 
         <Tabs.Content value="rolepermissions">
           <TanstackPermissionMatrix
-            title="Roles × Permissions"
+            title={t("admin.permissions.rolesPermissionsMatrix")}
             rows={roles.data}
             rowKey="id"
             rowLabel={(r) => r.name}
@@ -433,7 +434,7 @@ export const Permissions = () => {
       <Flex justify="flex-end" mt={4} gap={2} align="center">
         {isDirty && (
           <Box fontSize="sm" color="orange.500" mr="auto">
-            You have unsaved changes
+            {t("admin.permissions.unsavedChanges")}
           </Box>
         )}
 
@@ -443,7 +444,7 @@ export const Permissions = () => {
           onClick={undo}
           disabled={history.length === 0}
         >
-          Undo
+          {t("admin.permissions.undo")}
         </Button>
 
         <Button
@@ -453,7 +454,7 @@ export const Permissions = () => {
           disabled={!isDirty}
           loading={isSaving}
         >
-          Save changes
+          {t("admin.permissions.saveChanges")}
         </Button>
       </Flex>
     </Flex>

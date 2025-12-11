@@ -1,4 +1,5 @@
 import { Button, Dialog, Text } from "@chakra-ui/react";
+import { useTranslation } from "@refinedev/core";
 import { EventDialog } from "./EventDialog";
 
 interface EventDetailsDialogProps {
@@ -14,6 +15,8 @@ const EventDetailsDialog = ({
   title,
   children,
 }: EventDetailsDialogProps) => {
+  const { translate: t } = useTranslation();
+
   return (
     <EventDialog
       isOpen={isOpen}
@@ -22,7 +25,7 @@ const EventDetailsDialog = ({
       footer={
         <Dialog.ActionTrigger asChild>
           <Button variant="outline" onClick={onClose}>
-            Schließen
+            {t("common.close")}
           </Button>
         </Dialog.ActionTrigger>
       }

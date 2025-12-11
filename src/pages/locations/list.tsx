@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { useLayout } from "../../providers/layout-provider";
-import { useList, useNavigation } from "@refinedev/core";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
 import { Box, Button, Table } from "@chakra-ui/react";
 import { Location } from "../../features/locations/location.model";
 
 const LocationsListPage = () => {
+  const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const { create } = useNavigation();
   const {
@@ -15,23 +16,23 @@ const LocationsListPage = () => {
   });
 
   useEffect(() => {
-    setTitle("Locations");
+    setTitle(t("admin.locations.title"));
     setActions(
-      <Button onClick={() => create("locations")}>Create Location</Button>,
+      <Button onClick={() => create("locations")}>{t("admin.locations.actions.create")}</Button>,
     );
-  }, [setTitle, setActions, create]);
+  }, [setTitle, setActions, create, t]);
 
-  if (isLoading) return <Box>Loading...</Box>;
+  if (isLoading) return <Box>{t("common.loading")}</Box>;
 
   return (
     <Box p={4}>
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
-            <Table.ColumnHeader>City</Table.ColumnHeader>
-            <Table.ColumnHeader>State</Table.ColumnHeader>
-            <Table.ColumnHeader>Actions</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.locations.table.name")}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.locations.table.city")}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.locations.table.state")}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t("admin.locations.table.actions")}</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -47,7 +48,7 @@ const LocationsListPage = () => {
                     (window.location.href = `/locations/show/${location.id}`)
                   }
                 >
-                  View
+                  {t("common.actions.view")}
                 </Button>
               </Table.Cell>
             </Table.Row>
