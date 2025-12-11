@@ -4,17 +4,17 @@ import en from "./locales/en.json";
 import de from "./locales/de.json";
 
 i18n.use(initReactI18next).init({
-    lng: "en",
-    resources: {
-        en: {
-            translation: en,
-        },
-        de: {
-            translation: de,
-        },
+  lng: "en",
+  resources: {
+    en: {
+      translation: en,
     },
-    supportedLngs: ["en", "de"],
-    fallbackLng: ["en", "de"],
+    de: {
+      translation: de,
+    },
+  },
+  supportedLngs: ["en", "de"],
+  fallbackLng: ["en", "de"],
 });
 
 export default i18n;

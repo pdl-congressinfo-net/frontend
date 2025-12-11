@@ -4,5 +4,23 @@
     "loading": "Laden...",
     "login": "Login",
     "allRightsReserved": "Alle Rechte vorbehalten"
+  },
+  "admin": {
+    "links": {
+      "users": "Benutzer",
+      "companies": "Unternehmen",
+      "locations": "Standorte",
+      "roles": "Rollen",
+      "permissions": "Berechtigungen",
+      "settings": "Einstellungen",
+      "logs": "Protokolle"
+    },
+    "folder": {
+      "usermanagement": "Benutzerverwaltung",
+      "roles": "Rollen",
+      "permissions": "Berechtigungen",
+      "settings": "Einstellungen",
+      "logs": "Protokolle"
+    }
   }
 }
