@@ -10,11 +10,13 @@ export const i18nProvider: I18nProvider = {
     return i18n.t(key, { ...options, defaultValue: defaultMessage }) as string;
   },
 
-  changeLocale: (lang: string, options?: any) => {
+  changeLocale: async (lang: string, options?: any) => {
+    // Save to localStorage before changing
+    localStorage.setItem("i18nextLng", lang);
     return i18n.changeLanguage(lang, options);
   },
 
   getLocale: () => {
-    return i18n.language;
+    return i18n.language || localStorage.getItem("i18nextLng") || "en";
   },
 };

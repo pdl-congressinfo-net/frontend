@@ -2,6 +2,7 @@ import { Box, Container, Flex, Image } from "@chakra-ui/react";
 import { useTranslation, useLink } from "@refinedev/core";
 import { UserButton } from "../User/UserButton";
 import { AccountDialog } from "../User/AccountDialog";
+import { LanguageToggle } from "./LanguageToggle";
 import { useState } from "react";
 
 const NavBar = () => {
@@ -42,7 +43,10 @@ const NavBar = () => {
             />
           </Link>
         </Container>
-        <UserButton />
+        <Flex align="center" gap={2}>
+          <LanguageToggle />
+          <UserButton />
+        </Flex>
         <AccountDialog isOpen={isOpen} onClose={onClose} />
       </Flex>
     </Box>
