@@ -48,11 +48,11 @@ const CompanyEditPage = () => {
   });
 
   useEffect(() => {
-    if (companyData?.data) {
+    if (companyData) {
       reset({
-        name: companyData.data.name,
-        sponsoring: companyData.data.sponsoring,
-        location_id: companyData.data.locationId,
+        name: companyData.name,
+        sponsoring: companyData.sponsoring,
+        location_id: companyData.locationId,
       });
     }
   }, [companyData, reset]);
@@ -77,17 +77,22 @@ const CompanyEditPage = () => {
     );
   };
 
-  if (!companyData?.data) return <Box>Loading...</Box>;
+  if (!companyData) return <Box>Loading...</Box>;
 
   return (
     <Box p={4}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={4} align="stretch">
-          <Field label="Company Name" invalid={!!errors.name}>
-            <Input {...register("name")} />
-          </Field>
+          <Field.Root invalid={!!errors.name}>
+            <Field.Label>Name</Field.Label>
+            <Input {...register("name", { required: true })} />
+            {errors.name && (
+              <Field.ErrorText>This field is required</Field.ErrorText>
+            )}
+          </Field.Root>
 
-          <Field label="Location">
+          <Field.Root>
+            <Field.Label>Location</Field.Label>
             <select {...register("location_id")}>
               <option value="">Select a location</option>
               {locations?.data.map((location) => (
@@ -96,14 +101,23 @@ const CompanyEditPage = () => {
                 </option>
               ))}
             </select>
-          </Field>
+          </Field.Root>
 
-          <Field label="Sponsoring">
-            <Checkbox {...register("sponsoring")}>Is Sponsoring</Checkbox>
-          </Field>
+          <Field.Root>
+            <Field.Label>Sponsoring</Field.Label>
+            <Checkbox.Root>
+              <Checkbox.HiddenInput {...register("sponsoring")} />
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+              <Box as="span" ml={2}>
+                Is Sponsoring
+              </Box>
+            </Checkbox.Root>
+          </Field.Root>
 
           <Button type="submit" colorScheme="blue">
-            Update Company
+            Create Company
           </Button>
         </VStack>
       </form>

@@ -35,6 +35,8 @@ const CompanyShowPage = () => {
     id: id!,
   });
 
+  console.log("Company Data:", companyData);
+
   useEffect(() => {
     setTitle("Company Details");
     setActions(<CompanyShowActions />);
@@ -56,9 +58,9 @@ const CompanyShowPage = () => {
     }
   };
 
-  if (!companyData?.data) return <Box>Loading...</Box>;
+  if (!companyData) return <Box>Loading...</Box>;
 
-  const company = companyData.data;
+  const company = companyData;
 
   return (
     <Box p={4}>
