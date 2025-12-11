@@ -1,9 +1,9 @@
 export const locationTypeResource = {
   name: "locationtypes",
-  list: "/locations/types",
-  create: "/locations/types/create",
-  edit: "/locations/types/edit/:id",
-  show: "/locations/types/show/:id",
+  list: "/admin/locations/types",
+  create: "/admin/locations/types/create",
+  edit: "/admin/locations/types/edit/:id",
+  show: "/admin/locations/types/show/:id",
   meta: {
     canDelete: true,
     parentmodule: "locations",
@@ -12,10 +12,10 @@ export const locationTypeResource = {
 
 export const countryResource = {
   name: "countries",
-  list: "/locations/countries",
-  create: "/locations/countries/create",
-  edit: "/locations/countries/edit/:id",
-  show: "/locations/countries/show/:id",
+  list: "/admin/locations/countries",
+  create: "/admin/locations/countries/create",
+  edit: "/admin/locations/countries/edit/:id",
+  show: "/admin/locations/countries/show/:id",
   meta: {
     canDelete: true,
     parentmodule: "locations",
@@ -24,10 +24,10 @@ export const countryResource = {
 
 export const locationResource = {
   name: "locations",
-  list: "/locations",
-  create: "/locations/create",
-  edit: "/locations/edit/:id",
-  show: "/locations/show/:id",
+  list: "/admin/locations",
+  create: "/admin/locations/create",
+  edit: "/admin/locations/edit/:id",
+  show: "/admin/locations/show/:id",
   meta: {
     canDelete: true,
   },

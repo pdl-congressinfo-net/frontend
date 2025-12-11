@@ -74,12 +74,6 @@ function AppRoutes() {
               element={<EventTypeEditPage />}
             />
 
-            {/* Locations routes */}
-            <Route path="/locations" element={<LocationsListPage />} />
-            <Route path="/locations/create" element={<LocationCreatePage />} />
-            <Route path="/locations/edit/:id" element={<LocationEditPage />} />
-            <Route path="/locations/show/:id" element={<LocationShowPage />} />
-
             {/* Locaton Types routes */}
             <Route
               path="/locations/types"
@@ -90,21 +84,6 @@ function AppRoutes() {
             <Route
               path="/locations/countries"
               element={<CountriesListPage />}
-            />
-
-            {/* Permissions routes */}
-            <Route path="/permissions" element={<PermissionsListPage />} />
-            <Route
-              path="/permissions/create"
-              element={<PermissionCreatePage />}
-            />
-            <Route
-              path="/permissions/edit/:id"
-              element={<PermissionEditPage />}
-            />
-            <Route
-              path="/permissions/show/:id"
-              element={<PermissionShowPage />}
             />
 
             <Route path="*" element={<NotFound />} />
@@ -122,6 +101,18 @@ function AppRoutes() {
             <Route index element={<AdminDashboard />} />
 
             <Route path="permissions" element={<PermissionsListPage />} />
+            <Route
+              path="permissions/create"
+              element={<PermissionCreatePage />}
+            />
+            <Route
+              path="permissions/edit/:id"
+              element={<PermissionEditPage />}
+            />
+            <Route
+              path="permissions/show/:id"
+              element={<PermissionShowPage />}
+            />
             {/* Access Control */}
             <Route path="roles" element={<RolesListPage />} />
             <Route path="roles/create" element={<RoleCreatePage />} />
@@ -132,6 +123,11 @@ function AppRoutes() {
             <Route path="companies/create" element={<CompanyCreatePage />} />
             <Route path="companies/edit/:id" element={<CompanyEditPage />} />
             <Route path="companies/show/:id" element={<CompanyShowPage />} />
+            {/* Locations routes */}
+            <Route path="locations" element={<LocationsListPage />} />
+            <Route path="locations/create" element={<LocationCreatePage />} />
+            <Route path="locations/edit/:id" element={<LocationEditPage />} />
+            <Route path="locations/show/:id" element={<LocationShowPage />} />
 
             <Route path="*" element={<NotFound />} />
           </Route>
