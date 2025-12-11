@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Container, Flex, Splitter } from "@chakra-ui/react";
+import { Box, Card, Container, Flex, Splitter } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
 import NavBar from "../Common/NavBar";
 import { Toaster } from "../ui/toaster";
@@ -28,7 +28,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <AdminNavigation sizes={sizes} />
           </Box>
           <Box width={sizes[1] + "%"} p={6}>
-            {children}
+            <Card.Root p={4}>{children}</Card.Root>
           </Box>
         </Flex>
       </Box>

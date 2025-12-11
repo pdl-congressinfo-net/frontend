@@ -28,14 +28,6 @@ import { LuCirclePlus } from "react-icons/lu";
 export const Permissions = () => {
   const HISTORY_LIMIT = 20;
 
-  const [permissionName, setPermissionName] = useState("");
-  const [isValid, setIsValid] = useState(false);
-
-  const validatePermission = (value: string) => {
-    // Must match "resource:action"
-    return /^[a-z0-9_-]+:[a-z0-9_-]+$/.test(value);
-  };
-
   const [changes, setChanges] = useState<{
     add: { entityId: string; permissionId: string }[];
     remove: { entityId: string; permissionId: string }[];
@@ -356,112 +348,114 @@ export const Permissions = () => {
   };
 
   return (
-    <Card.Root p={4}>
-      <Flex direction="column" gap={6}>
-        <Flex direction="row" align="center" justify="space-between">
-          <Heading size="lg">Permissions</Heading>
-        </Flex>
-
-        <Tabs.Root defaultValue="users">
-          <Flex flex={1} gap={4} align="center" justify="space-between">
-            <Tabs.List>
-              <Tabs.Trigger value="users">User Permissions</Tabs.Trigger>
-              <Tabs.Trigger value="roles">Role Permissions</Tabs.Trigger>
-            </Tabs.List>
-            <Flex gap={2} align="center">
-              <CanAccess resource="permissions" action="create">
-                <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
-                  <Popover.Trigger
-                    as={IconButton}
-                    aria-label="Add Permission"
-                    onClick={() => setOpen(true)}
-                    type="button"
-                  >
-                    <LuCirclePlus />
-                  </Popover.Trigger>
-                  <Popover.Positioner>
-                    <Popover.Content p={4} bg="white" boxShadow="md">
-                      <Popover.Arrow />
-                      <Popover.Body>
-                        <form onSubmit={submitHandler}>
-                          <Group attached w="full">
-                            <Input name="name" placeholder="resource:action" />
-
-                            <Button type="submit" colorScheme="blue">
-                              Create
-                            </Button>
-                          </Group>
-                        </form>
-                      </Popover.Body>
-                    </Popover.Content>
-                  </Popover.Positioner>
-                </Popover.Root>
-              </CanAccess>
-              <Input
-                variant="flushed"
-                placeholder="Search permissions…"
-                value={permissionSearch}
-                onChange={(e) => setPermissionSearch(e.target.value)}
-              />
-            </Flex>
-          </Flex>
-
-          <Tabs.Content value="users">
-            <TanstackPermissionMatrix
-              title="Users × Permissions"
-              rows={users.data}
-              rowKey="id"
-              rowLabel={(u) => u.fullName}
-              groupedPermissions={groupedPermissions}
-              isChecked={isUserChecked}
-              onToggle={handleUserToggle}
-              getChangeType={getChangeType}
-              getUserPermissionSource={getUserPermissionSource}
-              search={permissionSearch}
-            />
-          </Tabs.Content>
-
-          <Tabs.Content value="roles">
-            <TanstackPermissionMatrix
-              title="Roles × Permissions"
-              rows={roles.data}
-              rowKey="id"
-              rowLabel={(r) => r.name}
-              groupedPermissions={groupedPermissions}
-              isChecked={isRoleChecked}
-              onToggle={handleRoleToggle}
-              getChangeType={getChangeType}
-              search={permissionSearch}
-            />
-          </Tabs.Content>
-        </Tabs.Root>
-        <Flex justify="flex-end" mt={4} gap={2} align="center">
-          {isDirty && (
-            <Box fontSize="sm" color="orange.500" mr="auto">
-              You have unsaved changes
-            </Box>
-          )}
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={undo}
-            disabled={history.length === 0}
-          >
-            Undo
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={saveHandler}
-            disabled={!isDirty}
-            loading={isSaving}
-          >
-            Save changes
-          </Button>
-        </Flex>
+    <Flex direction="column" gap={6}>
+      <Flex direction="row" align="center" justify="space-between">
+        <Heading size="lg">Permissions</Heading>
       </Flex>
-    </Card.Root>
+
+      <Tabs.Root defaultValue="userpermissions">
+        <Flex flex={1} gap={4} align="center" justify="space-between">
+          <Tabs.List>
+            <Tabs.Trigger value="userpermissions">
+              User Permissions
+            </Tabs.Trigger>
+            <Tabs.Trigger value="rolepermissions">
+              Role Permissions
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Flex gap={2} align="center">
+            <CanAccess resource="permissions" action="create">
+              <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+                <Popover.Trigger
+                  as={IconButton}
+                  aria-label="Add Permission"
+                  onClick={() => setOpen(true)}
+                  type="button"
+                >
+                  <LuCirclePlus />
+                </Popover.Trigger>
+                <Popover.Positioner>
+                  <Popover.Content p={4} bg="white" boxShadow="md">
+                    <Popover.Arrow />
+                    <Popover.Body>
+                      <form onSubmit={submitHandler}>
+                        <Group attached w="full">
+                          <Input name="name" placeholder="resource:action" />
+
+                          <Button type="submit" colorScheme="blue">
+                            Create
+                          </Button>
+                        </Group>
+                      </form>
+                    </Popover.Body>
+                  </Popover.Content>
+                </Popover.Positioner>
+              </Popover.Root>
+            </CanAccess>
+            <Input
+              variant="flushed"
+              placeholder="Search permissions…"
+              value={permissionSearch}
+              onChange={(e) => setPermissionSearch(e.target.value)}
+            />
+          </Flex>
+        </Flex>
+
+        <Tabs.Content value="userpermissions">
+          <TanstackPermissionMatrix
+            title="Users × Permissions"
+            rows={users.data}
+            rowKey="id"
+            rowLabel={(u) => u.fullName}
+            groupedPermissions={groupedPermissions}
+            isChecked={isUserChecked}
+            onToggle={handleUserToggle}
+            getChangeType={getChangeType}
+            getUserPermissionSource={getUserPermissionSource}
+            search={permissionSearch}
+          />
+        </Tabs.Content>
+
+        <Tabs.Content value="rolepermissions">
+          <TanstackPermissionMatrix
+            title="Roles × Permissions"
+            rows={roles.data}
+            rowKey="id"
+            rowLabel={(r) => r.name}
+            groupedPermissions={groupedPermissions}
+            isChecked={isRoleChecked}
+            onToggle={handleRoleToggle}
+            getChangeType={getChangeType}
+            search={permissionSearch}
+          />
+        </Tabs.Content>
+      </Tabs.Root>
+      <Flex justify="flex-end" mt={4} gap={2} align="center">
+        {isDirty && (
+          <Box fontSize="sm" color="orange.500" mr="auto">
+            You have unsaved changes
+          </Box>
+        )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={undo}
+          disabled={history.length === 0}
+        >
+          Undo
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={saveHandler}
+          disabled={!isDirty}
+          loading={isSaving}
+        >
+          Save changes
+        </Button>
+      </Flex>
+    </Flex>
   );
 };
