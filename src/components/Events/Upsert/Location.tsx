@@ -32,6 +32,7 @@ type LocationProps = {
   initialValues?:
     | Partial<PhysicalLocationFormValues>
     | Partial<WebinarLocationFormValues>;
+  isWebinar?: boolean;
 };
 
 const physicalSchema = z
@@ -66,8 +67,9 @@ const LocationPage = ({
   onStatus,
   onSave,
   initialValues,
+  isWebinar = false,
 }: LocationProps) => {
-  const isWeb = initialValues && "link" in initialValues;
+  const isWeb = isWebinar || (initialValues && "link" in initialValues);
   const schema = useMemo(
     () => (isWeb ? webinarSchema : physicalSchema),
     [isWeb],
@@ -327,7 +329,7 @@ const LocationPage = ({
                       const nextId = Array.isArray(e.value)
                         ? e.value[0]
                         : e.value;
-                        setValue("countryId", nextId ?? "", {
+                      setValue("countryId", nextId ?? "", {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true,

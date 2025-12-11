@@ -39,10 +39,7 @@ const BasicInformationSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     startDate: z.preprocess(toYMD, z.string().min(1, "Start date is required")),
-    oneDay: z.preprocess((val) => {
-      if (typeof val === "string") return val === "true" || val === "on";
-      return Boolean(val);
-    }, z.boolean().default(false)),
+    oneDay: z.boolean().default(false),
     endDate: z.preprocess((v) => {
       if (v === "" || v == null) return undefined;
       return toYMD(v);
@@ -147,6 +144,7 @@ const BasicInformation = ({
       eventTypeId: initialValues.eventTypeId ?? current.eventTypeId,
       isPublic: initialValues.isPublic ?? current.isPublic,
     };
+
     const normalizedCurrent = normalizeEventValues(
       current as BasicInformationValues,
     );
@@ -170,8 +168,6 @@ const BasicInformation = ({
       parentmodule: "events",
     },
   });
-
-  console.log("Event Types:", eventTypes);
 
   const eventTypeCollection = useMemo(
     () =>
@@ -256,26 +252,27 @@ const BasicInformation = ({
               </Field.Root>
 
               <Flex align="center" height="40px" mt="28px">
-                <Checkbox.Root width="20vw">
+                <Checkbox.Root width="20vw" checked={oneDay}>
                   <Checkbox.HiddenInput
-                    {...register("oneDay")}
+                    name="oneDay"
                     onChange={(e) => {
                       const target = e.target as HTMLInputElement;
                       const checked = !!target.checked;
+                      const currentStartDate = watch("startDate");
+
                       setValue("oneDay", checked, {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true,
                       });
-                      if (checked) {
-                        const sd = watch("startDate");
-                        if (sd) {
-                          setValue("endDate", sd, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                            shouldTouch: true,
-                          });
-                        }
+
+                      if (checked && currentStartDate) {
+                        // When checking, set endDate to same as startDate
+                        setValue("endDate", currentStartDate, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        });
                       }
                     }}
                   />

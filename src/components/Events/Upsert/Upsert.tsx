@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Flex,
-  Heading,
   Icon,
   Spinner,
   Tabs,
@@ -48,6 +47,7 @@ import {
   CreateLocationRequest,
   UpdateLocationRequest,
 } from "../../../features/locations/location.requests";
+import { EventType } from "../../../features/events/events.model";
 
 export type UpsertMode = "create" | "edit";
 
@@ -236,8 +236,27 @@ const Upsert = ({
     return unwrapData<LocationDetail>(locationResult) ?? locationResult;
   }, [locationResult]);
 
-  console.log("Upsert Rendered", locationResult);
-  console.log("locationId", locationIdFromEvent);
+  const eventTypeIdFromDraft = basicDraft?.eventTypeId || eventInfo?.data.eventTypeId;
+
+  const { result: eventTypeResult } = useOne<EventType>({
+    resource: "types",
+    id: eventTypeIdFromDraft ?? "",
+    queryOptions: {
+      enabled: Boolean(eventTypeIdFromDraft),
+    },
+    meta: {
+      parentmodule: "events",
+    },
+  });
+
+  const eventTypeRecord = React.useMemo<EventType | undefined>(() => {
+    if (!eventTypeResult) return undefined;
+    return unwrapData<EventType>(eventTypeResult) ?? eventTypeResult;
+  }, [eventTypeResult]);
+
+  const isWebinar = React.useMemo(() => {
+    return eventTypeRecord?.code === "WEB";
+  }, [eventTypeRecord?.code]);
 
   const handleBasicChange = React.useCallback(
     (values: BasicInformationValues, meta?: { source: "user" | "sync" }) => {
@@ -261,7 +280,7 @@ const Upsert = ({
       name: eventRecord.name ?? "",
       startDate: safeStart,
       endDate: endDate ?? undefined,
-      oneDay: !endDate || endDate === safeStart,
+      oneDay: !endDate || startDate === endDate,
       eventTypeId:
         eventRecord.event_type_id ??
         eventRecord.eventTypeId ??
@@ -306,7 +325,7 @@ const Upsert = ({
       return { ...prev, locationId: candidateLocation.id ?? prev.locationId };
     });
 
-    const isWeb = Boolean(candidateLocation.link);
+    const isWeb = Boolean(candidateLocation.link) || isWebinar;
 
     setLocationInfo((prev) => {
       if (prev && prev.kind === (isWeb ? "webinar" : "physical")) {
@@ -354,7 +373,45 @@ const Upsert = ({
         data: physicalValues,
       };
     });
-  }, [locationRecord, eventRecord?.location]);
+  }, [locationRecord, eventRecord?.location, isWebinar]);
+
+  React.useEffect(() => {
+    if (!locationInfo && isWebinar) {
+      setLocationInfo({
+        kind: "webinar",
+        data: {
+          name: "",
+          link: "",
+        },
+      });
+    } else if (locationInfo && locationInfo.kind !== (isWebinar ? "webinar" : "physical")) {
+      if (isWebinar) {
+        setLocationInfo({
+          id: locationInfo.id,
+          kind: "webinar",
+          data: {
+            name: "",
+            link: "",
+          },
+        });
+      } else {
+        setLocationInfo({
+          id: locationInfo.id,
+          kind: "physical",
+          data: {
+            name: "",
+            road: "",
+            number: "",
+            postalCode: "",
+            city: "",
+            latitude: undefined,
+            longitude: undefined,
+            countryId: "",
+          },
+        });
+      }
+    }
+  }, [isWebinar, locationInfo]);
 
   const eventValuesForRender = basicDraft ?? eventInfo?.data ?? null;
   const locationInitialValues = locationInfo?.data;
@@ -705,7 +762,7 @@ const Upsert = ({
                     onPrevious={goPrevious}
                     onStatus={handleBasicStatus}
                     onSave={(data) => handleSave(data, "event")}
-                    initialValues={basicDraft ?? eventInfo?.data ?? undefined}
+                    initialValues={eventValuesForRender}
                     onChange={handleBasicChange}
                   />
                 </Tabs.Content>
@@ -717,6 +774,7 @@ const Upsert = ({
                     onStatus={handleLocationStatus}
                     onSave={(data) => handleSave(data, "location")}
                     initialValues={locationInitialValues}
+                    isWebinar={isWebinar}
                   />
                 </Tabs.Content>
                 {mergedSteps
