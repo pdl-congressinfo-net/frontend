@@ -20,6 +20,3 @@ export const eventResource = {
     canDelete: true,
   },
 };
-
-// Legacy exports for backward compatibility
-export const eventCategoryResource = eventTypeResource;
