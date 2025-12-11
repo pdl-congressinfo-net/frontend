@@ -5,9 +5,9 @@ export interface UserRoleDTO {
 }
 
 export interface UserPermissionDTO {
-    id: string;
-    user_id: string;
-    permission_id: string;
+  id: string;
+  user_id: string;
+  permission_id: string;
 }
 
 export interface UserDTO {
@@ -16,4 +16,5 @@ export interface UserDTO {
   full_name: string;
   created_at: Date;
   last_login: Date;
+  oeka_id?: string;
 }
