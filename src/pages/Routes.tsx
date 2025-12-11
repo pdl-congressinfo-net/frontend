@@ -25,6 +25,10 @@ import RolesListPage from "./roles/list";
 import RoleCreatePage from "./roles/create";
 import RoleEditPage from "./roles/edit";
 import RoleShowPage from "./roles/show";
+import CompaniesListPage from "./companies/list";
+import CompanyCreatePage from "./companies/create";
+import CompanyEditPage from "./companies/edit";
+import CompanyShowPage from "./companies/show";
 
 
 function AppRoutes() {
@@ -79,6 +83,12 @@ function AppRoutes() {
           <Route path="/roles/edit/:id" element={<RoleEditPage />} />
           <Route path="/roles/show/:id" element={<RoleShowPage />} />
 
+          {/* Companies routes */}
+          <Route path="/companies" element={<CompaniesListPage />} />
+          <Route path="/companies/create" element={<CompanyCreatePage />} />
+          <Route path="/companies/edit/:id" element={<CompanyEditPage />} />
+          <Route path="/companies/show/:id" element={<CompanyShowPage />} />
+
           <Route path="/admin" element={<AdminTempPage />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Route>
@@ -91,6 +101,7 @@ function AppRoutes() {
           <Route path="/events/types/show/:id" element={<EventTypeShowPage />} />
           <Route path="/permissions/show/:id" element={<PermissionShowPage />} />
           <Route path="/roles/show/:id" element={<RoleShowPage />} />
+          <Route path="/companies/show/:id" element={<CompanyShowPage />} />
         </Routes>
       )}
     </>

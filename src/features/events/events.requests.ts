@@ -1,17 +1,9 @@
 export interface CreateEventTypeRequest {
   code: string;
-  name_de: string;
-  name_en: string;
-  description_de?: string;
-  description_en?: string;
 }
 
 export interface UpdateEventTypeRequest {
   code?: string;
-  name_de?: string;
-  name_en?: string;
-  description_de?: string;
-  description_en?: string;
 }
 
 export interface CreateEventRequest {

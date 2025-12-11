@@ -1,10 +1,6 @@
 export interface EventTypeDTO {
   id: string;
   code: string;
-  name_de: string;
-  name_en: string;
-  description_de?: string;
-  description_en?: string;
 }
 
 export interface EventDTO {

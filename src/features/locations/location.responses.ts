@@ -1,6 +1,6 @@
 export interface LocationTypeDTO {
   id: string;
-  name: string;
+  code: string;
 }
 
 export interface CountryDTO {

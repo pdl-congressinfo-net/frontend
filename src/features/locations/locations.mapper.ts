@@ -3,7 +3,7 @@ import { Location, LocationType, Country } from "./location.model";
 
 export const mapLocationType = (dto: LocationTypeDTO): LocationType => ({
   id: dto.id,
-  name: dto.name,
+  code: dto.code,
 });
 
 export const mapCountry = (dto: CountryDTO): Country => ({

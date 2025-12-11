@@ -14,9 +14,5 @@ export default {
   types: (dto: EventTypeDTO): EventType => ({
     id: dto.id,
     code: dto.code,
-    nameDe: dto.name_de,
-    nameEn: dto.name_en,
-    descriptionDe: dto.description_de,
-    descriptionEn: dto.description_en,
   }),
 };

@@ -27,6 +27,10 @@ import {
   locationTypeResource,
   countryResource,
 } from "./features/locations/locations.resource";
+import {
+  companyResource,
+  companyEmployeeResource,
+} from "./features/companies/companies.resource";
 import AppRoutes from "./pages/Routes";
 import { LayoutProvider } from "./providers/layout-provider";
 import { rolePermissionResource, roleResource } from "./features/roles/roles.resource";
@@ -61,6 +65,8 @@ function App() {
                   locationResource,
                   locationTypeResource,
                   countryResource,
+                  companyResource,
+                  companyEmployeeResource,
                   roleResource,
                   rolePermissionResource,
                   permissionResource,
