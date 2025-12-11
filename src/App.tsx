@@ -33,7 +33,10 @@ import {
 } from "./features/companies/companies.resource";
 import AppRoutes from "./pages/Routes";
 import { LayoutProvider } from "./providers/layout-provider";
-import { rolePermissionResource, roleResource } from "./features/roles/roles.resource";
+import {
+  rolePermissionResource,
+  roleResource,
+} from "./features/roles/roles.resource";
 import { permissionResource } from "./features/permissions/permissions.resource";
 
 function App() {
@@ -74,7 +77,6 @@ function App() {
               >
                 <AppRoutes />
                 <RefineKbar />
-                <DocumentTitleHandler />
               </Refine>
               <DevtoolsPanel />
             </LayoutProvider>
