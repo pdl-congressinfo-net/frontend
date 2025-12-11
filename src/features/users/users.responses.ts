@@ -1,11 +1,9 @@
 export interface UserRoleDTO {
-  id: string;
   user_id: string;
   role_id: string;
 }
 
 export interface UserPermissionDTO {
-  id: string;
   user_id: string;
   permission_id: string;
 }

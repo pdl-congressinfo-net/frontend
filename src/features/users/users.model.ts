@@ -1,11 +1,9 @@
 export interface UserRole {
-  id: string;
   userId: string;
   roleId: string;
 }
 
 export interface UserPermission {
-  id: string;
   userId: string;
   permissionId: string;
 }

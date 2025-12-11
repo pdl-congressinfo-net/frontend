@@ -10,12 +10,10 @@ export default {
     lastLogin: dto.last_login,
   }),
   roles: (dto: UserRoleDTO): UserRole => ({
-    id: dto.id,
     userId: dto.user_id,
     roleId: dto.role_id,
   }),
   permissions: (dto: UserPermissionDTO): UserPermission => ({
-    id: dto.id,
     userId: dto.user_id,
     permissionId: dto.permission_id,
   }),
