@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { useDocumentTitle } from "@refinedev/react-router";
 
 interface LayoutContextProps {
   title: string;
@@ -14,6 +15,7 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [actions, setActions] = useState<React.ReactNode>(null);
+  useDocumentTitle(title);
 
   return (
     <LayoutContext.Provider value={{ title, actions, setTitle, setActions }}>
