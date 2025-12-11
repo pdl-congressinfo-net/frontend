@@ -16,9 +16,9 @@
       "logs": "Protokolle"
     },
     "folder": {
+      "events": "Kongresse",
       "usermanagement": "Benutzerverwaltung",
-      "roles": "Rollen",
-      "permissions": "Berechtigungen",
+      "accesscontrol": "Zugriffskontrolle",
       "settings": "Einstellungen",
       "logs": "Protokolle"
     }

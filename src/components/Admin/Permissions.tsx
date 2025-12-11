@@ -3,14 +3,18 @@ import {
   Button,
   Card,
   Flex,
+  Group,
   Heading,
+  IconButton,
   Input,
-  Separator,
+  Popover,
+  Portal,
   Tabs,
 } from "@chakra-ui/react";
 import { CanAccess, useCreate, useList, useDelete } from "@refinedev/core";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Permission } from "../../features/permissions/permissions.model";
+import { useMask } from "@react-input/mask";
 import {
   User,
   UserPermission,
@@ -19,9 +23,18 @@ import {
 
 import { Role, RolePermission } from "../../features/roles/roles.model";
 import { TanstackPermissionMatrix } from "../Common/Matrix";
+import { LuCirclePlus } from "react-icons/lu";
 
-export const AdminTemp = () => {
+export const Permissions = () => {
   const HISTORY_LIMIT = 20;
+
+  const [permissionName, setPermissionName] = useState("");
+  const [isValid, setIsValid] = useState(false);
+
+  const validatePermission = (value: string) => {
+    // Must match "resource:action"
+    return /^[a-z0-9_-]+:[a-z0-9_-]+$/.test(value);
+  };
 
   const [changes, setChanges] = useState<{
     add: { entityId: string; permissionId: string }[];
@@ -38,6 +51,7 @@ export const AdminTemp = () => {
   const [permissionSearch, setPermissionSearch] = useState("");
   const isDirty = changes.add.length > 0 || changes.remove.length > 0;
   const [isSaving, setIsSaving] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { mutateAsync: create } = useCreate();
 
@@ -344,34 +358,53 @@ export const AdminTemp = () => {
   return (
     <Card.Root p={4}>
       <Flex direction="column" gap={6}>
-        <Heading size="lg">Admin Area</Heading>
-
-        <Box>
-          <Heading size="sm">Create Permission</Heading>
-          <Separator my={2} />
-          <CanAccess resource="permissions" action="create">
-            <form onSubmit={submitHandler}>
-              <Flex gap={2}>
-                <Input name="name" placeholder="Permission name" />
-                <Button type="submit">Create</Button>
-              </Flex>
-            </form>
-          </CanAccess>
-        </Box>
-        <Box maxW="300px">
-          <Input
-            placeholder="Search permissions…"
-            value={permissionSearch}
-            onChange={(e) => setPermissionSearch(e.target.value)}
-            size="sm"
-          />
-        </Box>
+        <Flex direction="row" align="center" justify="space-between">
+          <Heading size="lg">Permissions</Heading>
+        </Flex>
 
         <Tabs.Root defaultValue="users">
-          <Tabs.List>
-            <Tabs.Trigger value="users">User Permissions</Tabs.Trigger>
-            <Tabs.Trigger value="roles">Role Permissions</Tabs.Trigger>
-          </Tabs.List>
+          <Flex flex={1} gap={4} align="center" justify="space-between">
+            <Tabs.List>
+              <Tabs.Trigger value="users">User Permissions</Tabs.Trigger>
+              <Tabs.Trigger value="roles">Role Permissions</Tabs.Trigger>
+            </Tabs.List>
+            <Flex gap={2} align="center">
+              <CanAccess resource="permissions" action="create">
+                <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+                  <Popover.Trigger
+                    as={IconButton}
+                    aria-label="Add Permission"
+                    onClick={() => setOpen(true)}
+                    type="button"
+                  >
+                    <LuCirclePlus />
+                  </Popover.Trigger>
+                  <Popover.Positioner>
+                    <Popover.Content p={4} bg="white" boxShadow="md">
+                      <Popover.Arrow />
+                      <Popover.Body>
+                        <form onSubmit={submitHandler}>
+                          <Group attached w="full">
+                            <Input name="name" placeholder="resource:action" />
+
+                            <Button type="submit" colorScheme="blue">
+                              Create
+                            </Button>
+                          </Group>
+                        </form>
+                      </Popover.Body>
+                    </Popover.Content>
+                  </Popover.Positioner>
+                </Popover.Root>
+              </CanAccess>
+              <Input
+                variant="flushed"
+                placeholder="Search permissions…"
+                value={permissionSearch}
+                onChange={(e) => setPermissionSearch(e.target.value)}
+              />
+            </Flex>
+          </Flex>
 
           <Tabs.Content value="users">
             <TanstackPermissionMatrix

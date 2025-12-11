@@ -16,9 +16,9 @@
       "logs": "Logs"
     },
     "folder": {
+      "events": "Events",
       "usermanagement": "User Management",
-      "roles": "Roles",
-      "permissions": "Permissions",
+      "accesscontrol": "Access Control",
       "settings": "Settings",
       "logs": "Logs"
     }

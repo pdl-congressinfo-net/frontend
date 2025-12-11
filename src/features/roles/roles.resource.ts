@@ -1,9 +1,9 @@
 export const roleResource = {
   name: "roles",
-  list: "/roles",
-  create: "/roles/create",
-  edit: "/roles/edit/:id",
-  show: "/roles/show/:id",
+  list: "/admin/roles",
+  create: "/admin/roles/create",
+  edit: "/admin/roles/edit/:id",
+  show: "/admin/roles/show/:id",
   meta: {
     canDelete: true,
   },
@@ -11,8 +11,8 @@ export const roleResource = {
 
 export const rolePermissionResource = {
   name: "rolepermissions",
-  list: "/roles/:roleId/permissions",
-  create: "/roles/:roleId/permissions/create",
+  list: "/admin/roles/:roleId/permissions",
+  create: "/admin/roles/:roleId/permissions/create",
   meta: {
     canDelete: true,
     parent: "roles",

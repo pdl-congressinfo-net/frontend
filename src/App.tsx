@@ -18,7 +18,6 @@ import "./providers/rest-data-provider/mapping/feature.loader";
 
 import { httpClient } from "./utils/httpClient";
 import {
-  eventCategoryResource,
   eventTypeResource,
   eventResource,
 } from "./features/events/events.resource";
@@ -38,6 +37,11 @@ import {
   roleResource,
 } from "./features/roles/roles.resource";
 import { permissionResource } from "./features/permissions/permissions.resource";
+import {
+  userPermissionRessource,
+  userRessource,
+  userRoleRessource,
+} from "./features/users/users.resource";
 
 function App() {
   return (
@@ -62,7 +66,9 @@ function App() {
                   projectId: "vcrr5U-GVoid5-2GKdr3",
                 }}
                 resources={[
-                  eventCategoryResource,
+                  userPermissionRessource,
+                  userRoleRessource,
+                  userRessource,
                   eventTypeResource,
                   eventResource,
                   locationResource,

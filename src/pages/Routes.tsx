@@ -2,6 +2,7 @@ import { NavigateToResource } from "@refinedev/react-router";
 import { useLocation, Routes, Route, Outlet } from "react-router";
 import type { Location } from "react-router";
 import { Layout } from "../components/Common/Layout";
+import { AdminLayout } from "../components/Admin/AdminLayout";
 import AdminTempPage from "./admin/temp";
 import EventsListPage from "./events/list";
 import EventShowPage from "./events/show";
@@ -29,7 +30,7 @@ import CompaniesListPage from "./companies/list";
 import CompanyCreatePage from "./companies/create";
 import CompanyEditPage from "./companies/edit";
 import CompanyShowPage from "./companies/show";
-
+import AdminDashboard from "./admin/dashboard";
 
 function AppRoutes() {
   const location = useLocation();
@@ -56,8 +57,14 @@ function AppRoutes() {
 
           {/* Event Types routes */}
           <Route path="/events/types" element={<EventTypesListPage />} />
-          <Route path="/events/types/create" element={<EventTypeCreatePage />} />
-          <Route path="/events/types/edit/:id" element={<EventTypeEditPage />} />
+          <Route
+            path="/events/types/create"
+            element={<EventTypeCreatePage />}
+          />
+          <Route
+            path="/events/types/edit/:id"
+            element={<EventTypeEditPage />}
+          />
 
           {/* Locations routes */}
           <Route path="/locations" element={<LocationsListPage />} />
@@ -73,15 +80,18 @@ function AppRoutes() {
 
           {/* Permissions routes */}
           <Route path="/permissions" element={<PermissionsListPage />} />
-          <Route path="/permissions/create" element={<PermissionCreatePage />} />
-          <Route path="/permissions/edit/:id" element={<PermissionEditPage />} />
-          <Route path="/permissions/show/:id" element={<PermissionShowPage />} />
-
-          {/* Roles routes */}
-          <Route path="/roles" element={<RolesListPage />} />
-          <Route path="/roles/create" element={<RoleCreatePage />} />
-          <Route path="/roles/edit/:id" element={<RoleEditPage />} />
-          <Route path="/roles/show/:id" element={<RoleShowPage />} />
+          <Route
+            path="/permissions/create"
+            element={<PermissionCreatePage />}
+          />
+          <Route
+            path="/permissions/edit/:id"
+            element={<PermissionEditPage />}
+          />
+          <Route
+            path="/permissions/show/:id"
+            element={<PermissionShowPage />}
+          />
 
           {/* Companies routes */}
           <Route path="/companies" element={<CompaniesListPage />} />
@@ -89,8 +99,22 @@ function AppRoutes() {
           <Route path="/companies/edit/:id" element={<CompanyEditPage />} />
           <Route path="/companies/show/:id" element={<CompanyShowPage />} />
 
-          <Route path="/admin" element={<AdminTempPage />} />
           <Route path="*" element={<div>404 Not Found</div>} />
+        </Route>
+        <Route
+          path="/admin/*"
+          element={
+            <AdminLayout>
+              <Outlet />
+            </AdminLayout>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="permissions" element={<PermissionsListPage />} />
+          <Route path="roles" element={<RolesListPage />} />
+          <Route path="roles/create" element={<RoleCreatePage />} />
+          <Route path="roles/edit/:id" element={<RoleEditPage />} />
+          <Route path="roles/show/:id" element={<RoleShowPage />} />
         </Route>
       </Routes>
 
@@ -98,8 +122,14 @@ function AppRoutes() {
       {state?.background && (
         <Routes>
           <Route path="/events/show/:id" element={<EventShowPage />} />
-          <Route path="/events/types/show/:id" element={<EventTypeShowPage />} />
-          <Route path="/permissions/show/:id" element={<PermissionShowPage />} />
+          <Route
+            path="/events/types/show/:id"
+            element={<EventTypeShowPage />}
+          />
+          <Route
+            path="/permissions/show/:id"
+            element={<PermissionShowPage />}
+          />
           <Route path="/roles/show/:id" element={<RoleShowPage />} />
           <Route path="/companies/show/:id" element={<CompanyShowPage />} />
         </Routes>
