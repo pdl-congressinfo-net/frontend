@@ -4,7 +4,6 @@ import { useTranslation } from "@refinedev/core";
 import NavBar from "./NavBar";
 import { Toaster } from "../ui/toaster";
 import { ToasterMobile } from "../ui/toasterMobile";
-import { useLayout } from "../../providers/layout-provider";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,7 +11,6 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { translate } = useTranslation();
-  const { title, actions } = useLayout();
 
   return (
     <Flex direction="column" minHeight="100vh">
@@ -20,14 +18,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <NavBar />
 
       {/* Main Content */}
-      <Box as="main" flex="1" bg="ui.background" width="80%" mx="auto" py={6}>
-        <Flex justify="space-between" mb={4}>
-          {title && <Heading>{title}</Heading>}
-          {actions && <Box mb={4}>{actions}</Box>}
-        </Flex>
-
-        <Container>{children}</Container>
-      </Box>
+      {children}
 
       {/* Footer */}
       <ToasterMobile />

@@ -17,41 +17,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { title, actions } = useLayout();
 
   return (
-    <Flex direction="column" minHeight="100vh">
-      {/* Header */}
-      <NavBar />
-
-      {/* Main Content */}
-      <Box as="main" flex="1" bg="ui.background" width="80%" mx="auto">
-        <Flex>
-          <Box width={sizes[0] + "%"} minHeight="100vh" bg="ui.surface">
-            <AdminNavigation sizes={sizes} />
-          </Box>
-          <Box width={sizes[1] + "%"} p={6}>
-            <Card.Root p={4}>{children}</Card.Root>
-          </Box>
-        </Flex>
-      </Box>
-
-      {/* Footer */}
-      <ToasterMobile />
-      <Toaster />
-      <Box
-        as="footer"
-        borderTopWidth="1px"
-        borderTopColor="gray.200"
-        bg="ui.surface"
-        px={4}
-        py={4}
-      >
-        <Container maxW="container.xl">
-          <Box fontSize="sm" color="ui.muted" textAlign="center">
-            © {new Date().getFullYear()} {translate("common.projectName")}
-            {" | "}
-            {translate("common.allRightsReserved")}
-          </Box>
-        </Container>
-      </Box>
-    </Flex>
+    <Box as="main" flex="1" bg="ui.background" width="80%" mx="auto">
+      <Flex>
+        <Box width={sizes[0] + "%"} minHeight="100vh" bg="ui.surface">
+          <AdminNavigation sizes={sizes} />
+        </Box>
+        <Box width={sizes[1] + "%"} p={6}>
+          <Card.Root p={4}>{children}</Card.Root>
+        </Box>
+      </Flex>
+    </Box>
   );
 };
