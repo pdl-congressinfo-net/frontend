@@ -7,7 +7,12 @@ import {
   Image,
   Skeleton,
 } from "@chakra-ui/react";
-import { CanAccess, useOne, useNavigation, useTranslation } from "@refinedev/core";
+import {
+  CanAccess,
+  useNavigation,
+  useOne,
+  useTranslation,
+} from "@refinedev/core";
 import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { toDate } from "../../utils/helpers";
@@ -139,7 +144,9 @@ export const EventCard = ({
                       onPublishClick?.(!event.isPublic);
                     }}
                   >
-                    {event.isPublic ? t("events.actions.unpublish") : t("events.actions.publish")}
+                    {event.isPublic
+                      ? t("events.actions.unpublish")
+                      : t("events.actions.publish")}
                   </Button>
                 </CanAccess>
               </Flex>

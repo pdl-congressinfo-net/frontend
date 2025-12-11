@@ -1,5 +1,5 @@
-import { CompanyDTO, CompanyEmployeeDTO } from "./companies.responses";
 import { Company, CompanyEmployee } from "./companies.model";
+import { CompanyDTO, CompanyEmployeeDTO } from "./companies.responses";
 
 export default {
   companies: (dto: CompanyDTO): Company => ({

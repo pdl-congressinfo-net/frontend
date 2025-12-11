@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useLayout } from "../../../providers/layout-provider";
-import { useList } from "@refinedev/core";
 import { Box, Table } from "@chakra-ui/react";
+import { useList } from "@refinedev/core";
+import { useEffect } from "react";
 import { LocationType } from "../../../features/locations/location.model";
+import { useLayout } from "../../../providers/layout-provider";
 
 const LocationTypesListPage = () => {
   const { setTitle, setActions } = useLayout();

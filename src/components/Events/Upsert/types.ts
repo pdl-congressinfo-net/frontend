@@ -22,4 +22,3 @@ export type WebinarLocationFormValues = {
   name: string;
   link: string;
 };
-

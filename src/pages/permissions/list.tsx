@@ -1,15 +1,17 @@
-import { useEffect } from "react";
-import { useLayout } from "../../providers/layout-provider";
+import { Box, Button } from "@chakra-ui/react";
 import { useList, useNavigation, useTranslation } from "@refinedev/core";
-import { Box, Button, Table } from "@chakra-ui/react";
-import { Permission } from "../../features/permissions/permissions.model";
+import { useEffect } from "react";
 import { Permissions } from "../../components/Admin/Permissions";
+import { Permission } from "../../features/permissions/permissions.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const PermissionsListActions = () => {
   const { translate: t } = useTranslation();
   const { create } = useNavigation();
   return (
-    <Button onClick={() => create("permissions")}>{t("admin.permissions.actions.create")}</Button>
+    <Button onClick={() => create("permissions")}>
+      {t("admin.permissions.actions.create")}
+    </Button>
   );
 };
 

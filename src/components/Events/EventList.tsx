@@ -1,11 +1,16 @@
 import { Stack, Text } from "@chakra-ui/react";
+import {
+  useCan,
+  useCustomMutation,
+  useList,
+  useTranslation,
+} from "@refinedev/core";
 import { useMemo, useState } from "react";
-import { EventCard } from "./EventCard";
-import EventLoginDialog from "./EventLoginDialog";
-import { useCan, useList, useCustomMutation, useTranslation } from "@refinedev/core";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Event } from "../../features/events/events.model";
+import { EventCard } from "./EventCard";
 import { EventCardLoading } from "./EventCardLoading";
+import EventLoginDialog from "./EventLoginDialog";
 
 type EventListProps = {
   archive?: boolean;
@@ -92,7 +97,7 @@ export const EventList = ({ archive }: EventListProps) => {
         onSuccess: () => {
           query.refetch();
         },
-      }
+      },
     );
   };
 

@@ -1,19 +1,5 @@
-import {
-  Box,
-  Heading,
-  Text,
-  Timeline,
-  PaginationRoot,
-  PaginationItems,
-  PaginationPrevTrigger,
-  PaginationNextTrigger,
-  IconButton,
-  Flex,
-} from "@chakra-ui/react";
-import TabsLayout from "./TabsLayout";
+import { Heading } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
-import { LuCheck, LuCircleArrowLeft, LuCircleArrowRight } from "react-icons/lu";
-import { useState } from "react";
 import { Event } from "../../../features/events/events.model";
 
 interface InformationProps {

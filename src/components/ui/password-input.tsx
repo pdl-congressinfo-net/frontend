@@ -39,8 +39,7 @@ export interface PasswordVisibilityProps {
 }
 
 export interface PasswordInputProps
-  extends InputProps,
-    PasswordVisibilityProps {
+  extends InputProps, PasswordVisibilityProps {
   rootProps?: GroupProps;
 }
 
@@ -106,7 +105,7 @@ const VisibilityTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 interface PasswordStrengthMeterProps extends StackProps {

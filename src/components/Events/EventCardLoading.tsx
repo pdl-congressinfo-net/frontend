@@ -1,4 +1,4 @@
-import { Card, Flex, Skeleton, Box, SkeletonText } from "@chakra-ui/react";
+import { Box, Card, Flex, Skeleton } from "@chakra-ui/react";
 
 export const EventCardLoading = () => {
   return (

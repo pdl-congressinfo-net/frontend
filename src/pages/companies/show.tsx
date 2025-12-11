@@ -1,10 +1,10 @@
+import { Box, Button, Text, VStack } from "@chakra-ui/react";
+import { useDelete, useOne } from "@refinedev/core";
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
-import { useOne, useDelete } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Text } from "@chakra-ui/react";
-import { Company } from "../../features/companies/companies.model";
 import { LuArrowLeft, LuPencil, LuTrash2 } from "react-icons/lu";
+import { useNavigate, useParams } from "react-router";
+import { Company } from "../../features/companies/companies.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const CompanyShowActions = () => {
   const navigate = useNavigate();

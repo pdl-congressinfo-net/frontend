@@ -1,16 +1,20 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
 import { useCreate } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { CreatePermissionRequest } from "../../features/permissions/permissions.requests";
+import { useLayout } from "../../providers/layout-provider";
 
 const PermissionCreatePage = () => {
   const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const { mutate: createPermission } = useCreate();
-  const { register, handleSubmit, formState: { errors } } = useForm<CreatePermissionRequest>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreatePermissionRequest>();
 
   useEffect(() => {
     setTitle("Create Permission");
@@ -27,7 +31,7 @@ const PermissionCreatePage = () => {
         onSuccess: () => {
           navigate("/permissions");
         },
-      }
+      },
     );
   };
 
@@ -38,7 +42,9 @@ const PermissionCreatePage = () => {
           <Field.Root invalid={!!errors.name}>
             <Field.Label>Name</Field.Label>
             <Input {...register("name", { required: true })} />
-            {errors.name && <Field.ErrorText>This field is required</Field.ErrorText>}
+            {errors.name && (
+              <Field.ErrorText>This field is required</Field.ErrorText>
+            )}
           </Field.Root>
 
           <Button type="submit">Create Permission</Button>

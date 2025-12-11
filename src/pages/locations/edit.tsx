@@ -1,15 +1,15 @@
+import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { useList, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { useUpdate, useOne, useList } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { UpdateLocationRequest } from "../../features/locations/location.requests";
+import { useNavigate, useParams } from "react-router";
 import {
-  Location,
   Country,
+  Location,
   LocationType,
 } from "../../features/locations/location.model";
+import { UpdateLocationRequest } from "../../features/locations/location.requests";
+import { useLayout } from "../../providers/layout-provider";
 
 const LocationEditPage = () => {
   const { id } = useParams<{ id: string }>();

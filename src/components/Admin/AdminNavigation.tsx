@@ -1,28 +1,11 @@
+import { Accordion, Button, Flex, Span } from "@chakra-ui/react";
+import { useNavigation, useTranslation } from "@refinedev/core";
 import * as React from "react";
 import {
-  Accordion,
-  Box,
-  Button,
-  Container,
-  Flex,
-  Heading,
-  Link,
-  Span,
-} from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router";
-import {
-  useTranslation,
-  useNavigation,
-  useShow,
-  useDelete,
-} from "@refinedev/core";
-import {
   LuCircleUser,
-  LuLogIn,
   LuLogs,
   LuPresentation,
   LuSettings,
-  LuShieldCheck,
   LuUsers,
 } from "react-icons/lu";
 

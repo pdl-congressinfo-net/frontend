@@ -1,11 +1,10 @@
 import { Tabs } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { LuInfo, LuClipboardList, LuLogIn, LuUsers } from "react-icons/lu";
+import { LuClipboardList, LuInfo, LuLogIn, LuUsers } from "react-icons/lu";
 
 import Information from "./Tabs/Information";
 import Login from "./Tabs/Login";
 import Program from "./Tabs/Program";
-import { any } from "zod";
 
 type EventDetailsProps = {
   event: any;

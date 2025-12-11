@@ -6,9 +6,9 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useTranslation } from "@refinedev/core";
 import { useNavigate } from "react-router";
 import { useLayout } from "../../providers/layout-provider";
-import { useTranslation } from "@refinedev/core";
 
 export default function NotFound() {
   const { translate: t } = useTranslation();

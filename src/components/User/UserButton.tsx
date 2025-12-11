@@ -1,15 +1,15 @@
-import React from "react";
-import { LuCircleUserRound } from "react-icons/lu";
-import { useTranslation } from "react-i18next";
-import { Icon, Button, Menu, Portal } from "@chakra-ui/react";
-import { AccountDialog } from "./AccountDialog";
+import { Button, Icon, Menu, Portal } from "@chakra-ui/react";
 import {
-  useLogout,
-  useIsAuthenticated,
-  useGo,
   useGetIdentity,
+  useGo,
+  useIsAuthenticated,
+  useLogout,
 } from "@refinedev/core";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { LuCircleUserRound } from "react-icons/lu";
 import { User } from "../../features/users/users.model";
+import { AccountDialog } from "./AccountDialog";
 
 interface UserButtonProps {
   className?: string;

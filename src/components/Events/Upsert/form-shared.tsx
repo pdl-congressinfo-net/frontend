@@ -143,26 +143,26 @@ const unwrapData = <T,>(result: any): T | undefined => {
 };
 
 export type {
-  StepStatus,
-  SaveResult,
-  StoredEventInfo,
-  StoredLocationInfo,
   BasicInformationValues,
-  PhysicalLocationFormValues,
-  WebinarLocationFormValues,
   EventDetail,
   LocationDetail,
+  PhysicalLocationFormValues,
+  SaveResult,
+  StepStatus,
+  StoredEventInfo,
+  StoredLocationInfo,
+  WebinarLocationFormValues,
 };
 
 export {
-  steps,
   getStatusIndicator,
-  normalizeEventValues,
   isSameEventValues,
-  normalizePhysicalLocation,
   isSamePhysicalLocation,
-  normalizeWebinarLocation,
   isSameWebinarLocation,
+  normalizeEventValues,
+  normalizePhysicalLocation,
+  normalizeWebinarLocation,
+  steps,
   toOptionalString,
   unwrapData,
 };

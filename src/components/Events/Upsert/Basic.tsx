@@ -1,26 +1,26 @@
 import {
   Button,
-  Input,
-  Field,
-  Stack,
   Checkbox,
-  Flex,
+  Field,
   Fieldset,
+  Flex,
+  Input,
   Portal,
   Select,
+  Stack,
   createListCollection,
 } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useList, useTranslation } from "@refinedev/core";
 import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EventType } from "../../../features/events/events.model";
 import {
   SaveResult,
   StepStatus,
-  normalizeEventValues,
   isSameEventValues,
+  normalizeEventValues,
 } from "./form-shared";
 import { BasicInformationValues } from "./types";
 export type { BasicInformationValues } from "./types";
@@ -35,39 +35,43 @@ const toYMD = (v: unknown) => {
   return v;
 };
 
-const createBasicInformationSchema = (t: (key: string) => string) => z
-  .object({
-    name: z.string().min(1, t("events.form.validation.nameRequired")),
-    startDate: z.preprocess(toYMD, z.string().min(1, t("events.form.validation.startDateRequired"))),
-    oneDay: z.boolean().default(false),
-    endDate: z.preprocess((v) => {
-      if (v === "" || v == null) return undefined;
-      return toYMD(v);
-    }, z.string().optional()),
-    eventTypeId: z.string().min(1, t("common.validation.required")),
-    isPublic: z.boolean().default(false),
-  })
-  .superRefine((data, ctx) => {
-    const start = data.startDate;
-    if (!data.oneDay) {
-      if (!data.endDate) {
-        ctx.addIssue({
-          path: ["endDate"],
-          message: t("events.form.validation.endDateRequired"),
-          code: z.ZodIssueCode.custom,
-        });
-      } else {
-        const end = data.endDate;
-        if (end < start) {
+const createBasicInformationSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z.string().min(1, t("events.form.validation.nameRequired")),
+      startDate: z.preprocess(
+        toYMD,
+        z.string().min(1, t("events.form.validation.startDateRequired")),
+      ),
+      oneDay: z.boolean().default(false),
+      endDate: z.preprocess((v) => {
+        if (v === "" || v == null) return undefined;
+        return toYMD(v);
+      }, z.string().optional()),
+      eventTypeId: z.string().min(1, t("common.validation.required")),
+      isPublic: z.boolean().default(false),
+    })
+    .superRefine((data, ctx) => {
+      const start = data.startDate;
+      if (!data.oneDay) {
+        if (!data.endDate) {
           ctx.addIssue({
             path: ["endDate"],
-            message: t("events.form.validation.endDateAfterStart"),
+            message: t("events.form.validation.endDateRequired"),
             code: z.ZodIssueCode.custom,
           });
+        } else {
+          const end = data.endDate;
+          if (end < start) {
+            ctx.addIssue({
+              path: ["endDate"],
+              message: t("events.form.validation.endDateAfterStart"),
+              code: z.ZodIssueCode.custom,
+            });
+          }
         }
       }
-    }
-  });
+    });
 
 type BasicInformationProps = {
   onNext?: () => void;
@@ -107,7 +111,10 @@ const BasicInformation = ({
     };
   }, []);
 
-  const BasicInformationSchema = useMemo(() => createBasicInformationSchema(t), [t]);
+  const BasicInformationSchema = useMemo(
+    () => createBasicInformationSchema(t),
+    [t],
+  );
 
   const {
     watch,
@@ -233,7 +240,9 @@ const BasicInformation = ({
     <form onSubmit={onSubmit}>
       <Fieldset.Root size="lg">
         <Stack>
-          <Fieldset.Legend>{t("events.form.sections.basicInformation")}</Fieldset.Legend>
+          <Fieldset.Legend>
+            {t("events.form.sections.basicInformation")}
+          </Fieldset.Legend>
           <Fieldset.HelperText>
             {t("events.form.sections.basicInformationHelp")}
           </Fieldset.HelperText>
@@ -280,7 +289,9 @@ const BasicInformation = ({
                     }}
                   />
                   <Checkbox.Control />
-                  <Checkbox.Label>{t("events.form.fields.oneDay")}</Checkbox.Label>
+                  <Checkbox.Label>
+                    {t("events.form.fields.oneDay")}
+                  </Checkbox.Label>
                 </Checkbox.Root>
               </Flex>
             </Flex>
@@ -309,7 +320,11 @@ const BasicInformation = ({
                 <Select.Label>{t("events.form.fields.eventType")}</Select.Label>
                 <Select.Control>
                   <Select.Trigger>
-                    <Select.ValueText placeholder={t("events.form.placeholders.selectEventType")} />
+                    <Select.ValueText
+                      placeholder={t(
+                        "events.form.placeholders.selectEventType",
+                      )}
+                    />
                   </Select.Trigger>
                   <Select.IndicatorGroup>
                     <Select.Indicator />

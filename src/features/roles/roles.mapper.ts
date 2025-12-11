@@ -1,5 +1,5 @@
-import { RoleDTO, RolePermissionDTO } from "./roles.responses";
 import { Role, RolePermission } from "./roles.model";
+import { RoleDTO, RolePermissionDTO } from "./roles.responses";
 
 export const mapRole = (dto: RoleDTO): Role => ({
   id: dto.id,

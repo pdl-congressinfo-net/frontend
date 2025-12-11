@@ -1,5 +1,5 @@
-import { EventDTO, EventTypeDTO } from "./events.responses";
 import { Event, EventType } from "./events.model";
+import { EventDTO, EventTypeDTO } from "./events.responses";
 
 export default {
   events: (dto: EventDTO): Event => ({

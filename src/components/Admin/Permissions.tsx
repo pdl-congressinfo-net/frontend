@@ -1,29 +1,32 @@
 import {
   Box,
   Button,
-  Card,
   Flex,
   Group,
   Heading,
   IconButton,
   Input,
   Popover,
-  Portal,
   Tabs,
 } from "@chakra-ui/react";
-import { CanAccess, useCreate, useList, useDelete, useTranslation } from "@refinedev/core";
-import { useMemo, useRef, useState } from "react";
+import {
+  CanAccess,
+  useCreate,
+  useDelete,
+  useList,
+  useTranslation,
+} from "@refinedev/core";
+import { useMemo, useState } from "react";
 import { Permission } from "../../features/permissions/permissions.model";
-import { useMask } from "@react-input/mask";
 import {
   User,
   UserPermission,
   UserRole,
 } from "../../features/users/users.model";
 
+import { LuCirclePlus } from "react-icons/lu";
 import { Role, RolePermission } from "../../features/roles/roles.model";
 import { TanstackPermissionMatrix } from "../Common/Matrix";
-import { LuCirclePlus } from "react-icons/lu";
 
 export const Permissions = () => {
   const { translate: t } = useTranslation();
@@ -381,7 +384,12 @@ export const Permissions = () => {
                     <Popover.Body>
                       <form onSubmit={submitHandler}>
                         <Group attached w="full">
-                          <Input name="name" placeholder={t("admin.permissions.permissionPlaceholder")} />
+                          <Input
+                            name="name"
+                            placeholder={t(
+                              "admin.permissions.permissionPlaceholder",
+                            )}
+                          />
 
                           <Button type="submit" colorScheme="blue">
                             {t("common.create")}

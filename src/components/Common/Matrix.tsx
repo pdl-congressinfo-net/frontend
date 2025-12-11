@@ -1,10 +1,10 @@
+import { Box, Checkbox, Heading, Table } from "@chakra-ui/react";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Box, Checkbox, Heading, Table } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { Permission } from "../../features/permissions/permissions.model";
 

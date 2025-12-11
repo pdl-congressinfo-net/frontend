@@ -1,9 +1,9 @@
-import { axiosInstance, generateSort, generateFilter } from "./utils";
-import { stringify } from "query-string";
-import type { AxiosInstance } from "axios";
 import type { CrudFilters, CrudSorting, DataProvider } from "@refinedev/core";
+import type { AxiosInstance } from "axios";
+import { stringify } from "query-string";
 import { ApiResponse } from "../../common/types/api";
 import { getMapper } from "../rest-data-provider/mapping/mapper.registry";
+import { axiosInstance, generateFilter, generateSort } from "./utils";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";

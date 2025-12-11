@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Button } from "@chakra-ui/react";
 import { useCreate, useList } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { LuArrowLeft } from "react-icons/lu";
+import { useNavigate } from "react-router";
+import Upsert from "../../components/Events/Upsert/Upsert";
+import { EventType } from "../../features/events/events.model";
 import { CreateEventRequest } from "../../features/events/events.requests";
 import { Location } from "../../features/locations/location.model";
-import { LuArrowLeft } from "react-icons/lu";
-import { EventType } from "../../features/events/events.model";
-import Upsert from "../../components/Events/Upsert/Upsert";
+import { useLayout } from "../../providers/layout-provider";
 
 const EventCreateActions = () => {
   const navigate = useNavigate();

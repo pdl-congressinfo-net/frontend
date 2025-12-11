@@ -1,22 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
-import { useLayout } from "../../providers/layout-provider";
-import { CanAccess, useCreate, useList, useNavigation, useTranslation } from "@refinedev/core";
 import {
   Accordion,
   Box,
   Button,
   Flex,
-  Text,
   Group,
   Heading,
   IconButton,
   Input,
   Popover,
   Stack,
+  Text,
 } from "@chakra-ui/react";
+import {
+  CanAccess,
+  useCreate,
+  useList,
+  useNavigation,
+  useTranslation,
+} from "@refinedev/core";
+import { useEffect, useMemo, useState } from "react";
+import { LuCirclePlus } from "react-icons/lu";
 import { Role } from "../../features/roles/roles.model";
-import { LuChevronRight, LuCirclePlus } from "react-icons/lu";
 import { User, UserRole } from "../../features/users/users.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const RolesListPage = () => {
   const { translate: t } = useTranslation();
@@ -181,7 +187,10 @@ const RolesListPage = () => {
                 <Popover.Body>
                   <form onSubmit={submitHandler}>
                     <Group attached w="full">
-                      <Input name="name" placeholder={t("admin.roles.form.roleName")} />
+                      <Input
+                        name="name"
+                        placeholder={t("admin.roles.form.roleName")}
+                      />
 
                       <Button type="submit" colorScheme="blue">
                         {t("common.create")}
@@ -242,7 +251,9 @@ const RolesListPage = () => {
             <Accordion.ItemContent>
               <Stack padding="4" borderWidth="1px" borderTopWidth={0}>
                 <Box>
-                  <Text fontWeight="bold">{t("admin.roles.assignedUsers")}</Text>
+                  <Text fontWeight="bold">
+                    {t("admin.roles.assignedUsers")}
+                  </Text>
                   {filteredUsers
                     .filter((user) =>
                       userRolesData?.some(
@@ -261,7 +272,11 @@ const RolesListPage = () => {
                       !userRolesData?.some(
                         (ur) => ur.roleId === role.id && ur.userId === user.id,
                       ),
-                  ) && <Text ml={4}>{t("admin.roles.messages.noUsersAssigned")}</Text>}
+                  ) && (
+                    <Text ml={4}>
+                      {t("admin.roles.messages.noUsersAssigned")}
+                    </Text>
+                  )}
                 </Box>
               </Stack>
             </Accordion.ItemContent>

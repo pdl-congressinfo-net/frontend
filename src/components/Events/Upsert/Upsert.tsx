@@ -1,6 +1,3 @@
-import React from "react";
-import { Link } from "react-router";
-import { useCan, useCreate, useOne, useUpdate, useTranslation } from "@refinedev/core";
 import {
   Box,
   Button,
@@ -11,43 +8,52 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
+import {
+  useCan,
+  useCreate,
+  useOne,
+  useTranslation,
+  useUpdate,
+} from "@refinedev/core";
+import React from "react";
 import { LuArrowLeft } from "react-icons/lu";
+import { Link } from "react-router";
 
+import {
+  CreateEventRequest,
+  UpdateEventRequest,
+} from "../../../features/events/events.requests";
 import BasicInformation from "./Basic";
+import {
+  EventDetail,
+  LocationDetail,
+  SaveResult,
+  StepStatus,
+  StoredEventInfo,
+  StoredLocationInfo,
+  getStatusIndicator,
+  isSameEventValues,
+  isSamePhysicalLocation,
+  isSameWebinarLocation,
+  normalizeEventValues,
+  normalizePhysicalLocation,
+  normalizeWebinarLocation,
+  steps,
+  toOptionalString,
+  unwrapData,
+} from "./form-shared";
 import Location from "./Location";
 import {
   BasicInformationValues,
   PhysicalLocationFormValues,
   WebinarLocationFormValues,
 } from "./types";
-import {
-  StepStatus,
-  SaveResult,
-  StoredEventInfo,
-  StoredLocationInfo,
-  steps,
-  getStatusIndicator,
-  normalizeEventValues,
-  isSameEventValues,
-  normalizePhysicalLocation,
-  isSamePhysicalLocation,
-  normalizeWebinarLocation,
-  isSameWebinarLocation,
-  toOptionalString,
-  unwrapData,
-  EventDetail,
-  LocationDetail,
-} from "./form-shared";
-import {
-  CreateEventRequest,
-  UpdateEventRequest,
-} from "../../../features/events/events.requests";
 
+import { EventType } from "../../../features/events/events.model";
 import {
   CreateLocationRequest,
   UpdateLocationRequest,
 } from "../../../features/locations/location.requests";
-import { EventType } from "../../../features/events/events.model";
 
 export type UpsertMode = "create" | "edit";
 
@@ -237,7 +243,8 @@ const Upsert = ({
     return unwrapData<LocationDetail>(locationResult) ?? locationResult;
   }, [locationResult]);
 
-  const eventTypeIdFromDraft = basicDraft?.eventTypeId || eventInfo?.data.eventTypeId;
+  const eventTypeIdFromDraft =
+    basicDraft?.eventTypeId || eventInfo?.data.eventTypeId;
 
   const { result: eventTypeResult } = useOne<EventType>({
     resource: "types",
@@ -385,7 +392,10 @@ const Upsert = ({
           link: "",
         },
       });
-    } else if (locationInfo && locationInfo.kind !== (isWebinar ? "webinar" : "physical")) {
+    } else if (
+      locationInfo &&
+      locationInfo.kind !== (isWebinar ? "webinar" : "physical")
+    ) {
       if (isWebinar) {
         setLocationInfo({
           id: locationInfo.id,
@@ -822,5 +832,5 @@ const toInputDate = (value?: string | Date): string | undefined => {
   return undefined;
 };
 
-export type { UpsertProps, UpsertExtraTab, UpsertTabHelpers };
+export type { UpsertExtraTab, UpsertProps, UpsertTabHelpers };
 export default Upsert;

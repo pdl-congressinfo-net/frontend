@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
 import { useOne, useUpdate } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { UpdatePermissionRequest } from "../../features/permissions/permissions.requests";
+import { useNavigate, useParams } from "react-router";
 import { Permission } from "../../features/permissions/permissions.model";
+import { UpdatePermissionRequest } from "../../features/permissions/permissions.requests";
+import { useLayout } from "../../providers/layout-provider";
 
 const PermissionEditPage = () => {
   const { setTitle, setActions } = useLayout();

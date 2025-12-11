@@ -1,8 +1,8 @@
-import { useParams, useNavigate, useLocation } from "react-router";
+import { HStack, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useOne } from "@refinedev/core";
-import { VStack, Text, Spinner, HStack } from "@chakra-ui/react";
-import { EventType } from "../../../features/events/events.model";
+import { useLocation, useNavigate, useParams } from "react-router";
 import EventDetailsDialog from "../../../components/Events/EventDetailsDialog";
+import { EventType } from "../../../features/events/events.model";
 
 const EventTypeShowPage = () => {
   const { id } = useParams<{ id: string }>();

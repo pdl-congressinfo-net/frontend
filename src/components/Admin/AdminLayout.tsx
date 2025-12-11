@@ -1,9 +1,6 @@
-import * as React from "react";
-import { Box, Card, Container, Flex, Splitter } from "@chakra-ui/react";
+import { Box, Card, Flex } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
-import NavBar from "../Common/NavBar";
-import { Toaster } from "../ui/toaster";
-import { ToasterMobile } from "../ui/toasterMobile";
+import * as React from "react";
 import { useLayout } from "../../providers/layout-provider";
 import { AdminNavigation } from "./AdminNavigation";
 

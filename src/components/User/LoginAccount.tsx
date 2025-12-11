@@ -1,9 +1,9 @@
 import { Button, Field, Input, Stack } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
-import { PasswordInput } from "../ui/password-input";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin, useTranslation } from "@refinedev/core";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { PasswordInput } from "../ui/password-input";
 
 interface AccountDialogProps {
   isOpen: boolean;

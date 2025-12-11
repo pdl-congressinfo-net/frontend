@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useLayout } from "../../providers/layout-provider";
-import { useList, useNavigation, useTranslation } from "@refinedev/core";
 import { Box, Button, Table } from "@chakra-ui/react";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useEffect } from "react";
 import { Location } from "../../features/locations/location.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const LocationsListPage = () => {
   const { translate: t } = useTranslation();
@@ -18,7 +18,9 @@ const LocationsListPage = () => {
   useEffect(() => {
     setTitle(t("admin.locations.title"));
     setActions(
-      <Button onClick={() => create("locations")}>{t("admin.locations.actions.create")}</Button>,
+      <Button onClick={() => create("locations")}>
+        {t("admin.locations.actions.create")}
+      </Button>,
     );
   }, [setTitle, setActions, create, t]);
 
@@ -29,10 +31,18 @@ const LocationsListPage = () => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>{t("admin.locations.table.name")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.locations.table.city")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.locations.table.state")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.locations.table.actions")}</Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.locations.table.name")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.locations.table.city")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.locations.table.state")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.locations.table.actions")}
+            </Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>

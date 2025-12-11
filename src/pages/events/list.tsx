@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { useLayout } from "../../providers/layout-provider";
-import { EventList } from "../../components/Events/EventList";
 import { IconButton } from "@chakra-ui/react";
-import { useNavigate } from "react-router";
+import { useEffect } from "react";
 import { LuArchive, LuCirclePlus } from "react-icons/lu";
+import { useNavigate } from "react-router";
+import { EventList } from "../../components/Events/EventList";
+import { useLayout } from "../../providers/layout-provider";
 
 const EventListActions = () => {
   const navigate = useNavigate();

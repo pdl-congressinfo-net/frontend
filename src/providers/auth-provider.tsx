@@ -1,6 +1,6 @@
 import { AuthProvider } from "@refinedev/core";
-import users from "../features/users/users.mapper";
 import { ApiResponse } from "../common/types/api";
+import users from "../features/users/users.mapper";
 import { UserDTO } from "../features/users/users.responses";
 import { resetPermissionCache } from "./access-control-provider";
 

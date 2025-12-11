@@ -1,8 +1,8 @@
-import { Box, Heading, Text, DataList, Link } from "@chakra-ui/react";
-import TabsLayout from "./TabsLayout";
+import { Box, Heading, Text } from "@chakra-ui/react";
 import { useOne, useTranslation } from "@refinedev/core";
-import { Country, Location } from "../../../features/locations/location.model";
 import { Event } from "../../../features/events/events.model";
+import { Country, Location } from "../../../features/locations/location.model";
+import TabsLayout from "./TabsLayout";
 
 interface InformationProps {
   event: Event;

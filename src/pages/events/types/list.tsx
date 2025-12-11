@@ -1,10 +1,9 @@
+import { Box, Button, HStack, Spinner, Table } from "@chakra-ui/react";
+import { useDelete, useList, useTranslation } from "@refinedev/core";
 import { useEffect } from "react";
-import { useList, useDelete, useTranslation } from "@refinedev/core";
-import { useNavigate, useLocation } from "react-router";
-import { useLayout } from "../../../providers/layout-provider";
-import { Box, Button, Table, Spinner, HStack } from "@chakra-ui/react";
+import { useLocation, useNavigate } from "react-router";
 import { EventType } from "../../../features/events/events.model";
-import { ApiResponse } from "../../../common/types/api";
+import { useLayout } from "../../../providers/layout-provider";
 
 const EventTypesListPage = () => {
   const { translate: t } = useTranslation();
@@ -53,10 +52,18 @@ const EventTypesListPage = () => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>{t("admin.eventTypes.table.code")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.eventTypes.table.nameDe")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.eventTypes.table.nameEn")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.eventTypes.table.actions")}</Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.eventTypes.table.code")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.eventTypes.table.nameDe")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.eventTypes.table.nameEn")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.eventTypes.table.actions")}
+            </Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>

@@ -1,9 +1,9 @@
 import { Box, Container, Flex, Image } from "@chakra-ui/react";
-import { useTranslation, useLink } from "@refinedev/core";
-import { UserButton } from "../User/UserButton";
-import { AccountDialog } from "../User/AccountDialog";
-import { LanguageToggle } from "./LanguageToggle";
+import { useLink, useTranslation } from "@refinedev/core";
 import { useState } from "react";
+import { AccountDialog } from "../User/AccountDialog";
+import { UserButton } from "../User/UserButton";
+import { LanguageToggle } from "./LanguageToggle";
 
 const NavBar = () => {
   const { translate } = useTranslation();

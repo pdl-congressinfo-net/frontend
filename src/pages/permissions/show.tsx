@@ -1,9 +1,9 @@
+import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { useDelete, useOne } from "@refinedev/core";
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { useOne, useDelete } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Heading, Text } from "@chakra-ui/react";
+import { useNavigate, useParams } from "react-router";
 import { Permission } from "../../features/permissions/permissions.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const PermissionShowPage = () => {
   const { setTitle, setActions } = useLayout();

@@ -1,13 +1,13 @@
+import { Box, Button, Checkbox, Field, Input, VStack } from "@chakra-ui/react";
+import { useList, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
-import { useOne, useUpdate, useList } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field, Checkbox } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { UpdateCompanyRequest } from "../../features/companies/companies.requests";
-import { Company } from "../../features/companies/companies.model";
-import { Location } from "../../features/locations/location.model";
 import { LuArrowLeft } from "react-icons/lu";
+import { useNavigate, useParams } from "react-router";
+import { Company } from "../../features/companies/companies.model";
+import { UpdateCompanyRequest } from "../../features/companies/companies.requests";
+import { Location } from "../../features/locations/location.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const CompanyEditActions = () => {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
 import { useDocumentTitle } from "@refinedev/react-router";
+import React, { createContext, useContext, useState } from "react";
 
 interface LayoutContextProps {
   title: string;

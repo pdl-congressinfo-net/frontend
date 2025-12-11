@@ -1,5 +1,5 @@
-import { mapOperator } from "./mapOperator";
 import type { CrudFilters } from "@refinedev/core";
+import { mapOperator } from "./mapOperator";
 
 export const generateFilter = (filters?: CrudFilters) => {
   const queryFilters: { [key: string]: string } = {};

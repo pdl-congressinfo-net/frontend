@@ -1,26 +1,26 @@
 import {
   Button,
-  Input,
-  Field,
-  Stack,
-  Flex,
-  Fieldset,
   createListCollection,
-  Select,
+  Field,
+  Fieldset,
+  Flex,
+  Input,
   Portal,
+  Select,
   Separator,
+  Stack,
 } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useList, useTranslation } from "@refinedev/core";
+import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import L from "leaflet";
-import { MapPicker } from "../../Common/Map";
+import { ApiResponse } from "../../../common/types/api";
 import { Country, Location } from "../../../features/locations/location.model";
-import { useList, useTranslation } from "@refinedev/core";
+import { MapPicker } from "../../Common/Map";
 import { SaveResult, StepStatus } from "./form-shared";
 import { PhysicalLocationFormValues, WebinarLocationFormValues } from "./types";
-import { ApiResponse } from "../../../common/types/api";
 
 type LocationProps = {
   onNext?: () => void;
@@ -35,31 +35,33 @@ type LocationProps = {
   isWebinar?: boolean;
 };
 
-const createPhysicalSchema = (t: (key: string) => string) => z
-  .object({
-    name: z.string().min(1, t("common.validation.required")),
-    road: z.string().optional(),
-    number: z.string().optional(),
-    postalCode: z.string().optional(),
-    city: z.string().optional(),
-    countryId: z.string().optional(),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.latitude == null || data.longitude == null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["latitude"],
-        message: t("locations.form.validation.locateOnMap"),
-      });
-    }
-  });
+const createPhysicalSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z.string().min(1, t("common.validation.required")),
+      road: z.string().optional(),
+      number: z.string().optional(),
+      postalCode: z.string().optional(),
+      city: z.string().optional(),
+      countryId: z.string().optional(),
+      latitude: z.number().optional(),
+      longitude: z.number().optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.latitude == null || data.longitude == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["latitude"],
+          message: t("locations.form.validation.locateOnMap"),
+        });
+      }
+    });
 
-const createWebinarSchema = (t: (key: string) => string) => z.object({
-  name: z.string().min(1, t("locations.form.validation.webinarNameRequired")),
-  link: z.string().min(1, t("locations.form.validation.webinarLinkRequired")),
-});
+const createWebinarSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("locations.form.validation.webinarNameRequired")),
+    link: z.string().min(1, t("locations.form.validation.webinarLinkRequired")),
+  });
 
 const LocationPage = ({
   onNext,
@@ -237,7 +239,9 @@ const LocationPage = ({
     <form onSubmit={onSubmit}>
       <Fieldset.Root size="lg">
         <Stack>
-          <Fieldset.Legend>{t("locations.form.sections.location")}</Fieldset.Legend>
+          <Fieldset.Legend>
+            {t("locations.form.sections.location")}
+          </Fieldset.Legend>
           <Fieldset.HelperText>
             {isWeb
               ? t("locations.form.sections.webinarHelp")
@@ -249,14 +253,18 @@ const LocationPage = ({
             <Stack gap="2vh" align="flex-start">
               <Flex gap="1vw" wrap="wrap">
                 <Field.Root invalid={!!errors?.name} width={"40vw"}>
-                  <Field.Label>{t("locations.form.fields.webinarName")}</Field.Label>
+                  <Field.Label>
+                    {t("locations.form.fields.webinarName")}
+                  </Field.Label>
                   <Input {...register("name")} />
                   <Field.ErrorText>
                     {(errors as any)?.name?.message as any}
                   </Field.ErrorText>
                 </Field.Root>
                 <Field.Root invalid={!!errors?.link} width={"40vw"}>
-                  <Field.Label>{t("locations.form.fields.webinarLink")}</Field.Label>
+                  <Field.Label>
+                    {t("locations.form.fields.webinarLink")}
+                  </Field.Label>
                   <Input {...register("link")} />
                   <Field.ErrorText>
                     {(errors as any)?.link?.message as any}
@@ -307,7 +315,9 @@ const LocationPage = ({
               </Flex>
               <Flex gap="1vw" wrap="wrap">
                 <Field.Root invalid={!!errors?.postalCode} width={"7vw"}>
-                  <Field.Label>{t("locations.form.fields.postalCode")}</Field.Label>
+                  <Field.Label>
+                    {t("locations.form.fields.postalCode")}
+                  </Field.Label>
                   <Input {...register("postalCode")} />
                   <Field.ErrorText>
                     {(errors as any)?.postalCode?.message as any}
@@ -338,10 +348,16 @@ const LocationPage = ({
                     }}
                   >
                     <Select.HiddenSelect name="country" />
-                    <Select.Label>{t("locations.form.fields.country")}</Select.Label>
+                    <Select.Label>
+                      {t("locations.form.fields.country")}
+                    </Select.Label>
                     <Select.Control>
                       <Select.Trigger>
-                        <Select.ValueText placeholder={t("locations.form.placeholders.selectCountry")} />
+                        <Select.ValueText
+                          placeholder={t(
+                            "locations.form.placeholders.selectCountry",
+                          )}
+                        />
                       </Select.Trigger>
                       <Select.Indicator />
                     </Select.Control>

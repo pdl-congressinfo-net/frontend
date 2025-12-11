@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { Box, Card, Dialog, Text, Flex, Button } from "@chakra-ui/react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { Box, Button, Card, Dialog, Flex, Text } from "@chakra-ui/react";
+import { useTranslation } from "@refinedev/core";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useTranslation } from "@refinedev/core";
+import { useEffect, useMemo, useState } from "react";
+import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import { Location } from "../../features/locations/location.model";
 
 const markerIcon = new L.Icon({

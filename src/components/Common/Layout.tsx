@@ -1,9 +1,9 @@
-import * as React from "react";
-import { Box, Container, Flex, Heading } from "@chakra-ui/react";
+import { Box, Container, Flex } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
-import NavBar from "./NavBar";
+import * as React from "react";
 import { Toaster } from "../ui/toaster";
 import { ToasterMobile } from "../ui/toasterMobile";
+import NavBar from "./NavBar";
 
 interface LayoutProps {
   children: React.ReactNode;

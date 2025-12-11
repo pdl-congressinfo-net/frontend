@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
+import { Box, Button, Field, Input, Spinner, VStack } from "@chakra-ui/react";
 import { useOne, useUpdate } from "@refinedev/core";
-import { useLayout } from "../../../providers/layout-provider";
-import { Box, Button, VStack, Input, Spinner, Field } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { UpdateEventTypeRequest } from "../../../features/events/events.requests";
+import { useNavigate, useParams } from "react-router";
 import { EventType } from "../../../features/events/events.model";
+import { UpdateEventTypeRequest } from "../../../features/events/events.requests";
+import { useLayout } from "../../../providers/layout-provider";
 
 const EventTypeEditPage = () => {
   const { id } = useParams<{ id: string }>();

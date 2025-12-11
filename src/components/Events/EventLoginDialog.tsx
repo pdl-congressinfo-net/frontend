@@ -31,7 +31,10 @@ const EventLoginDialog = ({
         </>
       }
     >
-      <Text>{t("events.registration.formFor")}{title}</Text>
+      <Text>
+        {t("events.registration.formFor")}
+        {title}
+      </Text>
     </EventDialog>
   );
 };

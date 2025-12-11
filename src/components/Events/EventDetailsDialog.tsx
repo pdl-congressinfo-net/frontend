@@ -1,4 +1,4 @@
-import { Button, Dialog, Text } from "@chakra-ui/react";
+import { Button, Dialog } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
 import { EventDialog } from "./EventDialog";
 

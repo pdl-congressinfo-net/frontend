@@ -1,7 +1,7 @@
 import { IconButton, Menu, Text } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
+import { useEffect, useState } from "react";
 import { LuLanguages } from "react-icons/lu";
-import { useState, useEffect } from "react";
 import i18n from "../../i18n";
 
 export const LanguageToggle = () => {

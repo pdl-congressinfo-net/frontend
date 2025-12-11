@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
 import { useCreate, useList, useTranslation } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { CreateLocationRequest } from "../../features/locations/location.requests";
+import { useNavigate } from "react-router";
 import { Country, LocationType } from "../../features/locations/location.model";
+import { CreateLocationRequest } from "../../features/locations/location.requests";
+import { useLayout } from "../../providers/layout-provider";
 
 const LocationCreatePage = () => {
   const { translate: t } = useTranslation();
@@ -55,7 +55,9 @@ const LocationCreatePage = () => {
             <Field.Label>{t("locations.form.fields.name.label")}</Field.Label>
             <Input {...register("name", { required: true })} />
             {errors.name && (
-              <Field.ErrorText>{t("common.validation.required")}</Field.ErrorText>
+              <Field.ErrorText>
+                {t("common.validation.required")}
+              </Field.ErrorText>
             )}
           </Field.Root>
 
@@ -80,12 +82,16 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>{t("locations.form.fields.postalCode.label")}</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.postalCode.label")}
+            </Field.Label>
             <Input {...register("postal_code")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>{t("locations.form.fields.latitude.label")}</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.latitude.label")}
+            </Field.Label>
             <Input
               type="number"
               step="any"
@@ -94,7 +100,9 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>{t("locations.form.fields.longitude.label")}</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.longitude.label")}
+            </Field.Label>
             <Input
               type="number"
               step="any"
@@ -108,9 +116,13 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>{t("locations.form.fields.country.label")}</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.country.label")}
+            </Field.Label>
             <select {...register("country_id")}>
-              <option value="">{t("locations.form.fields.country.placeholder")}</option>
+              <option value="">
+                {t("locations.form.fields.country.placeholder")}
+              </option>
               {countries?.data.map((country) => (
                 <option key={country.id} value={country.id}>
                   {country.name}
@@ -120,9 +132,13 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>{t("locations.form.fields.locationType.label")}</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.locationType.label")}
+            </Field.Label>
             <select {...register("location_type_id")}>
-              <option value="">{t("locations.form.fields.locationType.placeholder")}</option>
+              <option value="">
+                {t("locations.form.fields.locationType.placeholder")}
+              </option>
               {locationTypes?.data.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}

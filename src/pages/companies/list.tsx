@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useLayout } from "../../providers/layout-provider";
-import { useList, useNavigation, useTranslation } from "@refinedev/core";
 import { Box, Button, Table } from "@chakra-ui/react";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useEffect } from "react";
 import { Company } from "../../features/companies/companies.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const CompaniesListPage = () => {
   const { translate: t } = useTranslation();
@@ -18,7 +18,9 @@ const CompaniesListPage = () => {
   useEffect(() => {
     setTitle(t("admin.companies.title"));
     setActions(
-      <Button onClick={() => create("companies")}>{t("admin.companies.actions.create")}</Button>,
+      <Button onClick={() => create("companies")}>
+        {t("admin.companies.actions.create")}
+      </Button>,
     );
   }, [setTitle, setActions, create, t]);
 
@@ -29,8 +31,12 @@ const CompaniesListPage = () => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>{t("admin.companies.table.name")}</Table.ColumnHeader>
-            <Table.ColumnHeader>{t("admin.companies.table.sponsoring")}</Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.companies.table.name")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.companies.table.sponsoring")}
+            </Table.ColumnHeader>
             <Table.ColumnHeader>{t("common.table.actions")}</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
@@ -38,7 +44,9 @@ const CompaniesListPage = () => {
           {data?.data.map((company) => (
             <Table.Row key={company.id}>
               <Table.Cell>{company.name}</Table.Cell>
-              <Table.Cell>{company.sponsoring ? t("common.yes") : t("common.no")}</Table.Cell>
+              <Table.Cell>
+                {company.sponsoring ? t("common.yes") : t("common.no")}
+              </Table.Cell>
               <Table.Cell>
                 <Button
                   size="sm"
