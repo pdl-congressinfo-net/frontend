@@ -4,6 +4,7 @@ import { RoleDTO, RolePermissionDTO } from "./roles.responses";
 export const mapRole = (dto: RoleDTO): Role => ({
   id: dto.id,
   name: dto.name,
+  isDefault: dto.is_default,
 });
 
 export const mapRolePermission = (dto: RolePermissionDTO): RolePermission => ({

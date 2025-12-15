@@ -1,6 +1,7 @@
 export interface RoleDTO {
   id: string;
   name: string;
+  is_default: boolean;
 }
 
 export interface RolePermissionDTO {

@@ -1,9 +1,11 @@
 export interface CreateRoleRequest {
   name: string;
+  is_default?: boolean;
 }
 
 export interface UpdateRoleRequest {
   name?: string;
+  is_default?: boolean;
 }
 
 export interface CreateRolePermissionRequest {
