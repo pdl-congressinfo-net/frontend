@@ -8,7 +8,7 @@ import { axiosInstance, generateFilter, generateSort } from "./utils";
 const removeEmptyFields = (obj: Record<string, any>): Record<string, any> => {
   return Object.entries(obj).reduce(
     (acc, [key, value]) => {
-      if (value !== "" && value !== null && value !== undefined) {
+      if (value !== null && value !== undefined) {
         acc[key] = value;
       }
       return acc;

@@ -35,8 +35,6 @@ const CompanyShowPage = () => {
     id: id!,
   });
 
-  console.log("Company Data:", companyData);
-
   useEffect(() => {
     setTitle("Company Details");
     setActions(<CompanyShowActions />);

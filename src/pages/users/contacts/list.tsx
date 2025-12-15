@@ -13,13 +13,9 @@ const ContactsListPage = () => {
     meta: { parentModule: "users" },
   });
 
-  console.log(data);
-
   if (isLoading) return <Box>{t("common.loading")}</Box>;
 
   const contacts = data?.data ?? [];
-
-  console.log(contacts);
 
   return (
     <Box p={4}>
