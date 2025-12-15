@@ -29,7 +29,10 @@ const UserEditPage = () => {
     const user = result ?? response?.data;
     if (user) {
       reset({
-        full_name: user.fullName,
+        email: user.email,
+        titles: user.titles,
+        first_name: user.firstName,
+        last_name: user.lastName,
       });
     }
   }, [result, response, reset]);
@@ -60,12 +63,38 @@ const UserEditPage = () => {
     <Box p={4}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={4} align="stretch">
-          <Field.Root invalid={!!errors.full_name}>
-            <Field.Label>Full Name</Field.Label>
-            <Input {...register("full_name", { required: true })} />
-            {errors.full_name && (
+          <Field.Root invalid={!!errors.email}>
+            <Field.Label>Email</Field.Label>
+            <Input
+              type="email"
+              {...register("email", { required: true })}
+            />
+            {errors.email && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
+          </Field.Root>
+
+          <Field.Root invalid={!!errors.titles}>
+            <Field.Label>Titles (Optional)</Field.Label>
+            <Input {...register("titles")} />
+          </Field.Root>
+
+          <Field.Root invalid={!!errors.first_name}>
+            <Field.Label>First Name</Field.Label>
+            <Input {...register("first_name", { required: true })} />
+            {errors.first_name && (
+              <Field.ErrorText>This field is required</Field.ErrorText>
+            )}
+          </Field.Root>
+
+          <Field.Root invalid={!!errors.last_name}>
+            <Field.Label>Last Name (Optional)</Field.Label>
+            <Input {...register("last_name")} />
+          </Field.Root>
+
+          <Field.Root invalid={!!errors.password}>
+            <Field.Label>Password (Leave empty to keep current)</Field.Label>
+            <Input type="password" {...register("password")} />
           </Field.Root>
 
           <Button type="submit">Update User</Button>

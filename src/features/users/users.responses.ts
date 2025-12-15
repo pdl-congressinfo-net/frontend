@@ -11,8 +11,10 @@ export interface UserPermissionDTO {
 export interface UserDTO {
   id: string;
   email: string;
-  full_name: string;
+  titles?: string;
+  first_name: string;
+  last_name?: string;
   created_at: Date;
   last_login: Date;
-  oeka_id?: string;
+  oeak_id?: number;
 }

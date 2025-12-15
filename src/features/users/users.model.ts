@@ -11,8 +11,10 @@ export interface UserPermission {
 export interface User {
   id: string;
   email: string;
-  fullName: string;
+  titles?: string;
+  firstName: string;
+  lastName?: string;
   createdAt: Date;
   lastLogin: Date;
-  oekaId?: string;
+  oeakId?: number;
 }

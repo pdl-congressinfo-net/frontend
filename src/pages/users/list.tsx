@@ -12,7 +12,7 @@ import { useLayout } from "../../providers/layout-provider";
 const UserListPage = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
-  const { create, show } = useNavigation();
+  const { show } = useNavigation();
   const Link = useLink();
   const {
     result: data,
@@ -39,13 +39,22 @@ const UserListPage = () => {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>
-              {t("admin.users.table.name")}
+              {t("admin.users.table.titles")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.users.table.firstName")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.users.table.lastName")}
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               {t("admin.users.table.email")}
             </Table.ColumnHeader>
             <Table.ColumnHeader>
-              {t("admin.users.table.role")}
+              {t("admin.users.table.oeakId")}
+            </Table.ColumnHeader>
+            <Table.ColumnHeader>
+              {t("admin.users.table.lastLogin")}
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               {t("admin.users.table.actions")}
@@ -55,8 +64,16 @@ const UserListPage = () => {
         <Table.Body>
           {data?.data.map((user) => (
             <Table.Row key={user.id}>
-              <Table.Cell>{user.fullName}</Table.Cell>
+              <Table.Cell>{user.titles || "-"}</Table.Cell>
+              <Table.Cell>{user.firstName}</Table.Cell>
+              <Table.Cell>{user.lastName || "-"}</Table.Cell>
               <Table.Cell>{user.email}</Table.Cell>
+              <Table.Cell>{user.oeakId || "-"}</Table.Cell>
+              <Table.Cell>
+                {user.lastLogin
+                  ? new Date(user.lastLogin).toLocaleDateString()
+                  : "-"}
+              </Table.Cell>
               <Table.Cell>
                 <Button
                   size="sm"

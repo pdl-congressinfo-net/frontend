@@ -5,9 +5,12 @@ export default {
   users: (dto: UserDTO): User => ({
     id: dto.id,
     email: dto.email,
-    fullName: dto.full_name,
+    titles: dto.titles,
+    firstName: dto.first_name,
+    lastName: dto.last_name,
     createdAt: dto.created_at,
     lastLogin: dto.last_login,
+    oeakId: dto.oeak_id,
   }),
   roles: (dto: UserRoleDTO): UserRole => ({
     userId: dto.user_id,

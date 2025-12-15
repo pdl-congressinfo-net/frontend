@@ -171,6 +171,18 @@
       "settings": "Einstellungen",
       "logs": "Protokolle"
     },
+    "users": {
+      "title": "Benutzer",
+      "actions": {
+        "create": "Benutzer erstellen"
+      },
+      "table": {
+        "fullName": "Vollständiger Name",
+        "email": "E-Mail",
+        "role": "Rolle",
+        "actions": "Aktionen"
+      }
+    },
     "locations": {
       "title": "Standorte",
       "create": {

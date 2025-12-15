@@ -21,13 +21,15 @@ export interface UpdateUserPermissionRequest {
 export interface CreateUserRequest {
   email: string;
   password: string;
-  full_name: string;
-  oeka_id?: string;
+  titles?: string;
+  first_name: string;
+  last_name?: string;
 }
 
 export interface UpdateUserRequest {
   email?: string;
   password?: string;
-  full_name?: string;
-  oeka_id?: string;
+  titles?: string;
+  first_name?: string;
+  last_name?: string;
 }

@@ -57,7 +57,8 @@ export const UserButton: React.FC<UserButtonProps> = ({
           <Icon>
             <LuCircleUserRound size={20} />
           </Icon>
-          <span>{user.fullName}</span>
+          {user.firstName && <span>{user.firstName} </span>}
+          {!user.firstName && <span>{user.lastName}</span>}
         </Button>
       </Menu.Trigger>
       <Portal>

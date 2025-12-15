@@ -1,5 +1,5 @@
 import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
-import { useDelete, useOne } from "@refinedev/core";
+import { useDelete, useNavigation, useOne } from "@refinedev/core";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { User } from "../../features/users/users.model";
@@ -9,6 +9,7 @@ const UserShowPage = () => {
   const { setTitle, setActions } = useLayout();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { edit } = useNavigation();
   const { mutate: deleteUser } = useDelete();
 
   const {
@@ -59,11 +60,51 @@ const UserShowPage = () => {
         </Box>
 
         <Box>
-          <Heading size="sm">Name</Heading>
-          <Text>{user.fullName}</Text>
+          <Heading size="sm">Email</Heading>
+          <Text>{user.email}</Text>
         </Box>
 
-        <Button onClick={() => navigate(`/users/edit/${id}`)}>Edit User</Button>
+        {user.titles && (
+          <Box>
+            <Heading size="sm">Titles</Heading>
+            <Text>{user.titles}</Text>
+          </Box>
+        )}
+
+        <Box>
+          <Heading size="sm">First Name</Heading>
+          <Text>{user.firstName}</Text>
+        </Box>
+
+        {user.lastName && (
+          <Box>
+            <Heading size="sm">Last Name</Heading>
+            <Text>{user.lastName}</Text>
+          </Box>
+        )}
+
+        {user.oeakId && (
+          <Box>
+            <Heading size="sm">OEAK ID</Heading>
+            <Text>{user.oeakId}</Text>
+          </Box>
+        )}
+
+        <Box>
+          <Heading size="sm">Created At</Heading>
+          <Text>{new Date(user.createdAt).toLocaleString()}</Text>
+        </Box>
+
+        <Box>
+          <Heading size="sm">Last Login</Heading>
+          <Text>
+            {user.lastLogin
+              ? new Date(user.lastLogin).toLocaleString()
+              : "Never"}
+          </Text>
+        </Box>
+
+        <Button onClick={() => edit("users", user.id!)}>Edit User</Button>
       </VStack>
     </Box>
   );
