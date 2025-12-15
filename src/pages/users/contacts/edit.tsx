@@ -40,7 +40,12 @@ const ContactEditPage = () => {
 
   const onSubmit = (values: UpdateContactRequest) => {
     update(
-      { resource: "contacts", id: id!, values },
+      {
+        resource: "contacts",
+        id: id!,
+        values,
+        meta: { parentModule: "users" },
+      },
       { onSuccess: () => list("contacts") },
     );
   };
