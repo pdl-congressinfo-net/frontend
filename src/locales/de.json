@@ -117,7 +117,7 @@
       "name": {
         "CON": "Kongress",
         "SEM": "Seminar",
-        "WOR": "Workshop",
+        "WKS": "Workshop",
         "WEB": "Webinar"
       }
     },
@@ -185,7 +185,7 @@
       "permissions": "Berechtigungen",
       "settings": "Einstellungen",
       "logs": "Protokolle",
-      "event-types": "Veranstaltungsarten"
+      "types": "Veranstaltungsarten"
     },
     "folder": {
       "events": "Kongresse",

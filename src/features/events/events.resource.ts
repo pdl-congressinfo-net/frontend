@@ -1,9 +1,9 @@
 export const eventTypeResource = {
-  name: "eventtypes",
-  list: "/events/types",
-  create: "/events/types",
-  edit: "/events/types/edit/:id",
-  show: "/events/types/show/:id",
+  name: "types",
+  list: "/admin/events/types",
+  create: "/admin/events/types",
+  edit: "/admin/events/types/edit/:id",
+  show: "/admin/events/types/show/:id",
   meta: {
     canDelete: true,
     parentModule: "events",
@@ -13,9 +13,9 @@ export const eventTypeResource = {
 export const eventResource = {
   name: "events",
   list: "/events",
-  create: "/events",
-  edit: "/events/edit/:id",
-  show: "/events/show/:id",
+  create: "/admin/events",
+  edit: "/admin/events/edit/:id",
+  show: "/admin/events/show/:id",
   meta: {
     canDelete: true,
   },

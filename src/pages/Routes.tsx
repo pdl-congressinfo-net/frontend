@@ -18,6 +18,10 @@ import {
   EventEditPage,
   EventShowPage,
   EventsListPage,
+  EventTypeCreatePage,
+  EventTypeEditPage,
+  EventTypeShowPage,
+  EventTypesListPage,
 } from "./events";
 import {
   CountriesListPage,
@@ -85,9 +89,6 @@ function AppRoutes() {
             {/* Events routes */}
             <Route path="events">
               <Route index element={<EventsListPage />} />
-              <Route path="create" element={<EventCreatePage />} />
-              <Route path="edit/:id" element={<EventEditPage />} />
-              <Route path="show/:id" element={<EventShowPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
@@ -157,6 +158,18 @@ function AppRoutes() {
               {/* Country & Location Types */}
               <Route path="countries" element={<CountriesListPage />} />
               <Route path="types" element={<LocationTypesListPage />} />
+            </Route>
+
+            <Route path="events">
+              <Route path="create" element={<EventCreatePage />} />
+              <Route path="edit/:id" element={<EventEditPage />} />
+              <Route path="show/:id" element={<EventShowPage />} />
+              <Route path="types">
+                <Route index element={<EventTypesListPage />} />
+                <Route path="create" element={<EventTypeCreatePage />} />
+                <Route path="edit/:id" element={<EventTypeEditPage />} />
+                <Route path="show/:id" element={<EventTypeShowPage />} />
+              </Route>
             </Route>
 
             <Route path="*" element={<NotFound />} />

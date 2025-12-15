@@ -1,13 +1,16 @@
-import { Box, Button, HStack, Spinner, Table } from "@chakra-ui/react";
-import { useDelete, useList, useTranslation } from "@refinedev/core";
-import { useEffect } from "react";
+import { Badge, Box, Button, HStack, Spinner, Table } from "@chakra-ui/react";
+import {
+  useDelete,
+  useList,
+  useNavigation,
+  useTranslation,
+} from "@refinedev/core";
 import { useLocation, useNavigate } from "react-router";
 import { EventType } from "../../../features/events/events.model";
-import { useLayout } from "../../../providers/layout-provider";
 
 const EventTypesListPage = () => {
   const { translate: t } = useTranslation();
-  const { setTitle, setActions } = useLayout();
+  const { create, edit, show } = useNavigation();
   const navigate = useNavigate();
   const location = useLocation();
   const { mutate: deleteEventType } = useDelete();
@@ -22,19 +25,10 @@ const EventTypesListPage = () => {
     },
   });
 
-  useEffect(() => {
-    setTitle(t("admin.eventTypes.title"));
-    setActions(
-      <Button onClick={() => navigate("/events/types/create")}>
-        {t("admin.eventTypes.actions.create")}
-      </Button>,
-    );
-  }, [setTitle, setActions, navigate, t]);
-
   const handleDelete = (id: string) => {
     if (window.confirm(t("admin.eventTypes.confirmDelete"))) {
       deleteEventType({
-        resource: "eventtypes",
+        resource: "types",
         id,
         meta: {
           parentModule: "events",
@@ -56,10 +50,8 @@ const EventTypesListPage = () => {
               {t("admin.eventTypes.table.code")}
             </Table.ColumnHeader>
             <Table.ColumnHeader>
-              {t("admin.eventTypes.table.nameDe")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.eventTypes.table.nameEn")}
+              {t("admin.eventTypes.table.name")}
+              <Badge ml={2}>Translated</Badge>
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               {t("admin.eventTypes.table.actions")}
@@ -70,18 +62,16 @@ const EventTypesListPage = () => {
           {data?.data.map((eventType) => (
             <Table.Row key={eventType.id}>
               <Table.Cell>{eventType.code}</Table.Cell>
-              <Table.Cell>{eventType.nameDe}</Table.Cell>
-              <Table.Cell>{eventType.nameEn}</Table.Cell>
+              <Table.Cell>
+                {t(`events.types.name.${eventType.code}`)}
+              </Table.Cell>
               <Table.Cell>
                 <HStack>
                   <Button
                     size="sm"
                     onClick={() =>
-                      navigate(`/events/types/show/${eventType.id}`, {
-                        state: {
-                          background: location,
-                          fallback: "/events/types",
-                        },
+                      show("types", eventType.id, "push", {
+                        meta: { parentModule: "events" },
                       })
                     }
                   >
@@ -89,9 +79,11 @@ const EventTypesListPage = () => {
                   </Button>
                   <Button
                     size="sm"
-                    onClick={() =>
-                      navigate(`/events/types/edit/${eventType.id}`)
-                    }
+                    onClick={() => {
+                      edit("types", eventType.id, "push", {
+                        meta: { parentModule: "events" },
+                      });
+                    }}
                   >
                     {t("common.actions.edit")}
                   </Button>

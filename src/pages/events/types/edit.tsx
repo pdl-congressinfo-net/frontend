@@ -1,5 +1,5 @@
 import { Box, Button, Field, Input, Spinner, VStack } from "@chakra-ui/react";
-import { useOne, useUpdate } from "@refinedev/core";
+import { useBack, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
@@ -9,6 +9,7 @@ import { useLayout } from "../../../providers/layout-provider";
 
 const EventTypeEditPage = () => {
   const { id } = useParams<{ id: string }>();
+  const back = useBack();
   const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const { mutate: updateEventType } = useUpdate();
@@ -40,10 +41,6 @@ const EventTypeEditPage = () => {
     if (data) {
       reset({
         code: data.code,
-        name_de: data.nameDe,
-        name_en: data.nameEn,
-        description_de: data.descriptionDe,
-        description_en: data.descriptionEn,
       });
     }
   }, [data, reset]);
@@ -60,7 +57,7 @@ const EventTypeEditPage = () => {
       },
       {
         onSuccess: () => {
-          navigate("/events/types");
+          back();
         },
       },
     );
@@ -89,44 +86,6 @@ const EventTypeEditPage = () => {
             />
             {errors.code && (
               <Field.ErrorText>{errors.code.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.name_de}>
-            <Field.Label>Name (German)</Field.Label>
-            <Input {...register("name_de")} placeholder="e.g., Workshop" />
-            {errors.name_de && (
-              <Field.ErrorText>{errors.name_de.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.name_en}>
-            <Field.Label>Name (English)</Field.Label>
-            <Input {...register("name_en")} placeholder="e.g., Workshop" />
-            {errors.name_en && (
-              <Field.ErrorText>{errors.name_en.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.description_de}>
-            <Field.Label>Description (German)</Field.Label>
-            <Input
-              {...register("description_de")}
-              placeholder="Optional description in German"
-            />
-            {errors.description_de && (
-              <Field.ErrorText>{errors.description_de.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.description_en}>
-            <Field.Label>Description (English)</Field.Label>
-            <Input
-              {...register("description_en")}
-              placeholder="Optional description in English"
-            />
-            {errors.description_en && (
-              <Field.ErrorText>{errors.description_en.message}</Field.ErrorText>
             )}
           </Field.Root>
 

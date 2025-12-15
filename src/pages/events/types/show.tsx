@@ -1,10 +1,10 @@
 import { HStack, Spinner, Text, VStack } from "@chakra-ui/react";
-import { useOne } from "@refinedev/core";
+import { useOne, useTranslation } from "@refinedev/core";
 import { useLocation, useNavigate, useParams } from "react-router";
-import EventDetailsDialog from "../../../components/Events/EventDetailsDialog";
 import { EventType } from "../../../features/events/events.model";
 
 const EventTypeShowPage = () => {
+  const { translate: t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,42 +31,17 @@ const EventTypeShowPage = () => {
   }
 
   return (
-    <EventDetailsDialog
-      isOpen={true}
-      onClose={handleClose}
-      title="Event Type Details"
-    >
-      <VStack align="stretch" gap={4}>
-        <HStack>
-          <Text fontWeight="bold">Code:</Text>
-          <Text>{eventType.code}</Text>
-        </HStack>
+    <VStack align="stretch" gap={4}>
+      <HStack>
+        <Text fontWeight="bold">Code:</Text>
+        <Text>{eventType.code}</Text>
+      </HStack>
 
-        <HStack>
-          <Text fontWeight="bold">Name (German):</Text>
-          <Text>{eventType.nameDe}</Text>
-        </HStack>
-
-        <HStack>
-          <Text fontWeight="bold">Name (English):</Text>
-          <Text>{eventType.nameEn}</Text>
-        </HStack>
-
-        {eventType.descriptionDe && (
-          <VStack align="stretch">
-            <Text fontWeight="bold">Description (German):</Text>
-            <Text>{eventType.descriptionDe}</Text>
-          </VStack>
-        )}
-
-        {eventType.descriptionEn && (
-          <VStack align="stretch">
-            <Text fontWeight="bold">Description (English):</Text>
-            <Text>{eventType.descriptionEn}</Text>
-          </VStack>
-        )}
-      </VStack>
-    </EventDetailsDialog>
+      <HStack>
+        <Text fontWeight="bold">Name (Translated):</Text>
+        <Text>{t(`events.types.name.${eventType.code}`)}</Text>
+      </HStack>
+    </VStack>
   );
 };
 
