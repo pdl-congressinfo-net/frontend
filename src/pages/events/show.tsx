@@ -1,6 +1,6 @@
 import { Spinner } from "@chakra-ui/react";
-import { useOne, useTranslation } from "@refinedev/core";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useBack, useOne, useTranslation } from "@refinedev/core";
+import { useNavigate, useParams } from "react-router";
 import { EventDetails } from "../../components/Events/EventDetails";
 import EventDetailsDialog from "../../components/Events/EventDetailsDialog";
 import { Event } from "../../features/events/events.model";
@@ -9,8 +9,7 @@ const EventShowPage = () => {
   const { translate: t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
-  const state = location.state as { fallback?: string };
+  const back = useBack();
 
   const { result, query } = useOne<Event>({
     resource: "events",
@@ -18,7 +17,7 @@ const EventShowPage = () => {
   });
 
   const handleClose = () => {
-    navigate(state?.fallback || "/events");
+    back();
   };
 
   if (!id) {

@@ -1,5 +1,5 @@
 import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
-import { useList, useNavigation, useOne, useUpdate } from "@refinedev/core";
+import { useBack, useList, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router";
@@ -14,7 +14,7 @@ import { useLayout } from "../../providers/layout-provider";
 const LocationEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const { setTitle, setActions } = useLayout();
-  const { show } = useNavigation();
+  const back = useBack();
   const { mutate: updateLocation } = useUpdate();
   const {
     register,
@@ -75,7 +75,7 @@ const LocationEditPage = () => {
       },
       {
         onSuccess: () => {
-          show("locations", id!);
+          back();
         },
       },
     );

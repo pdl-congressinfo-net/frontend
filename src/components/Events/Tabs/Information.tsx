@@ -1,5 +1,11 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
-import { useOne, useTranslation } from "@refinedev/core";
+import { Box, Heading, IconButton, Text } from "@chakra-ui/react";
+import {
+  CanAccess,
+  useNavigation,
+  useOne,
+  useTranslation,
+} from "@refinedev/core";
+import { LuPencil } from "react-icons/lu";
 import { Event } from "../../../features/events/events.model";
 import { Country, Location } from "../../../features/locations/location.model";
 import TabsLayout from "./TabsLayout";
@@ -10,6 +16,7 @@ interface InformationProps {
 
 export default function Information({ event }: InformationProps) {
   const { translate: t } = useTranslation();
+  const { edit } = useNavigation();
   const {
     result: location,
     query: { isLoading, isError },
@@ -49,6 +56,19 @@ export default function Information({ event }: InformationProps) {
         <Box>
           <Heading size="md" color="gray.800">
             {t("events.details.eventAddress")}
+            <CanAccess resource="locations" action="update">
+              <IconButton
+                aria-label="Edit Location"
+                size="sm"
+                variant="ghost"
+                ml={2}
+                onClick={() => {
+                  edit("locations", location.id);
+                }}
+              >
+                <LuPencil />
+              </IconButton>
+            </CanAccess>
           </Heading>
           <Text mt={2} fontWeight={"bold"}>
             {location.name}

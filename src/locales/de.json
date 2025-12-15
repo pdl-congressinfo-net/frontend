@@ -120,6 +120,12 @@
         "WOR": "Workshop",
         "WEB": "Webinar"
       }
+    },
+    "tabs": {
+      "information": "Information",
+      "program": "Programm",
+      "partner": "Partner",
+      "login": "Login"
     }
   },
   "locations": {
