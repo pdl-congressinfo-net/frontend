@@ -183,7 +183,10 @@ const BasicInformation = ({
     () =>
       createListCollection<{ label: string; value: string }>({
         items: (Array.isArray(eventTypes.data) ? eventTypes.data : []).map(
-          (t: EventType) => ({ label: t.nameDe, value: t.id }),
+          (type: EventType) => ({
+            label: t(`events.types.name.${type.code}`),
+            value: type.id,
+          }),
         ),
       }),
     [eventTypes.data],

@@ -112,6 +112,14 @@
       "title": "Anmeldung - ",
       "register": "Anmelden",
       "formFor": "Anmeldeformular für "
+    },
+    "types": {
+      "name": {
+        "CON": "Kongress",
+        "SEM": "Seminar",
+        "WOR": "Workshop",
+        "WEB": "Webinar"
+      }
     }
   },
   "locations": {
