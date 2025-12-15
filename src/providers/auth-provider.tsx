@@ -1,6 +1,7 @@
 import { AuthProvider } from "@refinedev/core";
 import { ApiResponse } from "../common/types/api";
 import users from "../features/users/users.mapper";
+import { CreateUserRequest } from "../features/users/users.requests";
 import { UserDTO } from "../features/users/users.responses";
 import { resetPermissionCache } from "./access-control-provider";
 
@@ -118,16 +119,14 @@ export const authProvider: AuthProvider = {
     }
   },
 
-  register: async (params) => {
-    const { full_name, email, password } = params;
-
+  register: async (params: CreateUserRequest) => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ full_name, email, password }),
+        body: JSON.stringify(params),
       });
 
       if (!response.ok) {

@@ -39,13 +39,7 @@ const UserListPage = () => {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>
-              {t("admin.users.table.titles")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.users.table.firstName")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.users.table.lastName")}
+              {t("admin.users.table.name")}
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               {t("admin.users.table.email")}
@@ -64,9 +58,11 @@ const UserListPage = () => {
         <Table.Body>
           {data?.data.map((user) => (
             <Table.Row key={user.id}>
-              <Table.Cell>{user.titles || "-"}</Table.Cell>
-              <Table.Cell>{user.firstName}</Table.Cell>
-              <Table.Cell>{user.lastName || "-"}</Table.Cell>
+              <Table.Cell>
+                {[user.titles, user.firstName, user.lastName]
+                  .filter(Boolean)
+                  .join(" ")}
+              </Table.Cell>
               <Table.Cell>{user.email}</Table.Cell>
               <Table.Cell>{user.oeakId || "-"}</Table.Cell>
               <Table.Cell>

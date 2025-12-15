@@ -102,7 +102,7 @@ export const accessControlProvider: AccessControlProvider = {
   options: {
     buttons: {
       enableAccessControl: true,
-      hideIfUnauthorized: false,
+      hideIfUnauthorized: true, // Auto-hide Create/Edit/Delete buttons when user lacks permission
     },
   },
 };

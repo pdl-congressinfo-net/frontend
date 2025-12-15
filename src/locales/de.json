@@ -15,6 +15,7 @@
     "close": "Schließen",
     "yes": "Ja",
     "no": "Nein",
+    "optional": "Optional",
     "actions": {
       "view": "Ansehen",
       "edit": "Bearbeiten",
@@ -33,6 +34,12 @@
       "goToHome": "Zur Startseite"
     }
   },
+  "notifications": {
+    "success": "Erfolg",
+    "error": "Fehler",
+    "info": "Info",
+    "warning": "Warnung"
+  },
   "auth": {
     "login": "Login",
     "register": "Registrieren",
@@ -40,8 +47,10 @@
     "forgotPassword": "Passwort vergessen?",
     "fields": {
       "email": "E-Mail",
+      "titles": "Titel",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
       "password": "Passwort",
-      "name": "Name",
       "confirmPassword": "Passwort bestätigen"
     },
     "validation": {
@@ -177,10 +186,12 @@
         "create": "Benutzer erstellen"
       },
       "table": {
-        "fullName": "Vollständiger Name",
+        "name": "Name",
         "email": "E-Mail",
         "role": "Rolle",
-        "actions": "Aktionen"
+        "actions": "Aktionen",
+        "lastLogin": "Letzte Anmeldung",
+        "oeakId": "ÖAK-ID"
       }
     },
     "locations": {
@@ -210,6 +221,7 @@
     },
     "roles": {
       "title": "Rollen",
+      "default": "Standardrolle",
       "searchPlaceholder": "Rollen/Benutzer suchen...",
       "actions": {
         "add": "Rolle hinzufügen",
@@ -247,7 +259,8 @@
       "unsavedChanges": "Sie haben ungespeicherte Änderungen",
       "saveChanges": "Änderungen speichern",
       "undo": "Rückgängig",
-      "permissionPlaceholder": "ressource:aktion",
+      "permissionPlaceholder": "gruppe:aktion",
+      "permissionMustHaveGroup": "Berechtigung muss eine Gruppe enthalten (Format: gruppe:aktion)",
       "usersPermissionsMatrix": "Benutzer × Berechtigungen",
       "rolesPermissionsMatrix": "Rollen × Berechtigungen",
       "actions": {

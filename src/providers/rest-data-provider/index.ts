@@ -5,6 +5,15 @@ import { ApiResponse } from "../../common/types/api";
 import { getMapper } from "../rest-data-provider/mapping/mapper.registry";
 import { axiosInstance, generateFilter, generateSort } from "./utils";
 
+const removeEmptyFields = (obj: Record<string, any>): Record<string, any> => {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== "" && value !== null && value !== undefined) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, any>);
+};
+
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
 
@@ -198,9 +207,11 @@ export const dataProvider = (
         ? `${apiUrl}/${parentmodule}/${resource}`
         : `${apiUrl}/${resource}`;
 
+      const cleanedVariables = removeEmptyFields(variables);
+
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(
         url,
-        variables,
+        cleanedVariables,
         {
           headers,
         },
@@ -232,9 +243,11 @@ export const dataProvider = (
         ? `${apiUrl}/${parentmodule}/${resource}/${selector}`
         : `${apiUrl}/${resource}/${selector}`;
 
+      const cleanedVariables = removeEmptyFields(variables);
+
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(
         url,
-        variables,
+        cleanedVariables,
         {
           headers,
         },

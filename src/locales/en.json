@@ -15,6 +15,7 @@
     "close": "Close",
     "yes": "Yes",
     "no": "No",
+    "optional": "Optional",
     "actions": {
       "view": "View",
       "edit": "Edit",
@@ -40,8 +41,10 @@
     "forgotPassword": "Forgot password?",
     "fields": {
       "email": "Email",
+      "titles": "Titles",
+      "firstName": "First Name",
+      "lastName": "Last Name",
       "password": "Password",
-      "name": "Name",
       "confirmPassword": "Confirm Password"
     },
     "validation": {

@@ -1,5 +1,6 @@
 import { Button, Icon, Menu, Portal } from "@chakra-ui/react";
 import {
+  CanAccess,
   useGetIdentity,
   useGo,
   useIsAuthenticated,
@@ -57,16 +58,18 @@ export const UserButton: React.FC<UserButtonProps> = ({
           <Icon>
             <LuCircleUserRound size={20} />
           </Icon>
-          {user.firstName && <span>{user.firstName} </span>}
-          {!user.firstName && <span>{user.lastName}</span>}
+          {user.lastName && <span>{user.lastName} </span>}
+          {!user.lastName && <span>{user.firstName}</span>}
         </Button>
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
           <Menu.Content>
-            <Menu.Item value="profile" onClick={() => go({ to: "admin" })}>
-              {t("user.admin")}
-            </Menu.Item>
+            <CanAccess action="view" resource="admin">
+              <Menu.Item value="profile" onClick={() => go({ to: "admin" })}>
+                {t("user.admin")}
+              </Menu.Item>
+            </CanAccess>
             <Menu.Item value="settings" onClick={() => go({ to: "settings" })}>
               {t("user.settings")}
             </Menu.Item>

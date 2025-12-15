@@ -45,14 +45,20 @@ export const LoginAccount = ({ onClose }: AccountDialogProps) => {
   return (
     <form onSubmit={onSubmit}>
       <Stack gap="4" align="flex-start" maxW="sm">
-        <Field.Root invalid={!!errors.email}>
-          <Field.Label>{t("auth.fields.email")}</Field.Label>
+        <Field.Root invalid={!!errors.email} required>
+          <Field.Label>
+            {t("auth.fields.email")}
+            <Field.RequiredIndicator />
+          </Field.Label>
           <Input {...register("email")} />
           <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.password}>
-          <Field.Label>{t("auth.fields.password")}</Field.Label>
+        <Field.Root invalid={!!errors.password} required>
+          <Field.Label>
+            {t("auth.fields.password")}
+            <Field.RequiredIndicator />
+          </Field.Label>
           <PasswordInput {...register("password")} />
           <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
         </Field.Root>
