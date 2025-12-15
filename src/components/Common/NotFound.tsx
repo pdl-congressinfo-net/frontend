@@ -28,7 +28,7 @@ export default function NotFound() {
   };
 
   return (
-    <Container maxW="container.md" py={20}>
+    <Container maxW="container.md" py={20} minH="84vh" alignContent={"center"}>
       <VStack gap={8} textAlign="center">
         <Box>
           <Heading

@@ -21,6 +21,9 @@ const NavBar = () => {
       bg="ui.surface"
       px={4}
       py={3}
+      alignContent={"center"}
+      minH={"8vh"}
+      maxH={"8vh"}
     >
       <Flex align="center" justify="space-between">
         <Container

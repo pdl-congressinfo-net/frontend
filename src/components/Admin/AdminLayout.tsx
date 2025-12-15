@@ -10,16 +10,15 @@ interface AdminLayoutProps {
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { translate } = useTranslation();
-  const [sizes, setSizes] = React.useState<number[]>([20, 80]);
   const { title, actions } = useLayout();
 
   return (
     <Box as="main" flex="1" bg="ui.background" width="80%" mx="auto">
       <Flex>
-        <Box width={sizes[0] + "%"} minHeight="100vh" bg="ui.surface">
-          <AdminNavigation sizes={sizes} />
+        <Box width="20%" minHeight="100vh" bg="ui.surface">
+          <AdminNavigation />
         </Box>
-        <Box width={sizes[1] + "%"} p={6}>
+        <Box width="80%" p={6}>
           <Card.Root p={4}>{children}</Card.Root>
         </Box>
       </Flex>
