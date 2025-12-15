@@ -1,4 +1,5 @@
-import { Box, Checkbox, Heading, Table } from "@chakra-ui/react";
+import { Box, Checkbox, Heading, Link, Table } from "@chakra-ui/react";
+import { useNavigation } from "@refinedev/core";
 import {
   ColumnDef,
   flexRender,
@@ -9,6 +10,7 @@ import { useMemo } from "react";
 import { Permission } from "../../features/permissions/permissions.model";
 
 type MatrixTableProps<T> = {
+  ressource?: string;
   title: string;
   rows: T[];
   rowKey: keyof T;
@@ -28,6 +30,7 @@ type MatrixTableProps<T> = {
 };
 
 export function TanstackPermissionMatrix<T>({
+  ressource,
   title,
   rows,
   rowKey,
@@ -39,6 +42,7 @@ export function TanstackPermissionMatrix<T>({
   getUserPermissionSource,
   search,
 }: MatrixTableProps<T>) {
+  const { show } = useNavigation();
   const filteredGroupedPermissions = useMemo(() => {
     const q = search?.toLowerCase().trim();
 
@@ -61,7 +65,25 @@ export function TanstackPermissionMatrix<T>({
     const nameColumn: ColumnDef<T> = {
       id: "name",
       header: "Name",
-      cell: ({ row }) => rowLabel(row.original),
+      cell: ({ row }) => {
+        const label = rowLabel(row.original);
+        const id = String(row.original[rowKey]);
+
+        if (!ressource) return label;
+
+        return (
+          <Link
+            onClick={(e) => {
+              e.preventDefault();
+              show(ressource, id);
+            }}
+            href="#"
+            color="blue.600"
+          >
+            {label}
+          </Link>
+        );
+      },
     };
 
     const permissionColumns = Object.entries(filteredGroupedPermissions).map(

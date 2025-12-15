@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Field,
   Flex,
   Group,
   Heading,
@@ -9,6 +10,7 @@ import {
   Popover,
   Tabs,
 } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CanAccess,
   useCreate,
@@ -17,6 +19,8 @@ import {
   useTranslation,
 } from "@refinedev/core";
 import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Permission } from "../../features/permissions/permissions.model";
 import {
   User,
@@ -27,6 +31,34 @@ import {
 import { LuCirclePlus } from "react-icons/lu";
 import { Role, RolePermission } from "../../features/roles/roles.model";
 import { TanstackPermissionMatrix } from "../Common/Matrix";
+
+// Zod schema for permission/resource creation
+const permissionSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Permission name is required")
+    .refine(
+      (val) => {
+        // If it contains ":", validate as permission (resource:action)
+        if (val.includes(":")) {
+          const parts = val.split(":");
+          return (
+            parts.length === 2 &&
+            parts[0].trim().length > 0 &&
+            parts[1].trim().length > 0
+          );
+        }
+        // If no ":", validate as resource name (alphanumeric, underscore, hyphen)
+        return /^[a-zA-Z0-9_-]+$/.test(val);
+      },
+      {
+        message:
+          "Must be either 'resource:action' format or a valid resource name (alphanumeric, underscore, hyphen)",
+      },
+    ),
+});
+
+type PermissionFormData = z.infer<typeof permissionSchema>;
 
 export const Permissions = () => {
   const { translate: t } = useTranslation();
@@ -52,6 +84,15 @@ export const Permissions = () => {
   const { mutateAsync: create } = useCreate();
 
   const { mutateAsync: del } = useDelete();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<PermissionFormData>({
+    resolver: zodResolver(permissionSchema),
+  });
 
   const { result: permissions } = useList<Permission>({
     resource: "permissions",
@@ -137,16 +178,28 @@ export const Permissions = () => {
     return "none";
   };
 
-  const submitHandler = (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const name = formData.get("name") as string;
+  const onSubmit = async (data: PermissionFormData) => {
+    const { name } = data;
 
-    create({
-      resource: "permissions",
-      values: { name },
-    });
-    (e.target as HTMLFormElement).reset();
+    try {
+      if (name.includes(":")) {
+        // Create a single permission (resource:action format)
+        await create({
+          resource: "permissions",
+          values: { name },
+        });
+      } else {
+        // Create a new resource with default actions
+        await create({
+          resource: "permissions",
+          values: { resource_name: name },
+        });
+      }
+      reset();
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to create permission/resource:", error);
+    }
   };
 
   const handleUserToggle = (
@@ -382,19 +435,26 @@ export const Permissions = () => {
                   <Popover.Content p={4} bg="white" boxShadow="md">
                     <Popover.Arrow />
                     <Popover.Body>
-                      <form onSubmit={submitHandler}>
-                        <Group attached w="full">
-                          <Input
-                            name="name"
-                            placeholder={t(
-                              "admin.permissions.permissionPlaceholder",
-                            )}
-                          />
+                      <form onSubmit={handleSubmit(onSubmit)}>
+                        <Field.Root invalid={!!errors.name}>
+                          <Group attached w="full">
+                            <Input
+                              {...register("name")}
+                              placeholder={t(
+                                "admin.permissions.permissionPlaceholder",
+                              )}
+                            />
 
-                          <Button type="submit" colorScheme="blue">
-                            {t("common.create")}
-                          </Button>
-                        </Group>
+                            <Button type="submit" colorScheme="blue">
+                              {t("common.create")}
+                            </Button>
+                          </Group>
+                          {errors.name && (
+                            <Field.ErrorText>
+                              {errors.name.message}
+                            </Field.ErrorText>
+                          )}
+                        </Field.Root>
                       </form>
                     </Popover.Body>
                   </Popover.Content>
@@ -412,10 +472,11 @@ export const Permissions = () => {
 
         <Tabs.Content value="userpermissions">
           <TanstackPermissionMatrix
+            ressource="users"
             title={t("admin.permissions.usersPermissionsMatrix")}
             rows={users.data}
             rowKey="id"
-            rowLabel={(u) => u.fullName}
+            rowLabel={(u) => u.firstName + " " + u.lastName}
             groupedPermissions={groupedPermissions}
             isChecked={isUserChecked}
             onToggle={handleUserToggle}
@@ -427,6 +488,7 @@ export const Permissions = () => {
 
         <Tabs.Content value="rolepermissions">
           <TanstackPermissionMatrix
+            ressource="roles"
             title={t("admin.permissions.rolesPermissionsMatrix")}
             rows={roles.data}
             rowKey="id"
