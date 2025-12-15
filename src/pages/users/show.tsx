@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text, VStack, HStack } from "@chakra-ui/react";
+import { Box, Button, Heading, HStack, Text, VStack } from "@chakra-ui/react";
 import { useDelete, useNavigation, useOne } from "@refinedev/core";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";

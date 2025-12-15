@@ -1,4 +1,4 @@
-import { Box, Button, Field, Input, VStack, HStack } from "@chakra-ui/react";
+import { Box, Button, Field, HStack, Input, VStack } from "@chakra-ui/react";
 import { useCreate, useNavigation } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -39,9 +39,7 @@ const UserCreatePage = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={4} align="stretch">
           <HStack justifyContent="space-between">
-            <Box>
-              {/* Creating a user requires an associated contact */}
-            </Box>
+            <Box>{/* Creating a user requires an associated contact */}</Box>
             <Button
               variant="outline"
               size="sm"
