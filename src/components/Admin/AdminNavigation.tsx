@@ -9,15 +9,11 @@ import {
   LuUsers,
 } from "react-icons/lu";
 
-interface AdminNavigationProps {
-  sizes: number[];
-}
+interface AdminNavigationProps {}
 
-export const AdminNavigation: React.FC<AdminNavigationProps> = ({ sizes }) => {
+export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
   const { translate: t } = useTranslation();
   const { show, list } = useNavigation();
-
-  const collapsed = sizes[0] == 5;
 
   const navigation = [
     {
@@ -42,30 +38,25 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ sizes }) => {
   return (
     <Accordion.Root multiple variant="outline">
       {navigation.map((navItem) => (
-        <Accordion.Item
-          key={navItem.label}
-          value={navItem.label}
-          disabled={collapsed}
-        >
+        <Accordion.Item key={navItem.label} value={navItem.label}>
           <Accordion.ItemTrigger>
             <Flex
               direction="row"
               align="center"
-              justify={collapsed ? "center" : "flex-start"}
+              justify="flex-start"
               w="100%"
               gap={2}
               height={7}
-              px={collapsed ? 0 : "2.4vh"}
+              px={0}
               mb={0}
               _hover={{ bg: "ui.hover" }}
               cursor="pointer"
             >
-              <navItem.icon />
-              {!collapsed && (
-                <Span textAlign="center">
-                  {t(`admin.folder.${navItem.label.toLowerCase()}`)}
-                </Span>
-              )}
+              <navItem.icon scale={20} />
+
+              <Span textAlign="center">
+                {t(`admin.folder.${navItem.label.toLowerCase()}`)}
+              </Span>
             </Flex>
           </Accordion.ItemTrigger>
           <Accordion.ItemContent>

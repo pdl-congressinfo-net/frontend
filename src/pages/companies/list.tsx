@@ -1,5 +1,10 @@
 import { Box, Button, Table } from "@chakra-ui/react";
-import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import {
+  useLink,
+  useList,
+  useNavigation,
+  useTranslation,
+} from "@refinedev/core";
 import { useEffect } from "react";
 import { Company } from "../../features/companies/companies.model";
 import { useLayout } from "../../providers/layout-provider";
@@ -8,6 +13,7 @@ const CompaniesListPage = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const { create } = useNavigation();
+  const Link = useLink();
   const {
     result: data,
     query: { isLoading },
@@ -18,11 +24,12 @@ const CompaniesListPage = () => {
   useEffect(() => {
     setTitle(t("admin.companies.title"));
     setActions(
-      <Button onClick={() => create("companies")}>
-        {t("admin.companies.actions.create")}
-      </Button>,
+      <Link to="/admin/companies/create">
+        <Button>{t("admin.companies.actions.create")}</Button>
+      </Link>,
     );
-  }, [setTitle, setActions, create, t]);
+    return () => setActions(null);
+  }, [setTitle, setActions, t]);
 
   if (isLoading) return <Box>{t("common.loading")}</Box>;
 

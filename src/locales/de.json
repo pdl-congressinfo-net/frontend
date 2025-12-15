@@ -154,6 +154,7 @@
       "welcome": "Willkommen im Admin-Dashboard"
     },
     "links": {
+      "events": "Veranstaltungen",
       "users": "Benutzer",
       "companies": "Unternehmen",
       "locations": "Standorte",

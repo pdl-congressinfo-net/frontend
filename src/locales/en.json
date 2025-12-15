@@ -154,6 +154,7 @@
       "welcome": "Welcome to the Admin Dashboard"
     },
     "links": {
+      "events": "Events",
       "users": "Users",
       "companies": "Companies",
       "locations": "Locations",

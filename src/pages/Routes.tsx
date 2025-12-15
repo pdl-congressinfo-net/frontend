@@ -74,24 +74,12 @@ function AppRoutes() {
               element={<EventTypeEditPage />}
             />
 
-            {/* Locaton Types routes */}
-            <Route
-              path="/locations/types"
-              element={<LocationTypesListPage />}
-            />
-
-            {/* Countries routes */}
-            <Route
-              path="/locations/countries"
-              element={<CountriesListPage />}
-            />
-
             <Route path="*" element={<NotFound />} />
           </Route>
 
           {/* Admin routes with AdminLayout */}
           <Route
-            path="/admin/*"
+            path="admin/"
             element={
               <AdminLayout>
                 <Outlet />
@@ -128,6 +116,10 @@ function AppRoutes() {
             <Route path="locations/create" element={<LocationCreatePage />} />
             <Route path="locations/edit/:id" element={<LocationEditPage />} />
             <Route path="locations/show/:id" element={<LocationShowPage />} />
+
+            {/* Country & Location Types */}
+            <Route path="locations/countries" element={<CountriesListPage />} />
+            <Route path="locations/types" element={<LocationTypesListPage />} />
 
             <Route path="*" element={<NotFound />} />
           </Route>
