@@ -19,7 +19,7 @@ import {
   useTranslation,
 } from "@refinedev/core";
 import { useEffect, useMemo, useState } from "react";
-import { LuCirclePlus } from "react-icons/lu";
+import { LuCirclePlus, LuPencil } from "react-icons/lu";
 import { Role } from "../../features/roles/roles.model";
 import { User, UserRole } from "../../features/users/users.model";
 import { useLayout } from "../../providers/layout-provider";
@@ -27,7 +27,7 @@ import { useLayout } from "../../providers/layout-provider";
 const RolesListPage = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
-  const { list } = useNavigation();
+  const { list, edit } = useNavigation();
   const { mutateAsync: create } = useCreate();
 
   const {
@@ -252,6 +252,17 @@ const RolesListPage = () => {
                   )}
                 </Flex>
                 <Flex gap={2} align="center">
+                  <IconButton
+                    aria-label={t("admin.roles.actions.viewPermissions")}
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      edit("roles", role.id!);
+                    }}
+                  >
+                    <LuPencil />
+                  </IconButton>
                   <Button
                     size="sm"
                     onClick={(e) => {

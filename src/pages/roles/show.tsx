@@ -1,5 +1,5 @@
 import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
-import { useDelete, useOne } from "@refinedev/core";
+import { useDelete, useNavigation, useOne } from "@refinedev/core";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Role } from "../../features/roles/roles.model";
@@ -8,6 +8,7 @@ import { useLayout } from "../../providers/layout-provider";
 const RoleShowPage = () => {
   const { setTitle, setActions } = useLayout();
   const { id } = useParams<{ id: string }>();
+  const { edit, list } = useNavigation();
   const navigate = useNavigate();
   const { mutate: deleteRole } = useDelete();
 
@@ -33,7 +34,7 @@ const RoleShowPage = () => {
               },
               {
                 onSuccess: () => {
-                  navigate("/roles");
+                  list("roles");
                 },
               },
             );
@@ -68,7 +69,7 @@ const RoleShowPage = () => {
           <Text>{role.isDefault ? "Yes" : "No"}</Text>
         </Box>
 
-        <Button onClick={() => navigate(`/roles/edit/${id}`)}>Edit Role</Button>
+        <Button onClick={() => edit("roles", id!)}>Edit Role</Button>
       </VStack>
     </Box>
   );
