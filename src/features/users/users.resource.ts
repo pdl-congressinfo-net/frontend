@@ -22,10 +22,10 @@ export const userPermissionRessource = {
 
 export const userRessource = {
   name: "users",
-  list: "/users",
-  create: "/users",
-  edit: "/users/edit/:id",
-  show: "/users/show/:id",
+  list: "/admin/users",
+  create: "/admin/users",
+  edit: "/admin/users/edit/:id",
+  show: "/admin/users/show/:id",
   meta: {
     canDelete: true,
   },

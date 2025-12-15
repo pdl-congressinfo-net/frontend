@@ -31,6 +31,10 @@ import RoleCreatePage from "./roles/create";
 import RoleEditPage from "./roles/edit";
 import RolesListPage from "./roles/list";
 import RoleShowPage from "./roles/show";
+import UserCreatePage from "./users/create";
+import UserEditPage from "./users/edit";
+import UsersListPage from "./users/list";
+import UserShowPage from "./users/show";
 
 function AppRoutes() {
   const location = useLocation();
@@ -101,6 +105,11 @@ function AppRoutes() {
               path="permissions/show/:id"
               element={<PermissionShowPage />}
             />
+            {/* User Management */}
+            <Route path="users" element={<UsersListPage />} />
+            <Route path="users/create" element={<UserCreatePage />} />
+            <Route path="users/edit/:id" element={<UserEditPage />} />
+            <Route path="users/show/:id" element={<UserShowPage />} />
             {/* Access Control */}
             <Route path="roles" element={<RolesListPage />} />
             <Route path="roles/create" element={<RoleCreatePage />} />
