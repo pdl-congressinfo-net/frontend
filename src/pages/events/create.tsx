@@ -37,7 +37,7 @@ const EventCreatePage = () => {
 
   const { result: eventTypes } = useList<EventType>({
     resource: "types",
-    meta: { parentmodule: "events" },
+    meta: { parentModule: "events" },
   });
   useEffect(() => {
     setTitle("Create Event");

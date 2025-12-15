@@ -14,7 +14,7 @@ const EventTypeShowPage = () => {
     resource: "types",
     id: id!,
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
 

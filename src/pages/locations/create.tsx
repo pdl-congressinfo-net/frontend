@@ -20,12 +20,12 @@ const LocationCreatePage = () => {
 
   const { result: countries } = useList<Country>({
     resource: "countries",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
   });
 
   const { result: locationTypes } = useList<LocationType>({
     resource: "locationtypes",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
   });
 
   useEffect(() => {

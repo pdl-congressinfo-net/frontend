@@ -11,7 +11,7 @@ const CountriesListPage = () => {
     query: { isLoading },
   } = useList<Country>({
     resource: "countries",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
     filters: [{ field: "preferred", operator: "eq", value: true }],
   });
 

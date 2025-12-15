@@ -83,7 +83,7 @@ const LocationPage = ({
     pagination: { pageSize: 1000 },
     sorters: [{ field: "name", order: "asc" }],
     meta: {
-      parentmodule: "locations",
+      parentModule: "locations",
     },
   });
 

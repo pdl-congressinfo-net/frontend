@@ -253,7 +253,7 @@ const Upsert = ({
       enabled: Boolean(eventTypeIdFromDraft),
     },
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
 

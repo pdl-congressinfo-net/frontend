@@ -11,7 +11,7 @@ const LocationTypesListPage = () => {
     query: { isLoading },
   } = useList<LocationType>({
     resource: "types",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
   });
 
   useEffect(() => {

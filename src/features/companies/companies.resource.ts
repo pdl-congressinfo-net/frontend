@@ -17,7 +17,7 @@ export const companyEmployeeResource = {
   show: "/admin/companies/employees/show/:id",
   meta: {
     canDelete: true,
-    parentmodule: "companies",
+    parentModule: "companies",
   },
 };
 

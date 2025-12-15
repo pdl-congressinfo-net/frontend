@@ -35,7 +35,7 @@ export default function Information({ event }: InformationProps) {
       enabled: !!location?.countryId,
     },
     meta: {
-      parentmodule: "locations",
+      parentModule: "locations",
     },
   });
   return (

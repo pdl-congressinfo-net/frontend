@@ -27,7 +27,7 @@ const EventTypeCreatePage = () => {
         resource: "types",
         values: data,
         meta: {
-          parentmodule: "events",
+          parentModule: "events",
         },
       },
       {

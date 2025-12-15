@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, Text, VStack, HStack } from "@chakra-ui/react";
 import { useDelete, useNavigation, useOne } from "@refinedev/core";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -64,24 +64,38 @@ const UserShowPage = () => {
           <Text>{user.email}</Text>
         </Box>
 
-        {user.titles && (
+        {user.contact?.titles && (
           <Box>
             <Heading size="sm">Titles</Heading>
-            <Text>{user.titles}</Text>
+            <Text>{user.contact?.titles}</Text>
           </Box>
         )}
 
         <Box>
           <Heading size="sm">First Name</Heading>
-          <Text>{user.firstName}</Text>
+          <Text>{user.contact?.firstName}</Text>
         </Box>
 
-        {user.lastName && (
+        {user.contact?.lastName && (
           <Box>
             <Heading size="sm">Last Name</Heading>
-            <Text>{user.lastName}</Text>
+            <Text>{user.contact?.lastName}</Text>
           </Box>
         )}
+
+        <HStack>
+          {user.contact?.id && (
+            <Button onClick={() => edit("contacts", user.contact!.id!)}>
+              Edit Linked Contact
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/admin/contacts")}
+          >
+            View All Contacts
+          </Button>
+        </HStack>
 
         {user.oeakId && (
           <Box>

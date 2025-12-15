@@ -59,7 +59,11 @@ const UsersListPage = () => {
           {data?.data.map((user) => (
             <Table.Row key={user.id}>
               <Table.Cell>
-                {[user.titles, user.firstName, user.lastName]
+                {[
+                  user.contact?.titles,
+                  user.contact?.firstName,
+                  user.contact?.lastName,
+                ]
                   .filter(Boolean)
                   .join(" ")}
               </Table.Cell>

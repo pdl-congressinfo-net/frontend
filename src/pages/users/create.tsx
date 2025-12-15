@@ -1,4 +1,4 @@
-import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Field, Input, VStack, HStack } from "@chakra-ui/react";
 import { useCreate, useNavigation } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -38,33 +38,42 @@ const UserCreatePage = () => {
     <Box p={4}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={4} align="stretch">
+          <HStack justifyContent="space-between">
+            <Box>
+              {/* Creating a user requires an associated contact */}
+            </Box>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => (window.location.href = "/admin/contacts/create")}
+            >
+              Create standalone contact
+            </Button>
+          </HStack>
           <Field.Root invalid={!!errors.email}>
             <Field.Label>Email</Field.Label>
-            <Input
-              type="email"
-              {...register("email", { required: true })}
-            />
+            <Input type="email" {...register("email", { required: true })} />
             {errors.email && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
           </Field.Root>
 
-          <Field.Root invalid={!!errors.titles}>
+          <Field.Root invalid={!!errors.contact?.titles}>
             <Field.Label>Titles (Optional)</Field.Label>
-            <Input {...register("titles")} />
+            <Input {...register("contact.titles")} />
           </Field.Root>
 
-          <Field.Root invalid={!!errors.first_name}>
+          <Field.Root invalid={!!errors.contact?.first_name}>
             <Field.Label>First Name</Field.Label>
-            <Input {...register("first_name", { required: true })} />
-            {errors.first_name && (
+            <Input {...register("contact.first_name", { required: true })} />
+            {errors.contact?.first_name && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
           </Field.Root>
 
-          <Field.Root invalid={!!errors.last_name}>
+          <Field.Root invalid={!!errors.contact?.last_name}>
             <Field.Label>Last Name (Optional)</Field.Label>
-            <Input {...register("last_name")} />
+            <Input {...register("contact.last_name")} />
           </Field.Root>
 
           <Field.Root invalid={!!errors.password}>

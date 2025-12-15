@@ -50,7 +50,7 @@ const RolesListPage = () => {
   } = useList<UserRole>({
     resource: "roles",
     meta: {
-      parentmodule: "users",
+      parentModule: "users",
     },
   });
 
@@ -77,8 +77,8 @@ const RolesListPage = () => {
           (ur) => ur.roleId === role.id && ur.userId === user.id,
         );
         const userMatches =
-          (user.firstName ?? "").toLowerCase().includes(q) ||
-          (user.lastName ?? "").toLowerCase().includes(q) ||
+          (user.contact?.firstName ?? "").toLowerCase().includes(q) ||
+          (user.contact?.lastName ?? "").toLowerCase().includes(q) ||
           (user.email ?? "").toLowerCase().includes(q);
         return isAssigned && userMatches;
       });
@@ -104,8 +104,8 @@ const RolesListPage = () => {
             (ur) => ur.roleId === role.id && ur.userId === user.id,
           );
           const userMatches =
-            (user.firstName ?? "").toLowerCase().includes(q) ||
-            (user.lastName ?? "").toLowerCase().includes(q) ||
+            (user.contact?.firstName ?? "").toLowerCase().includes(q) ||
+            (user.contact?.lastName ?? "").toLowerCase().includes(q) ||
             (user.email ?? "").toLowerCase().includes(q);
           return isAssigned && userMatches;
         });
@@ -136,8 +136,8 @@ const RolesListPage = () => {
 
     if (!q) return usersData ?? [];
     return (usersData ?? []).filter((p) => {
-      const first = (p.firstName ?? "").toLowerCase();
-      const last = (p.lastName ?? "").toLowerCase();
+      const first = (p.contact?.firstName ?? "").toLowerCase();
+      const last = (p.contact?.lastName ?? "").toLowerCase();
       const email = (p.email ?? "").toLowerCase();
       return first.includes(q) || last.includes(q) || email.includes(q);
     });
@@ -291,8 +291,8 @@ const RolesListPage = () => {
                     .map((user) => (
                       <Box key={user.id} ml={4}>
                         <Text>
-                          {user.firstName && user.firstName}{" "}
-                          {user.lastName && user.lastName} (
+                          {user.contact?.firstName && user.contact?.firstName}{" "}
+                          {user.contact?.lastName && user.contact?.lastName} (
                           {user.email && user.email})
                         </Text>
                       </Box>

@@ -18,7 +18,7 @@ const EventTypesListPage = () => {
   } = useList<EventType>({
     resource: "types",
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
 
@@ -37,7 +37,7 @@ const EventTypesListPage = () => {
         resource: "eventtypes",
         id,
         meta: {
-          parentmodule: "events",
+          parentModule: "events",
         },
       });
     }

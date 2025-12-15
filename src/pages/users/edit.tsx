@@ -1,4 +1,4 @@
-import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Field, Input, VStack, HStack } from "@chakra-ui/react";
 import { useNavigation, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -30,9 +30,11 @@ const UserEditPage = () => {
     if (user) {
       reset({
         email: user.email,
-        titles: user.titles,
-        first_name: user.firstName,
-        last_name: user.lastName,
+        contact: {
+          titles: user.contact?.titles,
+          first_name: user.contact?.firstName || "",
+          last_name: user.contact?.lastName,
+        },
       });
     }
   }, [result, response, reset]);
@@ -63,33 +65,48 @@ const UserEditPage = () => {
     <Box p={4}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={4} align="stretch">
+          <HStack justifyContent="space-between">
+            {result?.contact?.id && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => edit("contacts", result!.contact!.id!)}
+              >
+                Edit Linked Contact
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => (window.location.href = "/admin/contacts")}
+            >
+              View All Contacts
+            </Button>
+          </HStack>
           <Field.Root invalid={!!errors.email}>
             <Field.Label>Email</Field.Label>
-            <Input
-              type="email"
-              {...register("email", { required: true })}
-            />
+            <Input type="email" {...register("email", { required: true })} />
             {errors.email && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
           </Field.Root>
 
-          <Field.Root invalid={!!errors.titles}>
+          <Field.Root invalid={!!errors.contact?.titles}>
             <Field.Label>Titles (Optional)</Field.Label>
-            <Input {...register("titles")} />
+            <Input {...register("contact.titles")} />
           </Field.Root>
 
-          <Field.Root invalid={!!errors.first_name}>
+          <Field.Root invalid={!!errors.contact?.first_name}>
             <Field.Label>First Name</Field.Label>
-            <Input {...register("first_name", { required: true })} />
-            {errors.first_name && (
+            <Input {...register("contact.first_name", { required: true })} />
+            {errors.contact?.first_name && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
           </Field.Root>
 
-          <Field.Root invalid={!!errors.last_name}>
+          <Field.Root invalid={!!errors.contact?.last_name}>
             <Field.Label>Last Name (Optional)</Field.Label>
-            <Input {...register("last_name")} />
+            <Input {...register("contact.last_name")} />
           </Field.Root>
 
           <Field.Root invalid={!!errors.password}>

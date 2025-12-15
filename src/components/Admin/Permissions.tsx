@@ -101,17 +101,17 @@ export const Permissions = () => {
   const { result: users } = useList<User>({ resource: "users" });
   const { result: userPermissions } = useList<UserPermission>({
     resource: "permissions",
-    meta: { parentmodule: "users" },
+    meta: { parentModule: "users" },
   });
   const { result: userRoles } = useList<UserRole>({
     resource: "roles",
-    meta: { parentmodule: "users" },
+    meta: { parentModule: "users" },
   });
 
   const { result: roles } = useList<Role>({ resource: "roles" });
   const { result: rolePermissions } = useList<RolePermission>({
     resource: "permissions",
-    meta: { parentmodule: "roles" },
+    meta: { parentModule: "roles" },
     pagination: { pageSize: 1000 },
   });
 
@@ -320,13 +320,13 @@ export const Permissions = () => {
           if (isUser) {
             await create({
               resource: "permissions",
-              meta: { parentmodule: "users" },
+              meta: { parentModule: "users" },
               values: { user_id: entityId, permission_id: permissionId },
             });
           } else if (isRole) {
             await create({
               resource: "permissions",
-              meta: { parentmodule: "roles" },
+              meta: { parentModule: "roles" },
               values: { role_id: entityId, permission_id: permissionId },
             });
           } else {
@@ -352,7 +352,7 @@ export const Permissions = () => {
               await del({
                 resource: "permissions",
                 meta: {
-                  parentmodule: "users",
+                  parentModule: "users",
                   relation_ids: [entityId, permissionId],
                 },
                 id: "relation",
@@ -367,7 +367,7 @@ export const Permissions = () => {
               await del({
                 resource: "permissions",
                 meta: {
-                  parentmodule: "roles",
+                  parentModule: "roles",
                   relation_ids: [entityId, permissionId],
                 },
                 id: "relation",
@@ -476,7 +476,7 @@ export const Permissions = () => {
             title={t("admin.permissions.usersPermissionsMatrix")}
             rows={users.data}
             rowKey="id"
-            rowLabel={(u) => u.firstName + " " + u.lastName}
+            rowLabel={(u) => u.contact?.firstName + " " + u.contact?.lastName}
             groupedPermissions={groupedPermissions}
             isChecked={isUserChecked}
             onToggle={handleUserToggle}

@@ -54,7 +54,7 @@ export const EventCard = ({
       enabled: !!location?.countryId,
     },
     meta: {
-      parentmodule: "locations",
+      parentModule: "locations",
     },
   });
 

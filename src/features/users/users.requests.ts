@@ -21,15 +21,37 @@ export interface UpdateUserPermissionRequest {
 export interface CreateUserRequest {
   email: string;
   password: string;
-  titles?: string;
-  first_name: string;
-  last_name?: string;
+  contact?: {
+    titles?: string;
+    first_name: string;
+    last_name?: string;
+    phone_number?: string;
+  };
 }
 
 export interface UpdateUserRequest {
   email?: string;
   password?: string;
+  contact?: {
+    titles?: string;
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+  };
+}
+
+export interface CreateContactRequest {
+  email: string;
+  titles?: string;
+  first_name: string;
+  last_name?: string;
+  phone_number?: string;
+}
+
+export interface UpdateContactRequest {
+  email?: string;
   titles?: string;
   first_name?: string;
   last_name?: string;
+  phone_number?: string;
 }

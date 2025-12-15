@@ -6,12 +6,15 @@ import { getMapper } from "../rest-data-provider/mapping/mapper.registry";
 import { axiosInstance, generateFilter, generateSort } from "./utils";
 
 const removeEmptyFields = (obj: Record<string, any>): Record<string, any> => {
-  return Object.entries(obj).reduce((acc, [key, value]) => {
-    if (value !== "" && value !== null && value !== undefined) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {} as Record<string, any>);
+  return Object.entries(obj).reduce(
+    (acc, [key, value]) => {
+      if (value !== "" && value !== null && value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
 };
 
 type MethodTypes = "get" | "delete" | "head" | "options";
@@ -29,7 +32,7 @@ export type GetListParams = {
   meta?: {
     headers?: Record<string, string>;
     method?: MethodTypes;
-    parentmodule?: string;
+    parentModule?: string;
   };
 };
 
@@ -39,7 +42,7 @@ export type GetManyParams = {
   meta?: {
     headers?: Record<string, string>;
     method?: MethodTypes;
-    parentmodule?: string;
+    parentModule?: string;
   };
 };
 
@@ -49,7 +52,7 @@ export type CreateParams = {
   meta?: {
     headers?: Record<string, string>;
     method?: MethodTypesWithBody;
-    parentmodule?: string;
+    parentModule?: string;
   };
 };
 
@@ -60,7 +63,7 @@ export type UpdateParams = {
   meta?: {
     headers?: Record<string, string>;
     method?: MethodTypesWithBody;
-    parentmodule?: string;
+    parentModule?: string;
     relation_ids?: number[] | string[];
   };
 };
@@ -71,7 +74,7 @@ export type GetOneParams = {
   meta?: {
     headers?: Record<string, string>;
     method?: MethodTypes;
-    parentmodule?: string;
+    parentModule?: string;
   };
 };
 
@@ -82,7 +85,7 @@ export type DeleteOneParams = {
   meta?: {
     headers?: Record<string, string>;
     method?: MethodTypesWithBody;
-    parentmodule?: string;
+    parentModule?: string;
     relation_ids?: number[] | string[];
   };
 };
@@ -106,19 +109,19 @@ export const dataProvider = (
       } = pagination ?? {};
 
       const { headers: headersFromMeta, method } = meta ?? {};
-      let parentmodule = meta?.parentmodule;
+      let parentModule = meta?.parentModule;
 
       const requestMethod = (method as MethodTypes) ?? "get";
 
-      const featureName = meta?.parentmodule || resource;
+      const featureName = meta?.parentModule || resource;
       const mapper = getMapper(featureName, resource);
 
-      if (parentmodule === resource) {
-        parentmodule = undefined;
+      if (parentModule === resource) {
+        parentModule = undefined;
       }
 
-      const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}`
+      const url = parentModule
+        ? `${apiUrl}/${parentModule}/${resource}`
         : `${apiUrl}/${resource}`;
 
       const queryFilters = generateFilter(filters);
@@ -163,18 +166,18 @@ export const dataProvider = (
 
     getMany: async ({ resource, ids, meta }: GetManyParams) => {
       const { headers, method } = meta ?? {};
-      let parentmodule = meta?.parentmodule;
+      let parentModule = meta?.parentModule;
 
       const requestMethod = (method as MethodTypes) ?? "get";
-      const featureName = meta?.parentmodule || resource;
+      const featureName = meta?.parentModule || resource;
       const mapper = getMapper(featureName, resource);
 
-      if (parentmodule === resource) {
-        parentmodule = undefined;
+      if (parentModule === resource) {
+        parentModule = undefined;
       }
 
-      const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}?${stringify({ id: ids })}`
+      const url = parentModule
+        ? `${apiUrl}/${parentModule}/${resource}?${stringify({ id: ids })}`
         : `${apiUrl}/${resource}?${stringify({ id: ids })}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
@@ -194,17 +197,17 @@ export const dataProvider = (
       const { headers, method } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "post";
 
-      let parentmodule = meta?.parentmodule;
+      let parentModule = meta?.parentModule;
 
-      const featureName = meta?.parentmodule || resource;
+      const featureName = meta?.parentModule || resource;
       const mapper = getMapper(featureName, resource);
 
-      if (parentmodule === resource) {
-        parentmodule = undefined;
+      if (parentModule === resource) {
+        parentModule = undefined;
       }
 
-      const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}`
+      const url = parentModule
+        ? `${apiUrl}/${parentModule}/${resource}`
         : `${apiUrl}/${resource}`;
 
       const cleanedVariables = removeEmptyFields(variables);
@@ -228,19 +231,19 @@ export const dataProvider = (
       const { headers, method, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "patch";
 
-      let parentmodule = meta?.parentmodule;
+      let parentModule = meta?.parentModule;
 
-      const featureName = meta?.parentmodule || resource;
+      const featureName = meta?.parentModule || resource;
       const mapper = getMapper(featureName, resource);
 
-      if (parentmodule === resource) {
-        parentmodule = undefined;
+      if (parentModule === resource) {
+        parentModule = undefined;
       }
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
 
-      const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}/${selector}`
+      const url = parentModule
+        ? `${apiUrl}/${parentModule}/${resource}/${selector}`
         : `${apiUrl}/${resource}/${selector}`;
 
       const cleanedVariables = removeEmptyFields(variables);
@@ -263,17 +266,17 @@ export const dataProvider = (
     getOne: async ({ resource, id, meta }: GetOneParams) => {
       const { headers, method } = meta ?? {};
       const requestMethod = (method as MethodTypes) ?? "get";
-      let parentmodule = meta?.parentmodule;
+      let parentModule = meta?.parentModule;
 
-      const featureName = meta?.parentmodule || resource;
+      const featureName = meta?.parentModule || resource;
       const mapper = getMapper(featureName, resource);
 
-      if (parentmodule === resource) {
-        parentmodule = undefined;
+      if (parentModule === resource) {
+        parentModule = undefined;
       }
 
-      const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}/${id}`
+      const url = parentModule
+        ? `${apiUrl}/${parentModule}/${resource}/${id}`
         : `${apiUrl}/${resource}/${id}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
@@ -290,16 +293,16 @@ export const dataProvider = (
     deleteOne: async ({ resource, id, variables, meta }: DeleteOneParams) => {
       const { headers, method, relation_ids } = meta ?? {};
       const requestMethod = (method as MethodTypesWithBody) ?? "delete";
-      let parentmodule = meta?.parentmodule;
+      let parentModule = meta?.parentModule;
 
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
 
-      if (parentmodule === resource) {
-        parentmodule = undefined;
+      if (parentModule === resource) {
+        parentModule = undefined;
       }
 
-      const url = parentmodule
-        ? `${apiUrl}/${parentmodule}/${resource}/${selector}`
+      const url = parentModule
+        ? `${apiUrl}/${parentModule}/${resource}/${selector}`
         : `${apiUrl}/${resource}/${selector}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {

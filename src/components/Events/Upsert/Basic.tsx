@@ -175,7 +175,7 @@ const BasicInformation = ({
     resource: "types",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
 

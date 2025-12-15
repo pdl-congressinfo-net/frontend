@@ -8,13 +8,21 @@ export interface UserPermission {
   permissionId: string;
 }
 
-export interface User {
-  id: string;
-  email: string;
+export interface Contact {
+  id?: string;
+  email?: string;
   titles?: string;
   firstName: string;
   lastName?: string;
-  createdAt: Date;
-  lastLogin: Date;
+  phoneNumber?: string;
+  createdAt?: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  createdAt: string;
+  lastLogin: string | null;
   oeakId?: number;
+  contact?: Contact | null;
 }

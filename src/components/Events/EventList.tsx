@@ -45,7 +45,7 @@ export const EventList = ({ archive }: EventListProps) => {
   const { result: eventTypesDto } = useList({
     resource: "types",
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
 

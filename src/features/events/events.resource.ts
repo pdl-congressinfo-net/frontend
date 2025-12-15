@@ -6,7 +6,7 @@ export const eventTypeResource = {
   show: "/events/types/show/:id",
   meta: {
     canDelete: true,
-    parentmodule: "events",
+    parentModule: "events",
   },
 };
 

@@ -5,6 +5,6 @@ const modules = import.meta.glob("../../../features/**/**.mapper.ts", {
 });
 
 Object.entries(modules).forEach(([path, mod]: any) => {
-  const feature = path.split("/").slice(-2)[0]; // folder name == parentmodule
+  const feature = path.split("/").slice(-2)[0]; // folder name == parentModule
   registerMapper(feature, mod.default);
 });

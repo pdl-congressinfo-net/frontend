@@ -40,6 +40,16 @@ import {
   RolesListPage,
 } from "./roles";
 import {
+  SponsoringCreatePage,
+  SponsoringEditPage,
+  SponsoringShowPage,
+  SponsoringsListPage,
+} from "./sponsorings";
+import {
+  ContactCreatePage,
+  ContactEditPage,
+  ContactShowPage,
+  ContactsListPage,
   UserCreatePage,
   UserEditPage,
   UserShowPage,
@@ -108,6 +118,20 @@ function AppRoutes() {
               <Route path="create" element={<UserCreatePage />} />
               <Route path="edit/:id" element={<UserEditPage />} />
               <Route path="show/:id" element={<UserShowPage />} />
+            </Route>
+
+            <Route path="contacts">
+              <Route index element={<ContactsListPage />} />
+              <Route path="create" element={<ContactCreatePage />} />
+              <Route path="edit/:id" element={<ContactEditPage />} />
+              <Route path="show/:id" element={<ContactShowPage />} />
+            </Route>
+
+            <Route path="sponsorings">
+              <Route index element={<SponsoringsListPage />} />
+              <Route path="create" element={<SponsoringCreatePage />} />
+              <Route path="edit/:id" element={<SponsoringEditPage />} />
+              <Route path="show/:id" element={<SponsoringShowPage />} />
             </Route>
 
             <Route path="roles">

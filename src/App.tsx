@@ -19,6 +19,7 @@ import "./providers/rest-data-provider/mapping/feature.loader";
 import {
   companyEmployeeResource,
   companyResource,
+  sponsoringsResource,
 } from "./features/companies/companies.resource";
 import {
   eventResource,
@@ -35,6 +36,7 @@ import {
   roleResource,
 } from "./features/roles/roles.resource";
 import {
+  contactsResource,
   userPermissionRessource,
   userRessource,
   userRoleRessource,
@@ -69,6 +71,7 @@ function App() {
                   userPermissionRessource,
                   userRoleRessource,
                   userRessource,
+                  contactsResource,
                   eventTypeResource,
                   eventResource,
                   locationResource,
@@ -76,6 +79,8 @@ function App() {
                   countryResource,
                   companyResource,
                   companyEmployeeResource,
+                  contactsResource,
+                  sponsoringsResource,
                   roleResource,
                   rolePermissionResource,
                   permissionResource,

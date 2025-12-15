@@ -20,7 +20,7 @@ const EventTypeEditPage = () => {
     resource: "types",
     id: id!,
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
 
@@ -55,7 +55,7 @@ const EventTypeEditPage = () => {
         id: id!,
         values: formData,
         meta: {
-          parentmodule: "events",
+          parentModule: "events",
         },
       },
       {
