@@ -1,4 +1,4 @@
-import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Checkbox, Field, Input, VStack } from "@chakra-ui/react";
 import { useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -30,6 +30,7 @@ const RoleEditPage = () => {
     if (role) {
       reset({
         name: role.name,
+        is_default: role.isDefault,
       });
     }
   }, [result, response, reset]);
@@ -66,6 +67,14 @@ const RoleEditPage = () => {
             {errors.name && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
+          </Field.Root>
+
+          <Field.Root>
+            <Checkbox.Root {...register("is_default")}>
+              <Checkbox.HiddenInput />
+              <Checkbox.Control />
+              <Checkbox.Label>Set as Default Role</Checkbox.Label>
+            </Checkbox.Root>
           </Field.Root>
 
           <Button type="submit">Update Role</Button>

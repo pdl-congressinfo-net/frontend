@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { User } from "../../features/users/users.model";
 import { useLayout } from "../../providers/layout-provider";
 
-const UserListPage = () => {
+const UsersListPage = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const { show } = useNavigation();
@@ -86,4 +86,4 @@ const UserListPage = () => {
   );
 };
 
-export default UserListPage;
+export default UsersListPage;

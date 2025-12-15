@@ -1,4 +1,4 @@
-import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Checkbox, Field, Input, VStack } from "@chakra-ui/react";
 import { useCreate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -45,6 +45,14 @@ const RoleCreatePage = () => {
             {errors.name && (
               <Field.ErrorText>This field is required</Field.ErrorText>
             )}
+          </Field.Root>
+
+          <Field.Root>
+            <Checkbox.Root {...register("is_default")}>
+              <Checkbox.HiddenInput />
+              <Checkbox.Control />
+              <Checkbox.Label>Set as Default Role</Checkbox.Label>
+            </Checkbox.Root>
           </Field.Root>
 
           <Button type="submit">Create Role</Button>

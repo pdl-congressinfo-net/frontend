@@ -63,6 +63,11 @@ const RoleShowPage = () => {
           <Text>{role.name}</Text>
         </Box>
 
+        <Box>
+          <Heading size="sm">Default Role</Heading>
+          <Text>{role.isDefault ? "Yes" : "No"}</Text>
+        </Box>
+
         <Button onClick={() => navigate(`/roles/edit/${id}`)}>Edit Role</Button>
       </VStack>
     </Box>

@@ -77,8 +77,9 @@ const RolesListPage = () => {
           (ur) => ur.roleId === role.id && ur.userId === user.id,
         );
         const userMatches =
-          user.fullName.toLowerCase().includes(q) ||
-          user.email.toLowerCase().includes(q);
+          (user.firstName ?? "").toLowerCase().includes(q) ||
+          (user.lastName ?? "").toLowerCase().includes(q) ||
+          (user.email ?? "").toLowerCase().includes(q);
         return isAssigned && userMatches;
       });
 
@@ -103,8 +104,9 @@ const RolesListPage = () => {
             (ur) => ur.roleId === role.id && ur.userId === user.id,
           );
           const userMatches =
-            user.fullName.toLowerCase().includes(q) ||
-            user.email.toLowerCase().includes(q);
+            (user.firstName ?? "").toLowerCase().includes(q) ||
+            (user.lastName ?? "").toLowerCase().includes(q) ||
+            (user.email ?? "").toLowerCase().includes(q);
           return isAssigned && userMatches;
         });
       })
@@ -133,11 +135,12 @@ const RolesListPage = () => {
     const q = roleUserSearch?.toLowerCase().trim();
 
     if (!q) return usersData ?? [];
-    return (usersData ?? []).filter(
-      (p) =>
-        p.fullName.toLowerCase().includes(q) ||
-        p.email.toLowerCase().includes(q),
-    );
+    return (usersData ?? []).filter((p) => {
+      const first = (p.firstName ?? "").toLowerCase();
+      const last = (p.lastName ?? "").toLowerCase();
+      const email = (p.email ?? "").toLowerCase();
+      return first.includes(q) || last.includes(q) || email.includes(q);
+    });
   }, [usersData, roleUserSearch]);
 
   useEffect(() => {
@@ -233,7 +236,21 @@ const RolesListPage = () => {
               _last={{ borderBottomWidth: "1px" }}
             >
               <Flex justify="space-between" align="center" w="full">
-                <Text fontWeight="medium">{role.name}</Text>
+                <Flex gap={2} align="center">
+                  <Text fontWeight="medium">{role.name}</Text>
+                  {role.isDefault && (
+                    <Box
+                      px={2}
+                      py={1}
+                      bg="blue.100"
+                      color="blue.800"
+                      borderRadius="md"
+                      fontSize="xs"
+                    >
+                      {t("admin.roles.default")}
+                    </Box>
+                  )}
+                </Flex>
                 <Flex gap={2} align="center">
                   <Button
                     size="sm"
@@ -263,7 +280,9 @@ const RolesListPage = () => {
                     .map((user) => (
                       <Box key={user.id} ml={4}>
                         <Text>
-                          {user.fullName} ({user.email})
+                          {user.firstName && user.firstName}{" "}
+                          {user.lastName && user.lastName} (
+                          {user.email && user.email})
                         </Text>
                       </Box>
                     ))}
