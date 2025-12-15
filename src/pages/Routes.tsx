@@ -1,3 +1,4 @@
+import { CanAccess } from "@refinedev/core";
 import { NavigateToResource } from "@refinedev/react-router";
 import type { Location } from "react-router";
 import { Outlet, Route, Routes, useLocation } from "react-router";
@@ -5,36 +6,45 @@ import { AdminLayout } from "../components/Admin/AdminLayout";
 import { Layout } from "../components/Common/Layout";
 import NotFound from "../components/Common/NotFound";
 import { UserLayout } from "../components/Common/UserLayout";
-import AdminDashboard from "./admin/dashboard";
-import CompanyCreatePage from "./companies/create";
-import CompanyEditPage from "./companies/edit";
-import CompaniesListPage from "./companies/list";
-import CompanyShowPage from "./companies/show";
-import EventCreatePage from "./events/create";
-import EventEditPage from "./events/edit";
-import EventsListPage from "./events/list";
-import EventShowPage from "./events/show";
-import EventTypeCreatePage from "./events/types/create";
-import EventTypeEditPage from "./events/types/edit";
-import EventTypesListPage from "./events/types/list";
-import CountriesListPage from "./locations/countries/list";
-import LocationCreatePage from "./locations/create";
-import LocationEditPage from "./locations/edit";
-import LocationsListPage from "./locations/list";
-import LocationShowPage from "./locations/show";
-import LocationTypesListPage from "./locations/types/list";
-import PermissionCreatePage from "./permissions/create";
-import PermissionEditPage from "./permissions/edit";
-import PermissionsListPage from "./permissions/list";
-import PermissionShowPage from "./permissions/show";
-import RoleCreatePage from "./roles/create";
-import RoleEditPage from "./roles/edit";
-import RolesListPage from "./roles/list";
-import RoleShowPage from "./roles/show";
-import UserCreatePage from "./users/create";
-import UserEditPage from "./users/edit";
-import UsersListPage from "./users/list";
-import UserShowPage from "./users/show";
+import { AdminDashboard } from "./admin";
+import {
+  CompaniesListPage,
+  CompanyCreatePage,
+  CompanyEditPage,
+  CompanyShowPage,
+} from "./companies";
+import {
+  EventCreatePage,
+  EventEditPage,
+  EventShowPage,
+  EventsListPage,
+} from "./events";
+import {
+  CountriesListPage,
+  LocationCreatePage,
+  LocationEditPage,
+  LocationShowPage,
+  LocationsListPage,
+  LocationTypesListPage,
+} from "./locations";
+import {
+  PermissionCreatePage,
+  PermissionEditPage,
+  PermissionShowPage,
+  PermissionsListPage,
+} from "./permissions";
+import {
+  RoleCreatePage,
+  RoleEditPage,
+  RoleShowPage,
+  RolesListPage,
+} from "./roles";
+import {
+  UserCreatePage,
+  UserEditPage,
+  UserShowPage,
+  UsersListPage,
+} from "./users";
 
 function AppRoutes() {
   const location = useLocation();
@@ -63,72 +73,67 @@ function AppRoutes() {
             <Route index element={<NavigateToResource resource="events" />} />
 
             {/* Events routes */}
-            <Route path="/events" element={<EventsListPage />} />
-            <Route path="/events/create" element={<EventCreatePage />} />
-            <Route path="/events/edit/:id" element={<EventEditPage />} />
-
-            {/* Event Types routes */}
-            <Route path="/events/types" element={<EventTypesListPage />} />
-            <Route
-              path="/events/types/create"
-              element={<EventTypeCreatePage />}
-            />
-            <Route
-              path="/events/types/edit/:id"
-              element={<EventTypeEditPage />}
-            />
+            <Route path="events">
+              <Route index element={<EventsListPage />} />
+              <Route path="create" element={<EventCreatePage />} />
+              <Route path="edit/:id" element={<EventEditPage />} />
+              <Route path="show/:id" element={<EventShowPage />} />
+            </Route>
 
             <Route path="*" element={<NotFound />} />
           </Route>
 
-          {/* Admin routes with AdminLayout */}
+          {/* Admin routes with AdminLayout - Protected at layout level */}
           <Route
-            path="admin/"
+            path="admin"
             element={
-              <AdminLayout>
-                <Outlet />
-              </AdminLayout>
+              <CanAccess resource="admin" action="view" fallback={<NotFound />}>
+                <AdminLayout>
+                  <Outlet />
+                </AdminLayout>
+              </CanAccess>
             }
           >
             <Route index element={<AdminDashboard />} />
 
-            <Route path="permissions" element={<PermissionsListPage />} />
-            <Route
-              path="permissions/create"
-              element={<PermissionCreatePage />}
-            />
-            <Route
-              path="permissions/edit/:id"
-              element={<PermissionEditPage />}
-            />
-            <Route
-              path="permissions/show/:id"
-              element={<PermissionShowPage />}
-            />
-            {/* User Management */}
-            <Route path="users" element={<UsersListPage />} />
-            <Route path="users/create" element={<UserCreatePage />} />
-            <Route path="users/edit/:id" element={<UserEditPage />} />
-            <Route path="users/show/:id" element={<UserShowPage />} />
-            {/* Access Control */}
-            <Route path="roles" element={<RolesListPage />} />
-            <Route path="roles/create" element={<RoleCreatePage />} />
-            <Route path="roles/edit/:id" element={<RoleEditPage />} />
-            <Route path="roles/show/:id" element={<RoleShowPage />} />
-            {/* Companies */}
-            <Route path="companies" element={<CompaniesListPage />} />
-            <Route path="companies/create" element={<CompanyCreatePage />} />
-            <Route path="companies/edit/:id" element={<CompanyEditPage />} />
-            <Route path="companies/show/:id" element={<CompanyShowPage />} />
-            {/* Locations routes */}
-            <Route path="locations" element={<LocationsListPage />} />
-            <Route path="locations/create" element={<LocationCreatePage />} />
-            <Route path="locations/edit/:id" element={<LocationEditPage />} />
-            <Route path="locations/show/:id" element={<LocationShowPage />} />
+            <Route path="permissions">
+              <Route index element={<PermissionsListPage />} />
+              <Route path="create" element={<PermissionCreatePage />} />
+              <Route path="edit/:id" element={<PermissionEditPage />} />
+              <Route path="show/:id" element={<PermissionShowPage />} />
+            </Route>
 
-            {/* Country & Location Types */}
-            <Route path="locations/countries" element={<CountriesListPage />} />
-            <Route path="locations/types" element={<LocationTypesListPage />} />
+            <Route path="users">
+              <Route index element={<UsersListPage />} />
+              <Route path="create" element={<UserCreatePage />} />
+              <Route path="edit/:id" element={<UserEditPage />} />
+              <Route path="show/:id" element={<UserShowPage />} />
+            </Route>
+
+            <Route path="roles">
+              <Route index element={<RolesListPage />} />
+              <Route path="create" element={<RoleCreatePage />} />
+              <Route path="edit/:id" element={<RoleEditPage />} />
+              <Route path="show/:id" element={<RoleShowPage />} />
+            </Route>
+
+            <Route path="companies">
+              <Route index element={<CompaniesListPage />} />
+              <Route path="create" element={<CompanyCreatePage />} />
+              <Route path="edit/:id" element={<CompanyEditPage />} />
+              <Route path="show/:id" element={<CompanyShowPage />} />
+            </Route>
+
+            <Route path="locations">
+              <Route index element={<LocationsListPage />} />
+              <Route path="create" element={<LocationCreatePage />} />
+              <Route path="edit/:id" element={<LocationEditPage />} />
+              <Route path="show/:id" element={<LocationShowPage />} />
+
+              {/* Country & Location Types */}
+              <Route path="countries" element={<CountriesListPage />} />
+              <Route path="types" element={<LocationTypesListPage />} />
+            </Route>
 
             <Route path="*" element={<NotFound />} />
           </Route>
