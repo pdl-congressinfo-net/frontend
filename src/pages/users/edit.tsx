@@ -9,7 +9,7 @@ import { useLayout } from "../../providers/layout-provider";
 
 const UserEditPage = () => {
   const { setTitle, setActions } = useLayout();
-  const { list } = useNavigation();
+  const { list, edit } = useNavigation();
   const { id } = useParams<{ id: string }>();
   const { mutate: updateUser } = useUpdate();
   const {
