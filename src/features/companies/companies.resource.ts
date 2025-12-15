@@ -20,3 +20,11 @@ export const companyEmployeeResource = {
     parentmodule: "companies",
   },
 };
+
+export const sponsoringsResource = {
+  name: "sponsorings",
+  list: "/admin/sponsorings",
+  create: "/admin/sponsorings/create",
+  edit: "/admin/sponsorings/edit/:id",
+  show: "/admin/sponsorings/show/:id",
+};

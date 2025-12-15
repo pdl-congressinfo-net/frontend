@@ -13,13 +13,29 @@ export interface UpdateCompanyRequest {
 export interface CreateCompanyEmployeeRequest {
   departement?: string;
   function?: string;
-  user_id?: string;
+  contact_id?: string;
   company_id?: string;
 }
 
 export interface UpdateCompanyEmployeeRequest {
   departement?: string;
   function?: string;
-  user_id?: string;
+  contact_id?: string;
   company_id?: string;
+}
+
+export interface CreateSponsoringRequest {
+  name: string;
+  value?: number;
+  employee_id?: string;
+  contact_id?: string;
+  event_id?: string;
+}
+
+export interface UpdateSponsoringRequest {
+  name?: string;
+  value?: number;
+  employee_id?: string;
+  contact_id?: string;
+  event_id?: string;
 }

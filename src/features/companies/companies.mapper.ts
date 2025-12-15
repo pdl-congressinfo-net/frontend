@@ -1,5 +1,9 @@
-import { Company, CompanyEmployee } from "./companies.model";
-import { CompanyDTO, CompanyEmployeeDTO } from "./companies.responses";
+import { Company, CompanyEmployee, Sponsoring } from "./companies.model";
+import {
+  CompanyDTO,
+  CompanyEmployeeDTO,
+  SponsoringDTO,
+} from "./companies.responses";
 
 export default {
   companies: (dto: CompanyDTO): Company => ({
@@ -12,7 +16,15 @@ export default {
     id: dto.id,
     departement: dto.departement,
     function: dto.function,
-    userId: dto.user_id,
+    contactId: dto.contact_id,
     companyId: dto.company_id,
+  }),
+  sponsorings: (dto: SponsoringDTO): Sponsoring => ({
+    id: dto.id,
+    name: dto.name,
+    value: dto.value,
+    employeeId: dto.employee_id,
+    contactId: dto.contact_id,
+    eventId: dto.event_id,
   }),
 };

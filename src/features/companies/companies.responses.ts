@@ -9,6 +9,15 @@ export interface CompanyEmployeeDTO {
   id: string;
   departement?: string;
   function?: string;
-  user_id?: string;
+  contact_id?: string;
   company_id?: string;
+}
+
+export interface SponsoringDTO {
+  id: string;
+  name: string;
+  value: number;
+  employee_id?: string;
+  contact_id?: string;
+  event_id?: string;
 }

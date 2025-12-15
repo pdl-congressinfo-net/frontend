@@ -9,6 +9,15 @@ export interface CompanyEmployee {
   id: string;
   departement?: string;
   function?: string;
-  userId?: string;
+  contactId?: string;
   companyId?: string;
+}
+
+export interface Sponsoring {
+  id: string;
+  name: string;
+  value: number;
+  employeeId?: string;
+  contactId?: string;
+  eventId?: string;
 }
