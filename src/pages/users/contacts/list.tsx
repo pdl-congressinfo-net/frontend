@@ -24,18 +24,22 @@ const ContactsListPage = () => {
             header: "Title",
             sortable: true,
             searchable: true,
+            visible: false,
           },
           {
             key: "lastName",
             header: "Last Name",
             sortable: true,
             searchable: true,
+            visible: false,
           },
           {
             key: "firstName",
-            header: "First Name",
+            header: "Name",
             sortable: true,
             searchable: true,
+            render: (record: Contact) =>
+              `${record.titles ?? ""} ${record.firstName ?? ""} ${record.lastName ?? ""}`.trim(),
           },
           { key: "phoneNumber", header: "Phone" },
           {
