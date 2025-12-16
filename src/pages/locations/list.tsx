@@ -1,12 +1,8 @@
-import { Box, Button, IconButton, Table } from "@chakra-ui/react";
-import {
-  useLink,
-  useList,
-  useNavigation,
-  useTranslation,
-} from "@refinedev/core";
-import { useEffect } from "react";
+import { Box, Button, IconButton } from "@chakra-ui/react";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useCallback, useEffect, useState } from "react";
 import { LuCirclePlus } from "react-icons/lu";
+import { DataTable } from "../../components/Common/DataTable";
 import { Location } from "../../features/locations/location.model";
 import { useLayout } from "../../providers/layout-provider";
 
@@ -26,15 +22,43 @@ const LocationsCreateActions = () => {
 };
 
 const LocationsListPage = () => {
+  const [countryIds, setCountryIds] = useState<string[]>([]);
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
-  const { create, show } = useNavigation();
-  const Link = useLink();
+  const { show } = useNavigation();
+
+  const onDataChange = useCallback((data: Location[]) => {
+    const ids = Array.from(
+      new Set(
+        data
+          .map((location) => location.countryId)
+          .filter((id): id is string => id != null),
+      ),
+    );
+    // Only update state if ids actually changed to avoid render loops
+    setCountryIds((prev) => {
+      if (prev.length === ids.length && prev.every((v, i) => v === ids[i])) {
+        return prev;
+      }
+      return ids;
+    });
+  }, []);
+
   const {
-    result: data,
-    query: { isLoading },
-  } = useList<Location>({
-    resource: "locations",
+    result: { data: countries },
+  } = useList({
+    resource: "countries",
+    meta: { parentModule: "locations" },
+    filters:
+      countryIds.length > 0
+        ? [
+            {
+              field: "id",
+              operator: "in",
+              value: countryIds,
+            },
+          ]
+        : [],
   });
 
   useEffect(() => {
@@ -42,46 +66,50 @@ const LocationsListPage = () => {
     setActions(<LocationsCreateActions />);
     return () => setActions(null);
   }, [setTitle, setActions, t]);
-
-  if (isLoading) return <Box>{t("common.loading")}</Box>;
-
   return (
     <Box p={4}>
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>
-              {t("admin.locations.table.name")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.locations.table.city")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.locations.table.state")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.locations.table.actions")}
-            </Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {data?.data.map((location) => (
-            <Table.Row key={location.id}>
-              <Table.Cell>{location.name}</Table.Cell>
-              <Table.Cell>{location.city}</Table.Cell>
-              <Table.Cell>{location.state}</Table.Cell>
-              <Table.Cell>
-                <Button
-                  size="sm"
-                  onClick={() => show("locations", location.id.toString())}
-                >
-                  {t("common.actions.view")}
-                </Button>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+      <DataTable
+        resource="locations"
+        onDataChange={onDataChange}
+        columns={[
+          {
+            key: "name",
+            header: t("admin.locations.table.name"),
+            searchable: true,
+            sortable: true,
+          },
+          {
+            key: "city",
+            header: t("admin.locations.table.city"),
+            searchable: true,
+            sortable: true,
+          },
+          {
+            key: "countryId",
+            header: t("admin.locations.table.country"),
+            searchable: true,
+            sortable: true,
+            render: (record: Location) => {
+              const country = countries?.find(
+                (country) => country.id === record.countryId,
+              );
+              return country ? country.name : "";
+            },
+          },
+          {
+            key: "actions",
+            header: t("admin.locations.table.actions"),
+            render: (record: Location) => (
+              <Button
+                size="sm"
+                onClick={() => show("locations", record.id.toString())}
+              >
+                {t("common.actions.view")}
+              </Button>
+            ),
+          },
+        ]}
+      />
     </Box>
   );
 };

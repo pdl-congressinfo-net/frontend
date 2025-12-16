@@ -1,8 +1,10 @@
 import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
 import { useBack, useList, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useParams } from "react-router";
+import CountrySelector from "../../components/Location/CountrySelector";
+import LocationTypeSelector from "../../components/Location/LocationTypeSelector";
 import {
   Country,
   Location,
@@ -21,6 +23,7 @@ const LocationEditPage = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<UpdateLocationRequest>();
 
   const {
@@ -37,7 +40,7 @@ const LocationEditPage = () => {
   });
 
   const { result: locationTypes } = useList<LocationType>({
-    resource: "locationtypes",
+    resource: "types",
     meta: { parentModule: "locations" },
   });
 
@@ -145,27 +148,34 @@ const LocationEditPage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Country</Field.Label>
-            <select {...register("country_id")}>
-              <option value="">Select a country</option>
-              {countries?.data.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="country_id"
+              control={control}
+              render={({ field }) => (
+                <CountrySelector
+                  value={field.value ?? null}
+                  onChange={(val) => field.onChange(val ?? "")}
+                  preferredFirst
+                  width="100%"
+                  size="md"
+                />
+              )}
+            />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Location Type</Field.Label>
-            <select {...register("location_type_id")}>
-              <option value="">Select a type</option>
-              {locationTypes?.data.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="location_type_id"
+              control={control}
+              render={({ field }) => (
+                <LocationTypeSelector
+                  value={field.value ?? null}
+                  onChange={(val) => field.onChange(val ?? "")}
+                  width="100%"
+                  size="md"
+                />
+              )}
+            />
           </Field.Root>
 
           <Button type="submit">Update Location</Button>

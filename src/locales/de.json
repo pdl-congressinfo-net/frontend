@@ -19,6 +19,7 @@
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "optional": "Optional",
+    "translated": "Übersetzt",
     "actions": {
       "view": "Ansehen",
       "edit": "Bearbeiten",
@@ -172,6 +173,11 @@
     "map": {
       "preview": "Vorschau",
       "noLocationSelected": "Kein Standort ausgewählt — klicken Sie, um die Karte zu öffnen"
+    },
+    "types": {
+      "COM": "Unternehmen",
+      "SIT": "Standort",
+      "WEB": "Online"
     }
   },
   "admin": {
@@ -246,6 +252,19 @@
         }
       }
     },
+    "contacts": {
+      "title": "Kontakte",
+      "actions": {
+        "create": "Kontakt erstellen"
+      },
+      "table": {
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "email": "E-Mail",
+        "company": "Unternehmen",
+        "actions": "Aktionen"
+      }
+    },
     "roles": {
       "title": "Rollen",
       "default": "Standardrolle",
@@ -273,8 +292,8 @@
       "confirmDelete": "Sind Sie sicher, dass Sie diese Veranstaltungsart löschen möchten?",
       "table": {
         "code": "Code",
-        "nameDe": "Name (DE)",
-        "nameEn": "Name (EN)"
+        "name": "Name",
+        "actions": "Aktionen"
       }
     },
     "permissions": {
