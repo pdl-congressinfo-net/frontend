@@ -3,9 +3,8 @@ import {
   Button,
   Card,
   Flex,
-  Icon,
   Spinner,
-  Tabs,
+  Steps,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -109,9 +108,7 @@ const Upsert = ({
     return base;
   }, [extraTabs]);
 
-  const [currentStep, setCurrentStep] = React.useState(
-    () => mergedSteps[0]?.id ?? "event",
-  );
+  const [stepValue, setStepValue] = React.useState<number>(1);
   const [eventInfo, setEventInfo] = React.useState<StoredEventInfo | null>(
     null,
   );
@@ -129,10 +126,12 @@ const Upsert = ({
   });
 
   React.useEffect(() => {
-    if (!mergedSteps.some((step) => step.id === currentStep)) {
-      setCurrentStep(mergedSteps[0]?.id ?? "event");
-    }
-  }, [mergedSteps, currentStep]);
+    // Clamp step within range when steps change
+    setStepValue((prev) => {
+      const max = Math.max(1, mergedSteps.length);
+      return Math.min(Math.max(prev, 1), max);
+    });
+  }, [mergedSteps]);
 
   React.useEffect(() => {
     setStatus((prev) => {
@@ -149,17 +148,22 @@ const Upsert = ({
     [mergedSteps],
   );
 
+  const currentStepIndex = React.useMemo(
+    () => Math.max(0, Math.min(stepValue - 1, stepOrder.length - 1)),
+    [stepValue, stepOrder.length],
+  );
+  const currentStepId = React.useMemo(
+    () => stepOrder[currentStepIndex] ?? "event",
+    [stepOrder, currentStepIndex],
+  );
+
   const goNext = React.useCallback(() => {
-    const idx = stepOrder.indexOf(currentStep);
-    const nextId = stepOrder[Math.min(idx + 1, stepOrder.length - 1)];
-    setCurrentStep(nextId);
-  }, [currentStep, stepOrder]);
+    setStepValue((prev) => Math.min(prev + 1, stepOrder.length));
+  }, [stepOrder.length]);
 
   const goPrevious = React.useCallback(() => {
-    const idx = stepOrder.indexOf(currentStep);
-    const prevId = stepOrder[Math.max(idx - 1, 0)];
-    setCurrentStep(prevId);
-  }, [currentStep, stepOrder]);
+    setStepValue((prev) => Math.max(prev - 1, 1));
+  }, []);
 
   const handleBasicStatus = React.useCallback(
     (s: StepStatus) => setStatus((prev) => ({ ...prev, event: s })),
@@ -714,92 +718,93 @@ const Upsert = ({
     <>
       <Card.Root shadow="md" border="1px solid" borderColor="gray.200">
         <Card.Body>
-          <Tabs.Root
+          <Steps.Root
             orientation="vertical"
-            value={currentStep}
-            onValueChange={(e) => setCurrentStep(e.value)}
+            height="65vh"
+            step={stepValue}
+            onStepChange={(e) => setStepValue(e.step)}
+            count={mergedSteps.length}
+            colorPalette="brand"
           >
             <Flex direction="row" gap={4}>
-              <Box width="20vw" height="65vh" py={4} alignContent="center">
-                <Tabs.List display="flex" flexDirection="column" gap={2}>
-                  {mergedSteps.map((step) => {
+              <Box width="12vw" height="65vh" py={4} alignContent="center">
+                <Steps.List display="flex" flexDirection="column" gap={2}>
+                  {mergedSteps.map((step, index) => {
                     const stepStatus = status[step.id] ?? "open";
                     const statusIndicator = getStatusIndicator(stepStatus);
-                    const isActive = currentStep === step.id;
+                    const isActive = currentStepId === step.id;
                     return (
-                      <Tabs.Trigger
-                        key={step.id}
-                        value={step.id}
-                        display="flex"
-                        alignItems="center"
-                        gap={3}
-                        py={3}
-                        px={4}
-                        borderRadius="md"
-                        cursor="pointer"
-                      >
-                        <Box
-                          position="relative"
+                      <Steps.Item key={step.id} index={index}>
+                        <Steps.Trigger
                           display="flex"
                           alignItems="center"
-                          justifyContent="center"
-                          minWidth="24px"
+                          gap={3}
+                          py={3}
+                          px={4}
+                          borderRadius="md"
+                          cursor="pointer"
                         >
-                          <Icon
-                            size={isActive ? "lg" : "md"}
-                            color={statusIndicator.color}
-                            transition="0.2s ease-in-out"
+                          <Steps.Indicator color={statusIndicator.color}>
+                            <Steps.Status
+                              complete={statusIndicator.element}
+                              incomplete={statusIndicator.element}
+                            />
+                          </Steps.Indicator>
+                          <Box
+                            flex="1"
+                            textAlign="left"
+                            fontSize="sm"
+                            fontWeight={isActive ? "bold" : "normal"}
                           >
-                            {statusIndicator.element}
-                          </Icon>
-                        </Box>
-                        <Box
-                          flex="1"
-                          textAlign="left"
-                          fontSize="sm"
-                          fontWeight={isActive ? "bold" : "normal"}
-                        >
-                          {step.title}
-                        </Box>
-                      </Tabs.Trigger>
+                            <Steps.Title>{step.title}</Steps.Title>
+                          </Box>
+                        </Steps.Trigger>
+                        <Steps.Separator />
+                      </Steps.Item>
                     );
                   })}
-                </Tabs.List>
+                </Steps.List>
               </Box>
               <Box flex="1" height="65vh" overflowY="auto" py={4} width="80vw">
-                <Tabs.Content value="event">
-                  <BasicInformation
-                    onNext={goNext}
-                    onPrevious={goPrevious}
-                    onStatus={handleBasicStatus}
-                    onSave={(data) => handleSave(data, "event")}
-                    initialValues={eventValuesForRender}
-                    onChange={handleBasicChange}
-                  />
-                </Tabs.Content>
-                <Tabs.Content value="location">
-                  <Location
-                    key={locationRenderKey}
-                    onNext={goNext}
-                    onPrevious={goPrevious}
-                    onStatus={handleLocationStatus}
-                    onSave={(data) => handleSave(data, "location")}
-                    initialValues={locationInitialValues}
-                    isWebinar={isWebinar}
-                  />
-                </Tabs.Content>
-                {mergedSteps
-                  .filter(
-                    (step) => step.id !== "event" && step.id !== "location",
-                  )
-                  .map((step) => (
-                    <Tabs.Content key={step.id} value={step.id}>
+                {mergedSteps.map((step, index) => {
+                  if (step.id === "event") {
+                    return (
+                      <Steps.Content key={step.id} index={index}>
+                        <BasicInformation
+                          onNext={goNext}
+                          onPrevious={goPrevious}
+                          onStatus={handleBasicStatus}
+                          onSave={(data) => handleSave(data, "event")}
+                          initialValues={eventValuesForRender}
+                          onChange={handleBasicChange}
+                        />
+                      </Steps.Content>
+                    );
+                  }
+                  if (step.id === "location") {
+                    return (
+                      <Steps.Content key={step.id} index={index}>
+                        <Location
+                          key={locationRenderKey}
+                          onNext={goNext}
+                          onPrevious={goPrevious}
+                          onStatus={handleLocationStatus}
+                          onSave={(data) => handleSave(data, "location")}
+                          initialValues={locationInitialValues}
+                          isWebinar={isWebinar}
+                        />
+                      </Steps.Content>
+                    );
+                  }
+                  return (
+                    <Steps.Content key={step.id} index={index}>
                       {renderAdditionalTab(step.id, step.title)}
-                    </Tabs.Content>
-                  ))}
+                    </Steps.Content>
+                  );
+                })}
               </Box>
             </Flex>
-          </Tabs.Root>
+          </Steps.Root>
         </Card.Body>
       </Card.Root>
     </>
