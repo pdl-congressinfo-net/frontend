@@ -87,10 +87,20 @@ export function DataTable<T extends BaseRecord>({
     return pageSizeOptionsMemo;
   }, [result?.total, pageSizeOptionsMemo]);
 
-  // Adjust page size if total is smaller than current page size
+  // Adjust page size dynamically based on total results
   useEffect(() => {
-    if (result?.total && result.total < pageSize) {
-      setPageSize(result.total);
+    const total = result?.total || 0;
+
+    // If total is less than current pageSize, reduce it
+    if (total > 0 && total < pageSize) {
+      setPageSize(total);
+    }
+    // If total is now larger and pageSize is not in default options, reset to default
+    else if (
+      total >= pageSizeOptionsMemo[0] &&
+      !pageSizeOptionsMemo.includes(pageSize)
+    ) {
+      setPageSize(pageSizeOptionsMemo[0]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result?.total]);
@@ -136,8 +146,6 @@ export function DataTable<T extends BaseRecord>({
         next = [];
       }
     }
-
-    console.log("Setting sorters to:", next);
 
     setSorters(next);
     setCurrentPage(1);
@@ -298,7 +306,6 @@ export function DataTable<T extends BaseRecord>({
               <NativeSelect.Field
                 value={pageSize}
                 onChange={(e) => {
-                  console.log(e.currentTarget.value);
                   setPageSize(Number(e.currentTarget.value));
                 }}
               >
