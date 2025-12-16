@@ -9,9 +9,14 @@ import {
   Table,
   Text,
 } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useTable, type BaseRecord, type CrudSort } from "@refinedev/core";
+import {
+  useTable,
+  type BaseRecord,
+  type CrudFilters,
+  type CrudSort,
+} from "@refinedev/core";
 import {
   LuChevronDown,
   LuChevronLeft,
@@ -40,6 +45,7 @@ type DataTableProps<T extends BaseRecord> = {
   defaultPageSizeOptions?: number[];
   interactive?: boolean;
   onDataChange?: (data: T[], total: number) => void;
+  globalFilters?: CrudFilters;
 };
 
 export function DataTable<T extends BaseRecord>({
@@ -49,6 +55,7 @@ export function DataTable<T extends BaseRecord>({
   defaultPageSizeOptions = [10, 20, 50],
   interactive = true,
   onDataChange,
+  globalFilters = [],
 }: DataTableProps<T>) {
   const {
     result,
@@ -182,25 +189,49 @@ export function DataTable<T extends BaseRecord>({
   };
 
   useEffect(() => {
-    if (!searchableFields.length) return;
+    // Helper to stable-stringify filters for equality check
+    const makeKey = (filters: CrudFilters) =>
+      JSON.stringify(filters.map((f) => ({ ...f, value: f.value })));
 
-    if (!search.trim()) {
-      // Only clear filters if there's actually something to clear
-      setFilters([], "replace");
-      return;
-    }
-
-    setFilters(
-      searchableFields.map((field) => ({
+    const nextFilters: CrudFilters = (() => {
+      if (!searchableFields.length) {
+        return globalFilters;
+      }
+      if (!search.trim()) {
+        return globalFilters;
+      }
+      const searchFilters: CrudFilters = searchableFields.map((field) => ({
         field,
         operator: "contains",
         value: search,
-      })),
-      "replace",
-    );
+      }));
+      return [...globalFilters, ...searchFilters];
+    })();
 
-    setCurrentPage(1);
-  }, [search, setFilters, setCurrentPage]);
+    // Only update if filters actually changed
+    const key = makeKey(nextFilters);
+    if (key !== lastFiltersKeyRef.current) {
+      setFilters(nextFilters, "replace");
+      lastFiltersKeyRef.current = key;
+      setCurrentPage(1);
+    }
+  }, [search, setFilters, setCurrentPage, searchableFields, globalFilters]);
+
+  // Track last applied filters to avoid update loops
+  const lastFiltersKeyRef = useRef<string>("__init__");
+
+  // Initialize with global filters on mount and when they change
+  useEffect(() => {
+    const makeKey = (filters: CrudFilters) =>
+      JSON.stringify(filters.map((f) => ({ ...f, value: f.value })));
+    const key = makeKey(globalFilters);
+    if (key !== lastFiltersKeyRef.current) {
+      setFilters(globalFilters, "replace");
+      lastFiltersKeyRef.current = key;
+      setCurrentPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalFilters]);
 
   return (
     <>
