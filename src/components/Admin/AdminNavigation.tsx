@@ -24,7 +24,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
     {
       label: "UserManagement",
       icon: LuCircleUser,
-      ressources: ["users", "companies", "locations"],
+      ressources: ["users", "contacts", "companies", "locations"],
     },
     {
       label: "AccessControl",
