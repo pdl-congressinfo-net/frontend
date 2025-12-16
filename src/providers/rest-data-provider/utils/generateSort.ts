@@ -1,4 +1,5 @@
 import type { CrudSorting } from "@refinedev/core";
+import { camelToSnakeCase } from "../../../utils/helpers";
 
 export const generateSort = (sorters?: CrudSorting) => {
   if (sorters && sorters.length > 0) {
@@ -6,7 +7,8 @@ export const generateSort = (sorters?: CrudSorting) => {
     const _order: string[] = [];
 
     sorters.map((item) => {
-      _sort.push(item.field);
+      // Convert camelCase field names to snake_case for backend compatibility
+      _sort.push(camelToSnakeCase(item.field));
       _order.push(item.order);
     });
 

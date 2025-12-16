@@ -1,4 +1,5 @@
 import type { CrudFilters } from "@refinedev/core";
+import { camelToSnakeCase } from "../../../utils/helpers";
 import { mapOperator } from "./mapOperator";
 
 export const generateFilter = (filters?: CrudFilters) => {
@@ -20,8 +21,10 @@ export const generateFilter = (filters?: CrudFilters) => {
           return;
         }
 
+        // Convert camelCase field names to snake_case for backend compatibility
+        const snakeField = camelToSnakeCase(field);
         const mappedOperator = mapOperator(operator);
-        queryFilters[`${field}${mappedOperator}`] = value;
+        queryFilters[`${snakeField}${mappedOperator}`] = value;
       }
     });
   }
