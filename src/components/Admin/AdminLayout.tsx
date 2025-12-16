@@ -19,7 +19,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <AdminNavigation />
         </Box>
         <Box width="80%" p={6}>
-          <Card.Root p={4}>{children}</Card.Root>
+          <Card.Root p={4}>
+            <Card.Header mb={4}>
+              <Flex justify="space-between" align="center">
+                <Box fontSize="xl" fontWeight="bold">
+                  {title || translate("admin.title")}
+                </Box>
+                <Box>{actions}</Box>
+              </Flex>
+            </Card.Header>
+            {children}
+          </Card.Root>
         </Box>
       </Flex>
     </Box>

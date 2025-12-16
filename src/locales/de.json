@@ -175,6 +175,7 @@
     }
   },
   "admin": {
+    "title": "Admin-Bereich",
     "dashboard": {
       "title": "Admin-Dashboard",
       "welcome": "Willkommen im Admin-Dashboard"
