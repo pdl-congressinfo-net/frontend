@@ -21,8 +21,6 @@ const config = defineConfig({
       pageHeader: {
         value: {
           bg: "bg.surface",
-          borderBottomWidth: "1px",
-          borderColor: "border.default",
           px: 6,
           py: 4,
         },
