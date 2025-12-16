@@ -36,14 +36,14 @@ type DataTableProps<T extends BaseRecord> = {
   resource: string;
   parentModule?: string;
   columns: Column<T>[];
-  pageSizeOptions?: number[];
+  defaultPageSizeOptions?: number[];
 };
 
 export function DataTable<T extends BaseRecord>({
   resource,
   parentModule,
   columns,
-  pageSizeOptions = [10, 20, 50],
+  defaultPageSizeOptions = [10, 20, 50],
 }: DataTableProps<T>) {
   const {
     result,
@@ -73,6 +73,28 @@ export function DataTable<T extends BaseRecord>({
 
   const [search, setSearch] = useState("");
 
+  // Memoize default page size options to prevent recreating on every render
+  const pageSizeOptionsMemo = useMemo(
+    () => defaultPageSizeOptions,
+    [defaultPageSizeOptions.join(",")]
+  );
+
+  // Calculate page size options based on total results
+  const pageSizeOptions = useMemo(() => {
+    if (result?.total && result.total < pageSizeOptionsMemo[0]) {
+      return [result.total];
+    }
+    return pageSizeOptionsMemo;
+  }, [result?.total, pageSizeOptionsMemo]);
+
+  // Adjust page size if total is smaller than current page size
+  useEffect(() => {
+    if (result?.total && result.total < pageSize) {
+      setPageSize(result.total);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result?.total]);
+
   // Memoize visible columns (columns with visible !== false)
   const visibleColumns = useMemo(
     () => columns.filter((c) => c.visible !== false),
@@ -85,31 +107,58 @@ export function DataTable<T extends BaseRecord>({
     [columns],
   );
 
-  const toggleSort = (field: string) => {
+  const toggleSort = (field: string, multiSort: boolean = false) => {
     const existing = sorters.find((s) => s.field === field);
 
     let next: CrudSort[];
 
-    if (!existing) {
-      next = [{ field, order: "asc" }];
-    } else if (existing.order === "asc") {
-      next = [{ field, order: "desc" }];
+    if (multiSort) {
+      // Multi-sort mode: Shift+Click to add/modify additional sorts
+      if (!existing) {
+        // Add new sort to existing sorts
+        next = [...sorters, { field, order: "asc" }];
+      } else if (existing.order === "asc") {
+        // Change to desc
+        next = sorters.map((s) =>
+          s.field === field ? { field, order: "desc" } : s
+        );
+      } else {
+        // Remove this sort
+        next = sorters.filter((s) => s.field !== field);
+      }
     } else {
-      next = [];
+      // Single sort mode: Replace all sorts
+      if (!existing) {
+        next = [{ field, order: "asc" }];
+      } else if (existing.order === "asc") {
+        next = [{ field, order: "desc" }];
+      } else {
+        next = [];
+      }
     }
+
+    console.log("Setting sorters to:", next);
 
     setSorters(next);
     setCurrentPage(1);
   };
 
   const getSortIcon = (field: string) => {
-    const sorter = sorters.find((s) => s.field === field);
-    if (!sorter) return <LuChevronsUpDown size={14} opacity={0.3} />;
+    const sorterIndex = sorters.findIndex((s) => s.field === field);
+    if (sorterIndex === -1) return <LuChevronsUpDown size={14} opacity={0.3} />;
+
+    const sorter = sorters[sorterIndex];
     return sorter.order === "asc" ? (
       <LuChevronUp size={14} />
     ) : (
       <LuChevronDown size={14} />
     );
+  };
+
+  const getSortNumber = (field: string) => {
+    if (sorters.length <= 1) return null;
+    const sorterIndex = sorters.findIndex((s) => s.field === field);
+    return sorterIndex !== -1 ? sorterIndex + 1 : null;
   };
 
   useEffect(() => {
@@ -213,7 +262,7 @@ export function DataTable<T extends BaseRecord>({
 
       {/* Pagination */}
       <Pagination.Root
-        count={pageCount * pageSize}
+        count={result.total ?? 0}
         pageSize={pageSize}
         page={currentPage}
         onPageChange={(e) => setCurrentPage(e.page)}
@@ -242,7 +291,7 @@ export function DataTable<T extends BaseRecord>({
             </Pagination.NextTrigger>
           </ButtonGroup>
           <HStack>
-            <NativeSelect.Root>
+            <NativeSelect.Root disabled={result?.total == pageSize}>
               <NativeSelect.Field
                 value={pageSize}
                 onChange={(e) => {
