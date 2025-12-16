@@ -6,11 +6,12 @@ import { useLayout } from "../../providers/layout-provider";
 
 const AdminDashboard = () => {
   const { translate: t } = useTranslation();
-  const { setTitle } = useLayout();
+  const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
 
   useEffect(() => {
     setTitle(t("admin.dashboard.title"));
+    setActions(null);
   }, [setTitle, t]);
 
   return <Text>{t("admin.dashboard.welcome")}</Text>;
