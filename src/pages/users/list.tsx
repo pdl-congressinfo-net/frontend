@@ -1,11 +1,35 @@
-import { Box } from "@chakra-ui/react";
+import { Box, IconButton } from "@chakra-ui/react";
 import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useEffect } from "react";
+import { LuCirclePlus } from "react-icons/lu";
 import { DataTable } from "../../components/Common/DataTable";
 import { User } from "../../features/users/users.model";
+import { useLayout } from "../../providers/layout-provider";
+
+const UserCreateActions = () => {
+  const { create } = useNavigation();
+
+  return (
+    <IconButton
+      onClick={() => create("users")}
+      variant="ghost"
+      aria-label="Create User"
+      rounded="full"
+    >
+      <LuCirclePlus />
+    </IconButton>
+  );
+};
 
 const UsersListPage = () => {
   const { translate: t } = useTranslation();
   const { show } = useNavigation();
+
+  const { setActions, setTitle } = useLayout();
+  useEffect(() => {
+    setTitle(t("admin.users.title", "Users"));
+    setActions(<UserCreateActions />);
+  }, [setTitle, setActions]);
   const {
     result: data,
     query: { isLoading },

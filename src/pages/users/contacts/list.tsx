@@ -1,11 +1,34 @@
-import { Box, Button, HStack } from "@chakra-ui/react";
+import { Box, Button, HStack, IconButton } from "@chakra-ui/react";
 import { CanAccess, useNavigation, useTranslation } from "@refinedev/core";
+import { useEffect } from "react";
+import { LuCirclePlus } from "react-icons/lu";
 import { DataTable } from "../../../components/Common/DataTable";
 import { Contact } from "../../../features/users/users.model";
+import { useLayout } from "../../../providers/layout-provider";
+
+const ContactCreateActions = () => {
+  const { create } = useNavigation();
+
+  return (
+    <IconButton
+      onClick={() => create("contacts")}
+      variant="ghost"
+      aria-label="Create Contact"
+      rounded="full"
+    >
+      <LuCirclePlus />
+    </IconButton>
+  );
+};
 
 const ContactsListPage = () => {
   const { translate: t } = useTranslation();
   const { edit } = useNavigation();
+  const { setActions, setTitle } = useLayout();
+  useEffect(() => {
+    setTitle(t("admin.contacts.title", "Contacts"));
+    setActions(<ContactCreateActions />);
+  }, [setTitle, setActions]);
 
   return (
     <Box p={4}>

@@ -12,7 +12,7 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { translate } = useTranslation();
   const back = useBack();
-  const { title, actions } = useLayout();
+  const { title, actions, contentTitle } = useLayout();
 
   return (
     <Box as="main" flex="1" bg="ui.background" width="80%" mx="auto">
@@ -23,7 +23,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <Box width="80%" p={6}>
           <Box layerStyle="pageHeader">
             <Flex justify="space-between" align="center" gap={4}>
-              <Heading textStyle="pageTitle">{title}</Heading>
+              {contentTitle ? (
+                <Box>{contentTitle}</Box>
+              ) : (
+                <Heading textStyle="pageTitle">{title}</Heading>
+              )}
               <HStack layerStyle="actionBar">
                 {actions}
                 <Button onClick={() => back()} variant="ghost">

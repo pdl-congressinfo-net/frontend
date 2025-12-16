@@ -7,7 +7,7 @@ import {
   useParsed,
   useTranslation,
 } from "@refinedev/core";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { DataTable } from "../../../components/Common/DataTable";
 import {
   Company,
@@ -31,8 +31,10 @@ const CompanyEmployeesListPage = () => {
     pathname,
     params: { companyId },
   } = useParsed<MyParams>();
-  setTitle(t("admin.companies.employees.title", "Company Employees"));
-  setActions(null);
+  useEffect(() => {
+    setTitle(t("admin.companies.employees.title", "Company Employees"));
+    setActions(null);
+  }, [setTitle, setActions, t]);
   const { result: company } = useOne<Company>({
     resource: "companies",
     id: companyId!,

@@ -1,18 +1,39 @@
 import { Box, IconButton } from "@chakra-ui/react";
 import { useList, useNavigation, useTranslation } from "@refinedev/core";
-import { useState } from "react";
-import { LuEye, LuUserSearch } from "react-icons/lu";
+import { useEffect, useState } from "react";
+import { LuCirclePlus, LuEye, LuUserSearch } from "react-icons/lu";
 import { DataTable } from "../../components/Common/DataTable";
 import { Tooltip } from "../../components/ui/tooltip";
 import {
   Company,
   CompanyEmployee,
 } from "../../features/companies/companies.model";
+import { useLayout } from "../../providers/layout-provider";
+
+const CompanyCreateActions = () => {
+  const { create } = useNavigation();
+
+  return (
+    <IconButton
+      onClick={() => create("companies")}
+      variant="ghost"
+      aria-label="Create Company"
+      rounded="full"
+    >
+      <LuCirclePlus />
+    </IconButton>
+  );
+};
 
 const CompaniesListPage = () => {
   const { translate: t } = useTranslation();
+  const { setActions, setTitle } = useLayout();
   const { show } = useNavigation();
   const [companies, setCompanies] = useState<Company[]>([]);
+  useEffect(() => {
+    setTitle(t("admin.companies.title", "Companies"));
+    setActions(<CompanyCreateActions />);
+  }, [setTitle, setActions]);
 
   const {
     result: { data: employees },

@@ -1,5 +1,5 @@
 import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
-import { useNavigation, useOne, useUpdate } from "@refinedev/core";
+import { useBack, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router";
@@ -7,7 +7,7 @@ import { Contact } from "../../../features/users/users.model";
 import { UpdateContactRequest } from "../../../features/users/users.requests";
 
 const ContactEditPage = () => {
-  const { list } = useNavigation();
+  const back = useBack();
   const { id } = useParams<{ id: string }>();
   const { mutate: update } = useUpdate();
   const {
@@ -46,7 +46,7 @@ const ContactEditPage = () => {
         values,
         meta: { parentModule: "users" },
       },
-      { onSuccess: () => list("contacts") },
+      { onSuccess: () => back() },
     );
   };
 

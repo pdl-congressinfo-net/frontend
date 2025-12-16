@@ -7,6 +7,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useLayout } from "../../providers/layout-provider";
 
@@ -16,8 +17,10 @@ export default function NotFound() {
   const navigate = useNavigate();
   const { setTitle, setActions } = useLayout();
 
-  setTitle("");
-  setActions(null);
+  useEffect(() => {
+    setTitle("");
+    setActions(null);
+  }, [setTitle, setActions]);
 
   const handleGoBack = () => {
     navigate(-1);

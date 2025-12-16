@@ -1,4 +1,4 @@
-import { Box, Button, Table } from "@chakra-ui/react";
+import { Box, Button, IconButton, Table } from "@chakra-ui/react";
 import {
   useLink,
   useList,
@@ -6,8 +6,24 @@ import {
   useTranslation,
 } from "@refinedev/core";
 import { useEffect } from "react";
+import { LuCirclePlus } from "react-icons/lu";
 import { Location } from "../../features/locations/location.model";
 import { useLayout } from "../../providers/layout-provider";
+
+const LocationsCreateActions = () => {
+  const { create } = useNavigation();
+
+  return (
+    <IconButton
+      onClick={() => create("locations")}
+      variant="ghost"
+      aria-label="Create Location"
+      rounded="full"
+    >
+      <LuCirclePlus />
+    </IconButton>
+  );
+};
 
 const LocationsListPage = () => {
   const { translate: t } = useTranslation();
@@ -23,11 +39,7 @@ const LocationsListPage = () => {
 
   useEffect(() => {
     setTitle(t("admin.locations.title"));
-    setActions(
-      <Link to="/admin/locations/create">
-        <Button>{t("admin.locations.actions.create")}</Button>
-      </Link>,
-    );
+    setActions(<LocationsCreateActions />);
     return () => setActions(null);
   }, [setTitle, setActions, t]);
 
