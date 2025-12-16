@@ -27,9 +27,10 @@ type Column<T> = {
   sortable?: boolean;
   searchable?: boolean;
   isDate?: boolean;
-  visible?: boolean; // default: true - if false, column won't be rendered but can still be used for filtering/sorting
+  visible?: boolean;
   render?: (record: T) => React.ReactNode;
   width?: string;
+  textAlign?: "left" | "center" | "right";
 };
 
 type DataTableProps<T extends BaseRecord> = {
@@ -37,6 +38,8 @@ type DataTableProps<T extends BaseRecord> = {
   parentModule?: string;
   columns: Column<T>[];
   defaultPageSizeOptions?: number[];
+  interactive?: boolean;
+  onDataChange?: (data: T[], total: number) => void;
 };
 
 export function DataTable<T extends BaseRecord>({
@@ -44,6 +47,8 @@ export function DataTable<T extends BaseRecord>({
   parentModule,
   columns,
   defaultPageSizeOptions = [10, 20, 50],
+  interactive = true,
+  onDataChange,
 }: DataTableProps<T>) {
   const {
     result,
@@ -72,6 +77,13 @@ export function DataTable<T extends BaseRecord>({
   });
 
   const [search, setSearch] = useState("");
+
+  // Notify parent component when data changes
+  useEffect(() => {
+    if (onDataChange && result.data) {
+      onDataChange(result.data, result.total ?? 0);
+    }
+  }, [result.data, result.total, onDataChange]);
 
   // Memoize default page size options to prevent recreating on every render
   const pageSizeOptionsMemo = useMemo(
@@ -203,15 +215,45 @@ export function DataTable<T extends BaseRecord>({
         </HStack>
       )}
 
-      <Table.Root size="sm" variant="outline" tableLayout={"fixed"}>
+      <Table.Root
+        size="sm"
+        variant="outline"
+        tableLayout={"fixed"}
+        interactive={interactive}
+      >
         <Table.Header>
           <Table.Row>
             {visibleColumns.map((col) => (
               <Table.ColumnHeader key={String(col.key)} width={col.width}>
-                <HStack justify="space-between">
+                <HStack
+                  justify={
+                    col.sortable
+                      ? col.textAlign === "right"
+                        ? "flex-end"
+                        : col.textAlign === "center"
+                          ? "center"
+                          : "space-between"
+                      : col.textAlign === "right"
+                        ? "flex-end"
+                        : col.textAlign === "center"
+                          ? "center"
+                          : "flex-start"
+                  }
+                  gap={1}
+                >
+                  {col.sortable && col.textAlign === "right" && (
+                    <IconButton
+                      size="xs"
+                      variant="ghost"
+                      aria-label="Sort column"
+                      onClick={() => toggleSort(String(col.key))}
+                      minW="20px"
+                    >
+                      {getSortIcon(String(col.key))}
+                    </IconButton>
+                  )}
                   <Text lineClamp={1}>{col.header}</Text>
-
-                  {col.sortable && (
+                  {col.sortable && col.textAlign !== "right" && (
                     <IconButton
                       size="xs"
                       variant="ghost"
@@ -245,7 +287,10 @@ export function DataTable<T extends BaseRecord>({
                     : false;
 
                 return (
-                  <Table.Cell key={String(col.key)}>
+                  <Table.Cell
+                    key={String(col.key)}
+                    textAlign={col.textAlign || "left"}
+                  >
                     {shouldHighlight ? (
                       <Highlight
                         query={search}
