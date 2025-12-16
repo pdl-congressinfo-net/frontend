@@ -30,7 +30,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               )}
               <HStack layerStyle="actionBar">
                 {actions}
-                <Button onClick={() => back()} variant="ghost">
+                <Button onClick={back} variant="ghost">
                   <LuArrowLeft />
                   {translate("common.back", "Back")}
                 </Button>

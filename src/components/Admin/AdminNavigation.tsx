@@ -15,6 +15,18 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
   const { translate: t } = useTranslation();
   const { show, list } = useNavigation();
 
+  // Control open accordion values and cap at 2 simultaneously
+  const [openValues, setOpenValues] = React.useState<string[]>([]);
+  const handleValueChange = (details: { value: string[] }) => {
+    const next = details.value ?? [];
+    if (next.length <= 2) {
+      setOpenValues(next);
+    } else {
+      // keep most recent two by preserving order from details
+      setOpenValues(next.slice(-2));
+    }
+  };
+
   const navigation = [
     {
       label: "Events",
@@ -36,7 +48,12 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
   ];
 
   return (
-    <Accordion.Root multiple variant="outline">
+    <Accordion.Root
+      multiple
+      variant="outline"
+      value={openValues}
+      onValueChange={handleValueChange as any}
+    >
       {navigation.map((navItem) => (
         <Accordion.Item key={navItem.label} value={navItem.label}>
           <Accordion.ItemTrigger>
@@ -61,7 +78,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
           </Accordion.ItemTrigger>
           <Accordion.ItemContent>
             <Accordion.ItemBody>
-              <Flex direction="column" ms={5} mt={-4} mb={4} gap={-1}>
+              <Flex direction="column" ms={5} mb={4} gap={-1}>
                 {navItem.ressources.map((ressource) => (
                   <Button
                     onClick={() => list(ressource)}
@@ -69,9 +86,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
                     variant="ghost"
                     justifyContent={"flex-start"}
                     _hover={{
-                      bg: "white",
-                      color: "blue.500",
-                      fontStyle: "underline",
+                      bg: "gray.100",
                     }}
                     ps={7}
                   >
