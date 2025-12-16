@@ -35,9 +35,7 @@ import { permissionResource } from "./features/permissions/permissions.resource"
 import { roleResource } from "./features/roles/roles.resource";
 import {
   contactsResource,
-  userPermissionRessource,
   userRessource,
-  userRoleRessource,
 } from "./features/users/users.resource";
 import AppRoutes from "./pages/Routes";
 import { LayoutProvider } from "./providers/layout-provider";
@@ -66,8 +64,6 @@ function App() {
                   projectId: "vcrr5U-GVoid5-2GKdr3",
                 }}
                 resources={[
-                  userPermissionRessource,
-                  userRoleRessource,
                   userRessource,
                   contactsResource,
                   eventTypeResource,

@@ -32,12 +32,7 @@ import {
   LocationsListPage,
   LocationTypesListPage,
 } from "./locations";
-import {
-  PermissionCreatePage,
-  PermissionEditPage,
-  PermissionShowPage,
-  PermissionsListPage,
-} from "./permissions";
+import { PermissionsListPage } from "./permissions";
 import { RolesListPage } from "./roles";
 import {
   SponsoringCreatePage,
@@ -105,9 +100,6 @@ function AppRoutes() {
 
             <Route path="permissions">
               <Route index element={<PermissionsListPage />} />
-              <Route path="create" element={<PermissionCreatePage />} />
-              <Route path="edit/:id" element={<PermissionEditPage />} />
-              <Route path="show/:id" element={<PermissionShowPage />} />
             </Route>
 
             <Route path="users">
