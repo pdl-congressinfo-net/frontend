@@ -1,13 +1,11 @@
 import { Text } from "@chakra-ui/react";
 import { useTranslation } from "@refinedev/core";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import { useLayout } from "../../providers/layout-provider";
 
 const AdminDashboard = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
-  const navigate = useNavigate();
 
   useEffect(() => {
     setTitle(t("admin.dashboard.title"));

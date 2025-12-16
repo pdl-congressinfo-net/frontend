@@ -145,6 +145,7 @@ const RolesListPage = () => {
 
   useEffect(() => {
     setTitle(t("admin.roles.title"));
+    setActions(null);
   }, [setTitle, setActions, t]);
 
   const submitHandler = (e: React.FormEvent) => {
