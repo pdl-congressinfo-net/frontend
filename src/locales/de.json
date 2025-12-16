@@ -241,7 +241,7 @@
       },
       "table": {
         "name": "Name",
-        "sponsoring": "Sponsoring",
+        "sponsor": "Sponsoring",
         "employeeCount": "Kontaktanzahl",
         "viewContacts": "Kontakte anzeigen"
       },

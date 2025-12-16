@@ -1,7 +1,7 @@
-import { Box, IconButton } from "@chakra-ui/react";
+import { Badge, Box, IconButton } from "@chakra-ui/react";
 import { useList, useNavigation, useTranslation } from "@refinedev/core";
 import { useEffect, useState } from "react";
-import { LuCirclePlus, LuEye, LuUserSearch } from "react-icons/lu";
+import { LuCirclePlus, LuPencil, LuUserSearch } from "react-icons/lu";
 import { DataTable } from "../../components/Common/DataTable";
 import { Tooltip } from "../../components/ui/tooltip";
 import {
@@ -28,7 +28,7 @@ const CompanyCreateActions = () => {
 const CompaniesListPage = () => {
   const { translate: t } = useTranslation();
   const { setActions, setTitle } = useLayout();
-  const { show } = useNavigation();
+  const { show, edit } = useNavigation();
   const [companies, setCompanies] = useState<Company[]>([]);
   useEffect(() => {
     setTitle(t("admin.companies.title", "Companies"));
@@ -70,6 +70,18 @@ const CompaniesListPage = () => {
             header: t("admin.companies.table.name"),
             sortable: true,
             searchable: true,
+            render: (record: Company) => {
+              return (
+                <Box display="flex" alignItems="center" gap={2}>
+                  {record.name}
+                  {record.sponsoring && (
+                    <Badge colorPalette="purple" variant="solid" size="xs">
+                      {t("admin.companies.table.sponsor", "Sponsor")}
+                    </Badge>
+                  )}
+                </Box>
+              );
+            },
           },
           {
             key: "employeeCount",
@@ -114,12 +126,12 @@ const CompaniesListPage = () => {
                 >
                   <IconButton
                     size="sm"
-                    onClick={() => show("companies", record.id)}
+                    onClick={() => edit("companies", record.id)}
                     variant="ghost"
                     rounded="full"
-                    aria-label="View Company"
+                    aria-label="Edit Company"
                   >
-                    <LuEye />
+                    <LuPencil />
                   </IconButton>
                 </Tooltip>
               </>

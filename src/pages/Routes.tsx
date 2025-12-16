@@ -12,7 +12,6 @@ import {
   CompanyCreatePage,
   CompanyEditPage,
   CompanyEmployeesListPage,
-  CompanyShowPage,
 } from "./companies";
 import {
   EventCreatePage,
@@ -131,7 +130,6 @@ function AppRoutes() {
               <Route index element={<CompaniesListPage />} />
               <Route path="create" element={<CompanyCreatePage />} />
               <Route path="edit/:id" element={<CompanyEditPage />} />
-              <Route path="show/:id" element={<CompanyShowPage />} />
               <Route path="employees">
                 <Route
                   index

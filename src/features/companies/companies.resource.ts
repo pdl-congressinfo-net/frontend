@@ -11,12 +11,8 @@ export const companyResource = {
 
 export const companyEmployeeResource = {
   name: "companyemployees",
-  list: "/admin/companies/employees",
-  create: "/admin/companies/employees/create",
-  edit: "/admin/companies/employees/edit/:id",
   show: "/admin/companies/employees/show/:id",
   meta: {
-    canDelete: true,
     parentModule: "companies",
   },
 };
@@ -26,5 +22,4 @@ export const sponsoringsResource = {
   list: "/admin/sponsorings",
   create: "/admin/sponsorings/create",
   edit: "/admin/sponsorings/edit/:id",
-  show: "/admin/sponsorings/show/:id",
 };
