@@ -3,7 +3,7 @@ import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { dataProvider } from "./providers/rest-data-provider";
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import routerProvider from "@refinedev/react-router";
 import { BrowserRouter } from "react-router";
 import "./App.css";
@@ -15,6 +15,7 @@ import { authProvider } from "./providers/auth-provider";
 import { i18nProvider } from "./providers/i18n-provider";
 import { notificationProvider } from "./providers/notification-provider";
 import "./providers/rest-data-provider/mapping/feature.loader";
+import { system } from "./theme";
 
 import {
   companyEmployeeResource,
@@ -48,7 +49,7 @@ import { httpClient } from "./utils/httpClient";
 function App() {
   return (
     <BrowserRouter>
-      <ChakraProvider value={defaultSystem}>
+      <ChakraProvider value={system}>
         <RefineKbarProvider>
           <DevtoolsProvider>
             <LayoutProvider>
