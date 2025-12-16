@@ -140,9 +140,8 @@ export const dataProvider = (
 
       const generatedSort = generateSort(sorters);
       if (generatedSort) {
-        const { _sort, _order } = generatedSort;
-        query._sort = _sort.join(",");
-        query._order = _order.join(",");
+        query._sort = generatedSort._sort;
+        query._order = generatedSort._order;
       }
 
       const combinedQuery = { ...query, ...queryFilters };
@@ -341,10 +340,9 @@ export const dataProvider = (
       if (sorters) {
         const generatedSort = generateSort(sorters);
         if (generatedSort) {
-          const { _sort, _order } = generatedSort;
           const sortQuery = {
-            _sort: _sort.join(","),
-            _order: _order.join(","),
+            _sort: generatedSort._sort,
+            _order: generatedSort._order,
           };
           requestUrl = `${requestUrl}&${stringify(sortQuery)}`;
         }
