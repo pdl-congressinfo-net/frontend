@@ -38,7 +38,7 @@ const EventTypeShowPage = () => {
       </HStack>
 
       <HStack>
-        <Text fontWeight="bold">Name (Translated):</Text>
+        <Text fontWeight="bold">Name ({t("common.translated")}):</Text>
         <Text>{t(`events.types.name.${eventType.code}`)}</Text>
       </HStack>
     </VStack>

@@ -51,7 +51,7 @@ const EventTypesListPage = () => {
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               {t("admin.eventTypes.table.name")}
-              <Badge ml={2}>Translated</Badge>
+              <Badge ml={2}>{t("common.translated")}</Badge>
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               {t("admin.eventTypes.table.actions")}
