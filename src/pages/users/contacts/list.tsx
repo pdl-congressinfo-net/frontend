@@ -1,50 +1,63 @@
-import { Box, Button, Table } from "@chakra-ui/react";
-import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { Box, Button, HStack } from "@chakra-ui/react";
+import { CanAccess, useNavigation, useTranslation } from "@refinedev/core";
+import { DataTable } from "../../../components/Common/DataTable";
 import { Contact } from "../../../features/users/users.model";
 
 const ContactsListPage = () => {
   const { translate: t } = useTranslation();
-  const { show } = useNavigation();
-  const {
-    result: data,
-    query: { isLoading },
-  } = useList<Contact>({
-    resource: "contacts",
-    meta: { parentModule: "users" },
-  });
-
-  if (isLoading) return <Box>{t("common.loading")}</Box>;
-
-  const contacts = data?.data ?? [];
+  const { edit } = useNavigation();
 
   return (
     <Box p={4}>
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>Email</Table.ColumnHeader>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
-            <Table.ColumnHeader>Phone</Table.ColumnHeader>
-            <Table.ColumnHeader>Actions</Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {contacts.map((c) => (
-            <Table.Row key={c.id}>
-              <Table.Cell>{c.email}</Table.Cell>
-              <Table.Cell>
-                {[c.titles, c.firstName, c.lastName].filter(Boolean).join(" ")}
-              </Table.Cell>
-              <Table.Cell>{c.phoneNumber ?? "-"}</Table.Cell>
-              <Table.Cell>
-                <Button size="sm" onClick={() => show("contacts", c.id!)}>
-                  View
-                </Button>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+      <DataTable
+        resource="contacts"
+        parentModule="users"
+        columns={[
+          {
+            key: "email",
+            header: "Email",
+            sortable: true,
+            searchable: true,
+          },
+          {
+            key: "titles",
+            header: "Title",
+            sortable: true,
+            searchable: true,
+          },
+          {
+            key: "lastName",
+            header: "Last Name",
+            sortable: true,
+            searchable: true,
+          },
+          {
+            key: "firstName",
+            header: "First Name",
+            sortable: true,
+            searchable: true,
+          },
+          { key: "phoneNumber", header: "Phone" },
+          {
+            key: "actions",
+            header: "Actions",
+            render: (record: Contact) => (
+              <HStack>
+                <CanAccess resource="contacts" action="update">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      edit("contacts", record.id ?? "");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                </CanAccess>
+              </HStack>
+            ),
+          },
+        ]}
+      />
     </Box>
   );
 };
