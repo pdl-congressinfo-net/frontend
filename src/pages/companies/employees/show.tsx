@@ -1,7 +1,6 @@
 import { Box, Button, Heading, HStack } from "@chakra-ui/react";
 import {
   CanAccess,
-  Link,
   useList,
   useNavigation,
   useOne,
@@ -15,6 +14,7 @@ import {
   CompanyEmployee,
 } from "../../../features/companies/companies.model";
 import { Contact } from "../../../features/users/users.model";
+import { useLayout } from "../../../providers/layout-provider";
 
 type MyParams = {
   companyId: string;
@@ -23,6 +23,7 @@ type MyParams = {
 const CompanyEmployeesListPage = () => {
   const { translate: t } = useTranslation();
   const { edit } = useNavigation();
+  const { setActions, setTitle } = useLayout();
   const {
     resource,
     action,
@@ -30,7 +31,8 @@ const CompanyEmployeesListPage = () => {
     pathname,
     params: { companyId },
   } = useParsed<MyParams>();
-
+  setTitle(t("admin.companies.employees.title", "Company Employees"));
+  setActions(null);
   const { result: company } = useOne<Company>({
     resource: "companies",
     id: companyId!,
@@ -70,18 +72,11 @@ const CompanyEmployeesListPage = () => {
 
   return (
     <Box p={4}>
-      <Heading mb={4}>
-        <Link
-          go={{ to: { resource: "companies", id: companyId, action: "show" } }}
-        >
-          {company?.name}
-        </Link>{" "}
-        - {t("admin.companies.employees.title")}
-      </Heading>
+      <Heading mb={4}></Heading>
       <DataTable
         resource="contacts"
         parentModule="users"
-        globalFilters={contactGlobalFilters as any}
+        globalFilters={contactGlobalFilters}
         columns={[
           {
             key: "email",

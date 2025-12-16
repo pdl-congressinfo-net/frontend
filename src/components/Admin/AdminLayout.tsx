@@ -1,6 +1,7 @@
-import { Box, Card, Flex } from "@chakra-ui/react";
-import { useTranslation } from "@refinedev/core";
+import { Box, Button, Card, Flex, Heading, HStack } from "@chakra-ui/react";
+import { useBack, useTranslation } from "@refinedev/core";
 import * as React from "react";
+import { LuArrowLeft } from "react-icons/lu";
 import { useLayout } from "../../providers/layout-provider";
 import { AdminNavigation } from "./AdminNavigation";
 
@@ -10,6 +11,7 @@ interface AdminLayoutProps {
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { translate } = useTranslation();
+  const back = useBack();
   const { title, actions } = useLayout();
 
   return (
@@ -19,15 +21,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <AdminNavigation />
         </Box>
         <Box width="80%" p={6}>
-          <Card.Root p={4}>
-            <Card.Header mb={4}>
-              <Flex justify="space-between" align="center">
-                <Box fontSize="xl" fontWeight="bold">
-                  {title || translate("admin.title")}
-                </Box>
-                <Box>{actions}</Box>
-              </Flex>
-            </Card.Header>
+          <Box layerStyle="pageHeader">
+            <Flex justify="space-between" align="center" gap={4}>
+              <Heading textStyle="pageTitle">{title}</Heading>
+              <HStack layerStyle="actionBar">
+                {actions}
+                <Button onClick={() => back()} variant="ghost">
+                  <LuArrowLeft />
+                  {translate("common.back", "Back")}
+                </Button>
+              </HStack>
+            </Flex>
+          </Box>
+          <Card.Root p={4} mt={4}>
             {children}
           </Card.Root>
         </Box>

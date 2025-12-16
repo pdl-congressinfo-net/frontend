@@ -18,7 +18,14 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({
   useDocumentTitle(title);
 
   return (
-    <LayoutContext.Provider value={{ title, actions, setTitle, setActions }}>
+    <LayoutContext.Provider
+      value={{
+        title,
+        actions,
+        setTitle,
+        setActions,
+      }}
+    >
       {children}
     </LayoutContext.Provider>
   );
