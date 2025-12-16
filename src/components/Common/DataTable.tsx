@@ -76,7 +76,7 @@ export function DataTable<T extends BaseRecord>({
   // Memoize default page size options to prevent recreating on every render
   const pageSizeOptionsMemo = useMemo(
     () => defaultPageSizeOptions,
-    [defaultPageSizeOptions.join(",")]
+    [defaultPageSizeOptions.join(",")],
   );
 
   // Calculate page size options based on total results
@@ -120,7 +120,7 @@ export function DataTable<T extends BaseRecord>({
       } else if (existing.order === "asc") {
         // Change to desc
         next = sorters.map((s) =>
-          s.field === field ? { field, order: "desc" } : s
+          s.field === field ? { field, order: "desc" } : s,
         );
       } else {
         // Remove this sort
@@ -278,7 +278,10 @@ export function DataTable<T extends BaseRecord>({
 
             <Pagination.Items
               render={(page) => (
-                <IconButton variant={{ base: "ghost", _selected: "outline" }}>
+                <IconButton
+                  variant={{ base: "ghost", _selected: "outline" }}
+                  disabled={pageCount === 1}
+                >
                   {page.value}
                 </IconButton>
               )}
