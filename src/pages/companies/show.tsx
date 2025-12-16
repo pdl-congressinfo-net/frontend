@@ -1,31 +1,10 @@
 import { Box, Button, Text, VStack } from "@chakra-ui/react";
 import { useDelete, useOne } from "@refinedev/core";
-import { useEffect } from "react";
-import { LuArrowLeft, LuPencil, LuTrash2 } from "react-icons/lu";
+import { LuTrash2 } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { Company } from "../../features/companies/companies.model";
-import { useLayout } from "../../providers/layout-provider";
-
-const CompanyShowActions = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-
-  return (
-    <>
-      <Button onClick={() => navigate("/companies")} variant="ghost">
-        <LuArrowLeft />
-        Back to Companies
-      </Button>
-      <Button onClick={() => navigate(`/companies/edit/${id}`)} variant="ghost">
-        <LuPencil />
-        Edit
-      </Button>
-    </>
-  );
-};
 
 const CompanyShowPage = () => {
-  const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const { id } = useParams();
   const { mutate: deleteCompany } = useDelete();
@@ -34,11 +13,6 @@ const CompanyShowPage = () => {
     resource: "companies",
     id: id!,
   });
-
-  useEffect(() => {
-    setTitle("Company Details");
-    setActions(<CompanyShowActions />);
-  }, [setTitle, setActions]);
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this company?")) {

@@ -15,6 +15,9 @@
     "close": "Schließen",
     "yes": "Ja",
     "no": "Nein",
+    "view": "Ansehen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
     "optional": "Optional",
     "actions": {
       "view": "Ansehen",
@@ -231,7 +234,15 @@
       },
       "table": {
         "name": "Name",
-        "sponsoring": "Sponsoring"
+        "sponsoring": "Sponsoring",
+        "employeeCount": "Kontaktanzahl",
+        "viewContacts": "Kontakte anzeigen"
+      },
+      "employees": {
+        "title": "Mitarbeiter",
+        "actions": {
+          "addEmployee": "Mitarbeiter hinzufügen"
+        }
       }
     },
     "roles": {

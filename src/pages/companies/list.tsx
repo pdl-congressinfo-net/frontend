@@ -1,73 +1,111 @@
-import { Box, Button, Table } from "@chakra-ui/react";
+import { Box, IconButton } from "@chakra-ui/react";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useState } from "react";
+import { LuEye, LuUserSearch } from "react-icons/lu";
+import { DataTable } from "../../components/Common/DataTable";
+import { Tooltip } from "../../components/ui/tooltip";
 import {
-  useLink,
-  useList,
-  useNavigation,
-  useTranslation,
-} from "@refinedev/core";
-import { useEffect } from "react";
-import { Company } from "../../features/companies/companies.model";
-import { useLayout } from "../../providers/layout-provider";
+  Company,
+  CompanyEmployee,
+} from "../../features/companies/companies.model";
 
 const CompaniesListPage = () => {
   const { translate: t } = useTranslation();
-  const { setTitle, setActions } = useLayout();
-  const { create } = useNavigation();
-  const Link = useLink();
+  const { show } = useNavigation();
+  const [companies, setCompanies] = useState<Company[]>([]);
+
   const {
-    result: data,
-    query: { isLoading },
-  } = useList<Company>({
-    resource: "companies",
+    result: { data: employees },
+    query: { isLoading: isEmployeesLoading },
+  } = useList<CompanyEmployee>({
+    resource: "employees",
+    pagination: {
+      pageSize: 1000,
+    },
+    meta: {
+      parentModule: "companies",
+    },
+    filters: companies.length
+      ? [
+          {
+            field: "companyId",
+            operator: "in",
+            value: companies.map((company) => company.id),
+          },
+        ]
+      : [],
   });
 
-  useEffect(() => {
-    setTitle(t("admin.companies.title"));
-    setActions(
-      <Link to="/admin/companies/create">
-        <Button>{t("admin.companies.actions.create")}</Button>
-      </Link>,
-    );
-    return () => setActions(null);
-  }, [setTitle, setActions, t]);
-
-  if (isLoading) return <Box>{t("common.loading")}</Box>;
+  if (isEmployeesLoading) return <Box>{t("common.loading")}</Box>;
 
   return (
     <Box p={4}>
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>
-              {t("admin.companies.table.name")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.companies.table.sponsoring")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>{t("common.table.actions")}</Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {data?.data.map((company) => (
-            <Table.Row key={company.id}>
-              <Table.Cell>{company.name}</Table.Cell>
-              <Table.Cell>
-                {company.sponsoring ? t("common.yes") : t("common.no")}
-              </Table.Cell>
-              <Table.Cell>
-                <Button
-                  size="sm"
-                  onClick={() =>
-                    (window.location.href = `/companies/show/${company.id}`)
-                  }
+      <DataTable
+        resource="companies"
+        onDataChange={(data) => setCompanies(data)}
+        columns={[
+          {
+            key: "name",
+            header: t("admin.companies.table.name"),
+            sortable: true,
+            searchable: true,
+          },
+          {
+            key: "employeeCount",
+            header: t("admin.companies.table.employeeCount"),
+            textAlign: "right",
+            width: "12vw",
+            render: (record: Company) => {
+              const count = employees?.filter(
+                (emp) => emp.companyId === record.id,
+              ).length;
+              return count || "-";
+            },
+          },
+          {
+            key: "actions",
+            header: t("common.table.actions"),
+            textAlign: "right",
+            width: "12vw",
+            render: (record: Company) => (
+              <>
+                <Tooltip
+                  openDelay={200}
+                  closeDelay={0}
+                  positioning={{ placement: "right" }}
+                  content={t("admin.companies.table.viewContacts")}
                 >
-                  {t("common.actions.view")}
-                </Button>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+                  <IconButton
+                    size="sm"
+                    onClick={() => show("companyemployees", record.id)}
+                    variant="ghost"
+                    rounded="full"
+                    aria-label="View Contacts"
+                  >
+                    <LuUserSearch />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  openDelay={200}
+                  closeDelay={0}
+                  positioning={{ placement: "right" }}
+                  content={t("common.view")}
+                >
+                  <IconButton
+                    size="sm"
+                    onClick={() => show("companies", record.id)}
+                    variant="ghost"
+                    rounded="full"
+                    aria-label="View Company"
+                  >
+                    <LuEye />
+                  </IconButton>
+                </Tooltip>
+              </>
+            ),
+          },
+        ]}
+      />
     </Box>
   );
 };
