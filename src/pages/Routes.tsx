@@ -38,12 +38,7 @@ import {
   PermissionShowPage,
   PermissionsListPage,
 } from "./permissions";
-import {
-  RoleCreatePage,
-  RoleEditPage,
-  RoleShowPage,
-  RolesListPage,
-} from "./roles";
+import { RolesListPage } from "./roles";
 import {
   SponsoringCreatePage,
   SponsoringEditPage,
@@ -138,9 +133,6 @@ function AppRoutes() {
 
             <Route path="roles">
               <Route index element={<RolesListPage />} />
-              <Route path="create" element={<RoleCreatePage />} />
-              <Route path="edit/:id" element={<RoleEditPage />} />
-              <Route path="show/:id" element={<RoleShowPage />} />
             </Route>
 
             <Route path="companies">

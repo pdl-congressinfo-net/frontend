@@ -32,10 +32,7 @@ import {
   locationTypeResource,
 } from "./features/locations/locations.resource";
 import { permissionResource } from "./features/permissions/permissions.resource";
-import {
-  rolePermissionResource,
-  roleResource,
-} from "./features/roles/roles.resource";
+import { roleResource } from "./features/roles/roles.resource";
 import {
   contactsResource,
   userPermissionRessource,
@@ -83,7 +80,6 @@ function App() {
                   contactsResource,
                   sponsoringsResource,
                   roleResource,
-                  rolePermissionResource,
                   permissionResource,
                 ]}
               >
