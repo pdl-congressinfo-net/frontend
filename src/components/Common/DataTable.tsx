@@ -106,16 +106,11 @@ export function DataTable<T extends BaseRecord>({
     return pageSizeOptionsMemo;
   }, [result?.total, pageSizeOptionsMemo]);
 
-  // Adjust page size dynamically based on total results
+  // Adjust page size dynamically based on total results (fallback to current data length)
   useEffect(() => {
-    const total = result?.total || 0;
+    const total = (result?.total ?? 0) as number;
 
-    // If total is less than current pageSize, reduce it
-    if (total > 0 && total < pageSize) {
-      setPageSize(total);
-    }
-    // If total is now larger and pageSize is not in default options, reset to default
-    else if (
+    if (
       total >= pageSizeOptionsMemo[0] &&
       !pageSizeOptionsMemo.includes(pageSize)
     ) {
@@ -123,6 +118,20 @@ export function DataTable<T extends BaseRecord>({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result?.total]);
+
+  // Clamp current page when results fit in a single page or shrink
+  useEffect(() => {
+    const total = (result?.total ?? 0) as number;
+    if (total <= pageSize && currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      const maxPage = Math.max(1, Math.ceil(total / pageSize));
+      if (currentPage > maxPage) {
+        setCurrentPage(maxPage);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result?.total, pageSize]);
 
   // Memoize visible columns (columns with visible !== false)
   const visibleColumns = useMemo(
@@ -189,49 +198,47 @@ export function DataTable<T extends BaseRecord>({
   };
 
   useEffect(() => {
-    // Helper to stable-stringify filters for equality check
-    const makeKey = (filters: CrudFilters) =>
-      JSON.stringify(filters.map((f) => ({ ...f, value: f.value })));
+    // Debounce search to avoid rapid setFilters calls
+    const timer = setTimeout(() => {
+      const makeKey = (filters: CrudFilters) =>
+        JSON.stringify(filters.map((f) => ({ ...f, value: f.value })));
 
-    const nextFilters: CrudFilters = (() => {
-      if (!searchableFields.length) {
-        return globalFilters;
-      }
-      if (!search.trim()) {
-        return globalFilters;
-      }
-      const searchFilters: CrudFilters = searchableFields.map((field) => ({
-        field,
-        operator: "contains",
-        value: search,
-      }));
-      return [...globalFilters, ...searchFilters];
-    })();
+      const nextFilters: CrudFilters = (() => {
+        if (!searchableFields.length) {
+          return globalFilters;
+        }
+        if (!search.trim()) {
+          return globalFilters;
+        }
+        const searchFilters: CrudFilters = searchableFields.map((field) => ({
+          field,
+          operator: "contains",
+          value: search,
+        }));
+        return [...globalFilters, ...searchFilters];
+      })();
 
-    // Only update if filters actually changed
-    const key = makeKey(nextFilters);
-    if (key !== lastFiltersKeyRef.current) {
-      setFilters(nextFilters, "replace");
-      lastFiltersKeyRef.current = key;
-      setCurrentPage(1);
-    }
-  }, [search, setFilters, setCurrentPage, searchableFields, globalFilters]);
+      const key = makeKey(nextFilters);
+      if (key !== lastFiltersKeyRef.current) {
+        setFilters(nextFilters, "replace");
+        lastFiltersKeyRef.current = key;
+        // Only reset to page 1 when search text changes meaningfully
+        if (prevSearchRef.current !== search.trim()) {
+          setCurrentPage(1);
+          prevSearchRef.current = search.trim();
+        }
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [search, searchableFields, globalFilters, setFilters, setCurrentPage]);
 
   // Track last applied filters to avoid update loops
   const lastFiltersKeyRef = useRef<string>("__init__");
+  const prevSearchRef = useRef<string>("");
 
-  // Initialize with global filters on mount and when they change
-  useEffect(() => {
-    const makeKey = (filters: CrudFilters) =>
-      JSON.stringify(filters.map((f) => ({ ...f, value: f.value })));
-    const key = makeKey(globalFilters);
-    if (key !== lastFiltersKeyRef.current) {
-      setFilters(globalFilters, "replace");
-      lastFiltersKeyRef.current = key;
-      setCurrentPage(1);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalFilters]);
+  // Note: initial/global filter application is handled in the debounced search effect
+  // to avoid racing effects that cause rapid updates and refetches.
 
   return (
     <>
@@ -346,7 +353,7 @@ export function DataTable<T extends BaseRecord>({
 
       {/* Pagination */}
       <Pagination.Root
-        count={result.total ?? 0}
+        count={result.total ?? result.data.length ?? 0}
         pageSize={pageSize}
         page={currentPage}
         onPageChange={(e) => setCurrentPage(e.page)}
@@ -360,16 +367,15 @@ export function DataTable<T extends BaseRecord>({
               </IconButton>
             </Pagination.PrevTrigger>
 
-            <Pagination.Items
-              render={(page) => (
-                <IconButton
-                  variant={{ base: "ghost", _selected: "outline" }}
-                  disabled={pageCount === 1}
-                >
-                  {page.value}
-                </IconButton>
-              )}
-            />
+            {(result.total ?? result.data.length ?? 0) > pageSize && (
+              <Pagination.Items
+                render={(page) => (
+                  <IconButton variant={{ base: "ghost", _selected: "outline" }}>
+                    {page.value}
+                  </IconButton>
+                )}
+              />
+            )}
 
             <Pagination.NextTrigger asChild>
               <IconButton>
@@ -378,7 +384,9 @@ export function DataTable<T extends BaseRecord>({
             </Pagination.NextTrigger>
           </ButtonGroup>
           <HStack>
-            <NativeSelect.Root disabled={result?.total == pageSize}>
+            <NativeSelect.Root
+              disabled={(result?.total ?? result?.data.length ?? 0) <= pageSize}
+            >
               <NativeSelect.Field
                 value={pageSize}
                 onChange={(e) => {
