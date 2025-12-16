@@ -62,6 +62,7 @@ export function DataTable<T extends BaseRecord>({
     sorters,
     setSorters,
     setFilters,
+    filters,
     currentPage,
     setCurrentPage,
     pageSize,
@@ -84,6 +85,27 @@ export function DataTable<T extends BaseRecord>({
   });
 
   const [search, setSearch] = useState("");
+
+  // Restore search input from URL-synced filters when navigating back/forward
+  useEffect(() => {
+    // Find first 'contains' filter value and use it as search text if all search filters share same value
+    const containsFilters = (filters ?? []).filter(
+      (f) => f.operator === "contains" && typeof f.value === "string",
+    );
+    if (containsFilters.length > 0) {
+      const firstVal = String(containsFilters[0].value);
+      const allSame = containsFilters.every(
+        (f) => String(f.value) === firstVal,
+      );
+      if (allSame && firstVal !== search) {
+        setSearch(firstVal);
+      }
+    } else if (search) {
+      // If no search-related filters present, clear input
+      setSearch("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   // Notify parent component when data changes
   useEffect(() => {
