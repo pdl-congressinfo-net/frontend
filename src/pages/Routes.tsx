@@ -22,6 +22,7 @@ import {
   EventTypeEditPage,
   EventTypesListPage,
 } from "./events";
+import EventsArchiveListPage from "./events/archive";
 import {
   CountriesListPage,
   LocationCreatePage,
@@ -78,6 +79,7 @@ function AppRoutes() {
             {/* Events routes */}
             <Route path="events">
               <Route index element={<EventsListPage />} />
+              <Route path="archive" element={<EventsArchiveListPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
