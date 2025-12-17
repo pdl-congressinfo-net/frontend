@@ -286,6 +286,7 @@
     },
     "eventTypes": {
       "title": "Veranstaltungsarten",
+      "translationRequired": "Übersetzung erforderlich bei Neuerstellung oder Bearbeitung von Veranstaltungsarten.",
       "actions": {
         "create": "Veranstaltungsart erstellen"
       },

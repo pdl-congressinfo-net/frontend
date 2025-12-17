@@ -3,7 +3,6 @@ export const eventTypeResource = {
   list: "/admin/events/types",
   create: "/admin/events/types",
   edit: "/admin/events/types/edit/:id",
-  show: "/admin/events/types/show/:id",
   meta: {
     canDelete: true,
     parentModule: "events",

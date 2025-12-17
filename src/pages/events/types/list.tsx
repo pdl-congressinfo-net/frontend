@@ -1,11 +1,13 @@
-import { Badge, Box, Button, HStack, Spinner, Table } from "@chakra-ui/react";
+import { Badge, Box, HStack, IconButton, Spinner } from "@chakra-ui/react";
 import {
   useDelete,
   useList,
   useNavigation,
   useTranslation,
 } from "@refinedev/core";
+import { LuBadgeInfo, LuPencil, LuTrash2 } from "react-icons/lu";
 import { useLocation, useNavigate } from "react-router";
+import { DataTable } from "../../../components/Common/DataTable";
 import { EventType } from "../../../features/events/events.model";
 
 const EventTypesListPage = () => {
@@ -43,63 +45,63 @@ const EventTypesListPage = () => {
 
   return (
     <Box p={4}>
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>
-              {t("admin.eventTypes.table.code")}
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.eventTypes.table.name")}
-              <Badge ml={2}>{t("common.translated")}</Badge>
-            </Table.ColumnHeader>
-            <Table.ColumnHeader>
-              {t("admin.eventTypes.table.actions")}
-            </Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {data?.data.map((eventType) => (
-            <Table.Row key={eventType.id}>
-              <Table.Cell>{eventType.code}</Table.Cell>
-              <Table.Cell>
-                {t(`events.types.name.${eventType.code}`)}
-              </Table.Cell>
-              <Table.Cell>
-                <HStack>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      show("types", eventType.id, "push", {
-                        meta: { parentModule: "events" },
-                      })
-                    }
-                  >
-                    {t("common.actions.view")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      edit("types", eventType.id, "push", {
-                        meta: { parentModule: "events" },
-                      });
-                    }}
-                  >
-                    {t("common.actions.edit")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    colorPalette="red"
-                    onClick={() => handleDelete(eventType.id)}
-                  >
-                    {t("common.actions.delete")}
-                  </Button>
-                </HStack>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+      <DataTable
+        resource="types"
+        parentModule="events"
+        caption={
+          <Box color="red.500" display="flex" alignItems="center" gap={2}>
+            <LuBadgeInfo />
+            <span>{t("admin.eventTypes.translationRequired")}</span>
+          </Box>
+        }
+        columns={[
+          {
+            key: "code",
+            header: t("admin.eventTypes.table.code"),
+            sortable: true,
+          },
+          {
+            key: "name",
+            header: (
+              <>
+                {t("admin.eventTypes.table.name")}
+                <Badge ml={2}>{t("common.translated")}</Badge>
+              </>
+            ),
+            render: (item: EventType) => (
+              <>{t(`events.types.name.${item.code}`)}</>
+            ),
+          },
+          {
+            key: "actions",
+            header: t("admin.eventTypes.table.actions"),
+            textAlign: "right",
+            render: (item: EventType) => (
+              <HStack>
+                <IconButton
+                  variant="ghost"
+                  onClick={() => {
+                    edit("types", item.id, "push", {
+                      meta: { parentModule: "events" },
+                    });
+                  }}
+                >
+                  <LuPencil />
+                </IconButton>
+                <IconButton
+                  color="red"
+                  variant="ghost"
+                  onClick={() => handleDelete(item.id)}
+                  aria-label="Delete Event Type"
+                  rounded="full"
+                >
+                  <LuTrash2 />
+                </IconButton>
+              </HStack>
+            ),
+          },
+        ]}
+      />
     </Box>
   );
 };

@@ -20,7 +20,6 @@ import {
   EventsListPage,
   EventTypeCreatePage,
   EventTypeEditPage,
-  EventTypeShowPage,
   EventTypesListPage,
 } from "./events";
 import {
@@ -161,7 +160,6 @@ function AppRoutes() {
                 <Route index element={<EventTypesListPage />} />
                 <Route path="create" element={<EventTypeCreatePage />} />
                 <Route path="edit/:id" element={<EventTypeEditPage />} />
-                <Route path="show/:id" element={<EventTypeShowPage />} />
               </Route>
             </Route>
 
