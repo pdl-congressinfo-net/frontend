@@ -28,7 +28,7 @@ import { formatDate } from "../../utils/helpers";
 
 type Column<T> = {
   key: keyof T | string;
-  header: string;
+  header: React.ReactNode;
   sortable?: boolean;
   searchable?: boolean;
   isDate?: boolean;
@@ -46,6 +46,7 @@ type DataTableProps<T extends BaseRecord> = {
   interactive?: boolean;
   onDataChange?: (data: T[], total: number) => void;
   globalFilters?: CrudFilters;
+  caption?: React.ReactNode;
 };
 
 export function DataTable<T extends BaseRecord>({
@@ -56,6 +57,7 @@ export function DataTable<T extends BaseRecord>({
   interactive = true,
   onDataChange,
   globalFilters = [],
+  caption,
 }: DataTableProps<T>) {
   const {
     result,
@@ -281,6 +283,7 @@ export function DataTable<T extends BaseRecord>({
         tableLayout={"fixed"}
         interactive={interactive}
       >
+        {caption && <Table.Caption mt={"1vh"}>{caption}</Table.Caption>}
         <Table.Header>
           <Table.Row>
             {visibleColumns.map((col) => (
@@ -351,20 +354,30 @@ export function DataTable<T extends BaseRecord>({
                     key={String(col.key)}
                     textAlign={col.textAlign || "left"}
                   >
-                    {shouldHighlight ? (
-                      <Highlight
-                        query={search}
-                        ignoreCase
-                        styles={{
-                          bg: "orange.subtle",
-                          color: "orange.fg",
-                        }}
-                      >
-                        {cellContent as string}
-                      </Highlight>
-                    ) : (
-                      cellContent
-                    )}
+                    <HStack
+                      justify={
+                        col.textAlign === "right"
+                          ? "flex-end"
+                          : col.textAlign === "center"
+                            ? "center"
+                            : "flex-start"
+                      }
+                    >
+                      {shouldHighlight ? (
+                        <Highlight
+                          query={search}
+                          ignoreCase
+                          styles={{
+                            bg: "orange.subtle",
+                            color: "orange.fg",
+                          }}
+                        >
+                          {cellContent as string}
+                        </Highlight>
+                      ) : (
+                        cellContent
+                      )}
+                    </HStack>
                   </Table.Cell>
                 );
               })}
