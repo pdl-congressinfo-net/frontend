@@ -102,22 +102,25 @@ const CompaniesListPage = () => {
             width: "12vw",
             render: (record: Company) => (
               <>
-                <Tooltip
-                  openDelay={200}
-                  closeDelay={0}
-                  positioning={{ placement: "right" }}
-                  content={t("admin.companies.table.viewContacts")}
-                >
-                  <IconButton
-                    size="sm"
-                    onClick={() => show("companyemployees", record.id)}
-                    variant="ghost"
-                    rounded="full"
-                    aria-label="View Contacts"
+                {(employees?.filter((emp) => emp.companyId === record.id)
+                  .length || 0) > 0 && (
+                  <Tooltip
+                    openDelay={200}
+                    closeDelay={0}
+                    positioning={{ placement: "right" }}
+                    content={t("admin.companies.table.viewContacts")}
                   >
-                    <LuUserSearch />
-                  </IconButton>
-                </Tooltip>
+                    <IconButton
+                      size="sm"
+                      onClick={() => show("companyemployees", record.id)}
+                      variant="ghost"
+                      rounded="full"
+                      aria-label="View Contacts"
+                    >
+                      <LuUserSearch />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 <Tooltip
                   openDelay={200}
                   closeDelay={0}

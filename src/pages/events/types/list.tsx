@@ -80,6 +80,8 @@ const EventTypesListPage = () => {
               <HStack>
                 <IconButton
                   variant="ghost"
+                  aria-label="Edit Event Type"
+                  rounded="full"
                   onClick={() => {
                     edit("types", item.id, "push", {
                       meta: { parentModule: "events" },
