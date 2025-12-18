@@ -89,7 +89,7 @@ export const EventList = ({ archive }: EventListProps) => {
     const endpoint = shouldPublish ? "publish" : "unpublish";
     publishEvent(
       {
-        url: `/api/v1/events/${eventId}/${endpoint}`,
+        url: `events/${eventId}/${endpoint}`,
         method: "post",
         values: {},
       },

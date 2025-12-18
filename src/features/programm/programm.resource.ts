@@ -1,9 +1,7 @@
 export const programmResource = {
   name: "programm",
-  list: "/admin/programm",
-  create: "/admin/programm/create",
-  edit: "/admin/programm/edit/:id",
-  show: "/admin/programm/show/:id",
+  list: "/admin/events/:eventId/programm",
+  edit: "/admin/events/:eventId/programm/edit/:id",
   meta: {
     canDelete: true,
   },
@@ -11,10 +9,8 @@ export const programmResource = {
 
 export const eventSessionResource = {
   name: "sessions",
-  list: "/admin/programm/sessions",
-  create: "/admin/programm/sessions/create",
-  edit: "/admin/programm/sessions/edit/:id",
-  show: "/admin/programm/sessions/show/:id",
+  list: "/admin/events/:eventId/programm",
+  edit: "/admin/events/:eventId/sessions/edit/:id",
   meta: {
     canDelete: true,
     parentModule: "programm",

@@ -33,7 +33,9 @@ import {
 } from "./locations";
 import { PermissionsListPage } from "./permissions";
 import { ProgrammsListPage } from "./programm";
+import ProgrammEditPage from "./programm/Edit";
 import { RolesListPage } from "./roles";
+import SessionEditPage from "./sessions/Edit";
 import {
   SponsoringCreatePage,
   SponsoringEditPage,
@@ -116,9 +118,6 @@ function AppRoutes() {
               <Route path="edit/:id" element={<ContactEditPage />} />
               <Route path="show/:id" element={<ContactShowPage />} />
             </Route>
-            <Route path="programm">
-              <Route index element={<ProgrammsListPage />} />
-            </Route>
 
             <Route path="sponsorings">
               <Route index element={<SponsoringsListPage />} />
@@ -166,6 +165,14 @@ function AppRoutes() {
                 <Route index element={<EventTypesListPage />} />
                 <Route path="create" element={<EventTypeCreatePage />} />
                 <Route path="edit/:id" element={<EventTypeEditPage />} />
+              </Route>
+              <Route path=":eventId">
+                <Route path="programm" element={<ProgrammsListPage />} />
+                <Route
+                  path="programm/edit/:id"
+                  element={<ProgrammEditPage />}
+                />
+                <Route path="sessions/edit/:id" element={<SessionEditPage />} />
               </Route>
             </Route>
 
