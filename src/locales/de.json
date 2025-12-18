@@ -138,6 +138,7 @@
       "actions": {
         "addSession": "Session hinzufügen",
         "addProgramm": "Programmpunkt hinzufügen",
+        "view": "Programm ansehen",
         "save": "Speichern",
         "cancel": "Abbrechen"
       },

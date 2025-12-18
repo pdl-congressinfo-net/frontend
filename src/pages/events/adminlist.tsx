@@ -143,7 +143,7 @@ const EventsAdminListPage = () => {
                       openDelay={200}
                       closeDelay={0}
                       positioning={{ placement: "right" }}
-                      content={t("admin.events.table.viewProgramm")}
+                      content={t("events.programm.actions.view")}
                     >
                       <IconButton
                         size="sm"
@@ -164,7 +164,7 @@ const EventsAdminListPage = () => {
                         openDelay={200}
                         closeDelay={0}
                         positioning={{ placement: "right" }}
-                        content={t("admin.events.table.editLocation")}
+                        content={t("locations.form.actions.adjustLocation")}
                       >
                         <IconButton
                           size="sm"
@@ -196,7 +196,7 @@ const EventsAdminListPage = () => {
                         }
                         variant="ghost"
                         rounded="full"
-                        aria-label="View Contacts"
+                        aria-label="Publish Toggle"
                       >
                         {!record.isPublic ? <LuEye /> : <LuEyeOff />}
                       </IconButton>
@@ -207,14 +207,14 @@ const EventsAdminListPage = () => {
                       openDelay={200}
                       closeDelay={0}
                       positioning={{ placement: "right" }}
-                      content={t("admin.events.table.viewContacts")}
+                      content={t("events.details.title")}
                     >
                       <IconButton
                         size="sm"
                         onClick={() => edit("adminEvents", record.id)}
                         variant="ghost"
                         rounded="full"
-                        aria-label="View Contacts"
+                        aria-label="View Details"
                       >
                         <LuPencil />
                       </IconButton>
