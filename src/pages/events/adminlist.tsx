@@ -183,7 +183,11 @@ const EventsAdminListPage = () => {
                       openDelay={200}
                       closeDelay={0}
                       positioning={{ placement: "right" }}
-                      content={t("admin.events.table.viewContacts")}
+                      content={
+                        record.isPublic
+                          ? t("events.actions.unpublish")
+                          : t("events.actions.publish")
+                      }
                     >
                       <IconButton
                         size="sm"
