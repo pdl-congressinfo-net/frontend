@@ -9,6 +9,9 @@ export interface Event {
   startDate: Date;
   endDate: Date;
   isPublic: boolean;
+  subject?: string;
+  url?: string;
+  language: string;
   eventTypeId?: string;
   locationId?: string;
 }

@@ -11,6 +11,9 @@ export interface CreateEventRequest {
   start_date: Date;
   end_date: Date;
   is_public: boolean;
+  subject?: string;
+  url?: string;
+  language?: string;
   event_type_id?: string;
   location_id?: string;
 }
@@ -20,6 +23,9 @@ export interface UpdateEventRequest {
   start_date?: Date;
   end_date?: Date;
   is_public?: boolean;
+  subject?: string;
+  url?: string;
+  language?: string;
   event_type_id?: string;
   location_id?: string;
 }

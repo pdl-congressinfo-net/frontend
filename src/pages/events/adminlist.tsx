@@ -128,8 +128,13 @@ const EventsAdminListPage = () => {
             key: "startDate",
             header: "Date",
             sortable: true,
-            render: (item: Event) =>
-              new Date(item.startDate).toLocaleDateString(),
+            render: (item: Event) => (
+              <>
+                {new Date(item.startDate).toLocaleDateString()}
+                {" - "}
+                {new Date(item.endDate).toLocaleDateString()}
+              </>
+            ),
           },
           {
             key: "actions",
