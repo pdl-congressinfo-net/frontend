@@ -145,7 +145,7 @@ export const EventCard = ({
                         size="md"
                         onClick={(e) => {
                           e.stopPropagation();
-                          edit("events", event.id);
+                          edit("adminEvents", event.id);
                         }}
                       >
                         <LuPencil />

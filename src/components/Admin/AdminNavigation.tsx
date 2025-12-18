@@ -31,7 +31,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
     {
       label: "Events",
       icon: LuPresentation,
-      ressources: ["events", "types"],
+      ressources: ["adminEvents", "types"],
     },
     {
       label: "UserManagement",

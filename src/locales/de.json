@@ -67,6 +67,7 @@
   },
   "events": {
     "title": "Veranstaltungen",
+    "public": "Veröffentlicht",
     "actions": {
       "addEvent": "Veranstaltung hinzufügen",
       "register": "Anmelden",
@@ -224,7 +225,7 @@
       "welcome": "Willkommen im Admin-Dashboard"
     },
     "links": {
-      "events": "Veranstaltungen",
+      "adminEvents": "Veranstaltungen",
       "users": "Benutzer",
       "contacts": "Kontakte",
       "companies": "Unternehmen",

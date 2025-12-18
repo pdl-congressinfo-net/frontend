@@ -12,11 +12,13 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  GetListResponse,
   useTable,
   type BaseRecord,
   type CrudFilters,
   type CrudSort,
 } from "@refinedev/core";
+import { QueryObserverResult } from "@tanstack/query-core";
 import {
   LuChevronDown,
   LuChevronLeft,
@@ -31,6 +33,7 @@ type Column<T> = {
   header: React.ReactNode;
   sortable?: boolean;
   searchable?: boolean;
+  sortSearchTranslation?: (record: T) => string; // Function to translate ID to searchable text (for client-side filtering)
   isDate?: boolean;
   visible?: boolean;
   render?: (record: T) => React.ReactNode;
@@ -45,6 +48,7 @@ type DataTableProps<T extends BaseRecord> = {
   defaultPageSizeOptions?: number[];
   interactive?: boolean;
   onDataChange?: (data: T[], total: number) => void;
+  onQuery?: (query: QueryObserverResult<GetListResponse<T>, T>) => void;
   globalFilters?: CrudFilters;
   caption?: React.ReactNode;
 };
@@ -56,6 +60,7 @@ export function DataTable<T extends BaseRecord>({
   defaultPageSizeOptions = [10, 20, 50],
   interactive = true,
   onDataChange,
+  onQuery,
   globalFilters = [],
   caption,
 }: DataTableProps<T>) {
@@ -70,6 +75,7 @@ export function DataTable<T extends BaseRecord>({
     pageSize,
     setPageSize,
     pageCount,
+    tableQuery,
   } = useTable<T>({
     resource,
     pagination: {
@@ -109,12 +115,16 @@ export function DataTable<T extends BaseRecord>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  // Notify parent component when data changes
+  // Notify parent component when data changes; avoid function and query identity loops
   useEffect(() => {
     if (onDataChange && result.data) {
       onDataChange(result.data, result.total ?? 0);
     }
-  }, [result.data, result.total, onDataChange]);
+    if (onQuery) {
+      onQuery(tableQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result.data, result.total]);
 
   // Memoize default page size options to prevent recreating on every render
   const pageSizeOptionsMemo = useMemo(
@@ -164,12 +174,18 @@ export function DataTable<T extends BaseRecord>({
   );
 
   // Searchable fields include both visible and hidden columns
+  // Exclude columns with sortSearchTranslation (they use client-side filtering)
   const searchableFields = useMemo(
-    () => columns.filter((c) => c.searchable).map((c) => String(c.key)),
+    () =>
+      columns
+        .filter((c) => c.searchable && !c.sortSearchTranslation)
+        .map((c) => String(c.key)),
     [columns],
   );
 
-  const toggleSort = (field: string, multiSort: boolean = false) => {
+  const toggleSort = (columnKey: string, multiSort: boolean = false) => {
+    const field = columnKey;
+
     const existing = sorters.find((s) => s.field === field);
 
     let next: CrudSort[];
@@ -203,7 +219,9 @@ export function DataTable<T extends BaseRecord>({
     setCurrentPage(1);
   };
 
-  const getSortIcon = (field: string) => {
+  const getSortIcon = (columnKey: string) => {
+    const field = columnKey;
+
     const sorterIndex = sorters.findIndex((s) => s.field === field);
     if (sorterIndex === -1) return <LuChevronsUpDown size={14} opacity={0.3} />;
 
@@ -215,8 +233,11 @@ export function DataTable<T extends BaseRecord>({
     );
   };
 
-  const getSortNumber = (field: string) => {
+  const getSortNumber = (columnKey: string) => {
     if (sorters.length <= 1) return null;
+
+    const field = columnKey;
+
     const sorterIndex = sorters.findIndex((s) => s.field === field);
     return sorterIndex !== -1 ? sorterIndex + 1 : null;
   };
@@ -334,34 +355,40 @@ export function DataTable<T extends BaseRecord>({
         </Table.Header>
 
         <Table.Body>
-          {result.data.map((record) => (
-            <Table.Row key={record.id}>
-              {visibleColumns.map((col) => {
-                const cellContent = col.render
-                  ? col.render(record)
-                  : col.isDate
-                    ? formatDate(record[col.key as keyof T])
-                    : record[col.key as keyof T];
+          {result.data
+            .filter((record) => {
+              // Apply client-side filtering for columns with sortSearchTranslation
+              if (!search) return true;
 
-                // Only use Highlight for string content and when search is active
-                const shouldHighlight =
-                  search && col.searchable && typeof cellContent === "string"
-                    ? true
-                    : false;
+              const translatedColumns = columns.filter(
+                (c) => c.searchable && c.sortSearchTranslation,
+              );
+              if (translatedColumns.length === 0) return true;
 
-                return (
-                  <Table.Cell
-                    key={String(col.key)}
-                    textAlign={col.textAlign || "left"}
-                  >
-                    <HStack
-                      justify={
-                        col.textAlign === "right"
-                          ? "flex-end"
-                          : col.textAlign === "center"
-                            ? "center"
-                            : "flex-start"
-                      }
+              return translatedColumns.some((col) => {
+                const translated = col.sortSearchTranslation!(record);
+                return translated.toLowerCase().includes(search.toLowerCase());
+              });
+            })
+            .map((record) => (
+              <Table.Row key={record.id}>
+                {visibleColumns.map((col) => {
+                  const cellContent = col.render
+                    ? col.render(record)
+                    : col.isDate
+                      ? formatDate(record[col.key as keyof T])
+                      : record[col.key as keyof T];
+
+                  // Only use Highlight for string content and when search is active
+                  const shouldHighlight =
+                    search && col.searchable && typeof cellContent === "string"
+                      ? true
+                      : false;
+
+                  return (
+                    <Table.Cell
+                      key={String(col.key)}
+                      textAlign={col.textAlign || "left"}
                     >
                       {shouldHighlight ? (
                         <Highlight
@@ -375,14 +402,23 @@ export function DataTable<T extends BaseRecord>({
                           {cellContent as string}
                         </Highlight>
                       ) : (
-                        cellContent
+                        <HStack
+                          justify={
+                            col.textAlign === "right"
+                              ? "flex-end"
+                              : col.textAlign === "center"
+                                ? "center"
+                                : "flex-start"
+                          }
+                        >
+                          {cellContent}
+                        </HStack>
                       )}
-                    </HStack>
-                  </Table.Cell>
-                );
-              })}
-            </Table.Row>
-          ))}
+                    </Table.Cell>
+                  );
+                })}
+              </Table.Row>
+            ))}
         </Table.Body>
       </Table.Root>
 

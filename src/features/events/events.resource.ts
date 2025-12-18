@@ -11,11 +11,20 @@ export const eventTypeResource = {
 
 export const eventResource = {
   name: "events",
+  list: "/events",
+  meta: {
+    canDelete: true,
+  },
+};
+
+export const eventAdminResource = {
+  name: "adminEvents",
   list: "/admin/events",
   create: "/admin/events/create",
   edit: "/admin/events/edit/:id",
   show: "/admin/events/show/:id",
   meta: {
     canDelete: true,
+    adminModule: true,
   },
 };

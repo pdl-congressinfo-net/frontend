@@ -22,7 +22,7 @@ const EventArchiveListActions = () => {
         <LuClipboardPenLine />
       </IconButton>
       <IconButton
-        onClick={() => create("events")}
+        onClick={() => create("adminEvents")}
         variant="ghost"
         rounded="full"
         aria-label="Add Event"

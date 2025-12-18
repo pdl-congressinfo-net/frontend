@@ -23,6 +23,7 @@ import {
   sponsoringsResource,
 } from "./features/companies/companies.resource";
 import {
+  eventAdminResource,
   eventResource,
   eventTypeResource,
 } from "./features/events/events.resource";
@@ -72,6 +73,7 @@ function App() {
                   contactsResource,
                   eventTypeResource,
                   eventResource,
+                  eventAdminResource,
                   programmResource,
                   eventSessionResource,
                   locationResource,
