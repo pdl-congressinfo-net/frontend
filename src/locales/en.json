@@ -71,7 +71,13 @@
     "messages": {
       "noUpcomingEvents": "No upcoming events found. Try to look in the archive.",
       "detailsInInternalArea": "Details will be displayed in the internal area",
-      "programInInternalArea": "Program will be displayed in the internal area"
+      "programInInternalArea": "Program will be displayed in the internal area",
+      "noProgram": "Program will be announced soon.",
+      "noProgramItems": "No program items in this session yet.",
+      "noSessions": "No sessions created yet. Add your first session to get started."
+    },
+    "labels": {
+      "featured": "Featured"
     },
     "errors": {
       "loadingError": "Error loading events.",
@@ -106,6 +112,36 @@
       "title": "Registration - ",
       "register": "Register",
       "formFor": "Registration form for "
+    },
+    "programm": {
+      "types": {
+        "LCT": "Lecture",
+        "WKS": "Workshop",
+        "DMO": "Demo",
+        "NET": "Networking",
+        "BRK": "Break",
+        "KEY": "Keynote",
+        "OTH": "Other"
+      },
+      "actions": {
+        "addSession": "Add Session",
+        "addProgramm": "Add Program Item",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "type": "Type",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "sessionName": "Session Name"
+      },
+      "placeholders": {
+        "selectType": "Select type",
+        "enterTitle": "Enter title",
+        "enterDescription": "Enter description"
+      }
     }
   },
   "locations": {

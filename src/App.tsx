@@ -32,6 +32,10 @@ import {
   locationTypeResource,
 } from "./features/locations/locations.resource";
 import { permissionResource } from "./features/permissions/permissions.resource";
+import {
+  eventSessionResource,
+  programmResource,
+} from "./features/programm/programm.resource";
 import { roleResource } from "./features/roles/roles.resource";
 import {
   contactsResource,
@@ -68,6 +72,8 @@ function App() {
                   contactsResource,
                   eventTypeResource,
                   eventResource,
+                  programmResource,
+                  eventSessionResource,
                   locationResource,
                   locationTypeResource,
                   countryResource,

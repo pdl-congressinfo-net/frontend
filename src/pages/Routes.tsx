@@ -32,6 +32,7 @@ import {
   LocationTypesListPage,
 } from "./locations";
 import { PermissionsListPage } from "./permissions";
+import { ProgrammsListPage } from "./programm";
 import { RolesListPage } from "./roles";
 import {
   SponsoringCreatePage,
@@ -114,6 +115,9 @@ function AppRoutes() {
               <Route path="create" element={<ContactCreatePage />} />
               <Route path="edit/:id" element={<ContactEditPage />} />
               <Route path="show/:id" element={<ContactShowPage />} />
+            </Route>
+            <Route path="programm">
+              <Route index element={<ProgrammsListPage />} />
             </Route>
 
             <Route path="sponsorings">

@@ -1,7 +1,7 @@
-import { Box, Button, IconButton } from "@chakra-ui/react";
-import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { Badge, Box, Flex, IconButton } from "@chakra-ui/react";
+import { useGo, useList, useNavigation, useTranslation } from "@refinedev/core";
 import { useCallback, useEffect, useState } from "react";
-import { LuCirclePlus } from "react-icons/lu";
+import { LuCirclePlus, LuExternalLink, LuEye } from "react-icons/lu";
 import { DataTable } from "../../components/Common/DataTable";
 import { Location } from "../../features/locations/location.model";
 import { useLayout } from "../../providers/layout-provider";
@@ -26,6 +26,7 @@ const LocationsListPage = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const { show } = useNavigation();
+  const go = useGo();
 
   const onDataChange = useCallback((data: Location[]) => {
     const ids = Array.from(
@@ -77,6 +78,14 @@ const LocationsListPage = () => {
             header: t("admin.locations.table.name"),
             searchable: true,
             sortable: true,
+            render: (record: Location) => (
+              <Flex gap={2} alignItems="center">
+                {record.name}
+                {record.link && (
+                  <Badge>{t("admin.locations.table.online")}</Badge>
+                )}
+              </Flex>
+            ),
           },
           {
             key: "city",
@@ -99,13 +108,28 @@ const LocationsListPage = () => {
           {
             key: "actions",
             header: t("admin.locations.table.actions"),
+            textAlign: "right",
             render: (record: Location) => (
-              <Button
-                size="sm"
-                onClick={() => show("locations", record.id.toString())}
-              >
-                {t("common.actions.view")}
-              </Button>
+              <Flex gap={2}>
+                {record.link && (
+                  <IconButton
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      window.open(record.link!, "_blank", "noopener,noreferrer")
+                    }
+                  >
+                    <LuExternalLink />
+                  </IconButton>
+                )}
+                <IconButton
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => show("locations", record.id.toString())}
+                >
+                  <LuEye />
+                </IconButton>
+              </Flex>
             ),
           },
         ]}

@@ -23,7 +23,8 @@
     "actions": {
       "view": "Ansehen",
       "edit": "Bearbeiten",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "openLink": "Link öffnen"
     },
     "table": {
       "actions": "Aktionen"
@@ -81,7 +82,13 @@
     "messages": {
       "noUpcomingEvents": "Keine bevorstehenden Veranstaltungen gefunden. Schauen Sie im Archiv nach.",
       "detailsInInternalArea": "Details werden im internen Bereich angezeigt",
-      "programInInternalArea": "Programm wird im internen Bereich angezeigt"
+      "programInInternalArea": "Programm wird im internen Bereich angezeigt",
+      "noProgram": "Programm wird in Kürze bekanntgegeben.",
+      "noProgramItems": "Für diese Session sind noch keine Programmpunkte erfasst.",
+      "noSessions": "Noch keine Sessions erstellt. Fügen Sie Ihre erste Session hinzu, um zu beginnen."
+    },
+    "labels": {
+      "featured": "Highlight"
     },
     "errors": {
       "loadingError": "Fehler beim Laden der Veranstaltungen.",
@@ -116,6 +123,36 @@
       "title": "Anmeldung - ",
       "register": "Anmelden",
       "formFor": "Anmeldeformular für "
+    },
+    "programm": {
+      "types": {
+        "LCT": "Vortrag",
+        "WKS": "Workshop",
+        "DMO": "Demo",
+        "NET": "Networking",
+        "BRK": "Pause",
+        "KEY": "Keynote",
+        "OTH": "Sonstiges"
+      },
+      "actions": {
+        "addSession": "Session hinzufügen",
+        "addProgramm": "Programmpunkt hinzufügen",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+      },
+      "fields": {
+        "title": "Titel",
+        "description": "Beschreibung",
+        "type": "Typ",
+        "startTime": "Startzeit",
+        "endTime": "Endzeit",
+        "sessionName": "Sitzungsname"
+      },
+      "placeholders": {
+        "selectType": "Typ auswählen",
+        "enterTitle": "Titel eingeben",
+        "enterDescription": "Beschreibung eingeben"
+      }
     },
     "types": {
       "name": {
@@ -231,7 +268,8 @@
         "name": "Name",
         "city": "Stadt",
         "state": "Bundesland",
-        "actions": "Aktionen"
+        "actions": "Aktionen",
+        "online": "Online"
       }
     },
     "companies": {

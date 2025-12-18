@@ -3,7 +3,6 @@ body {
   background: white;
 }
 
-
 @media screen and (max-width: 751px) {
   .layout {
     display: block;
