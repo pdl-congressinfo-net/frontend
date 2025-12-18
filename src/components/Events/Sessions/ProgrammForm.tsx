@@ -51,7 +51,7 @@ export const ProgrammForm = ({
     ? new Date(programm.endTime).toTimeString().slice(0, 5)
     : "";
 
-  const { register, handleSubmit } = useForm<ProgrammFormValues>({
+  const { register, handleSubmit, setValue } = useForm<ProgrammFormValues>({
     defaultValues: {
       title: programm?.title || "",
       description: programm?.description || "",
@@ -60,6 +60,9 @@ export const ProgrammForm = ({
       end_time: defaultEndTime,
     },
   });
+
+  // Register type field manually
+  register("type", { required: true });
 
   const programmTypes: ProgrammType[] = [
     "LCT",
@@ -113,6 +116,14 @@ export const ProgrammForm = ({
               collection={typeCollection}
               defaultValue={[programm?.type || "LCT"]}
               positioning={{ sameWidth: true }}
+              onValueChange={(details) => {
+                if (details.value[0]) {
+                  setValue("type", details.value[0] as ProgrammType, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }
+              }}
             >
               <Select.Trigger>
                 <Select.ValueText
@@ -126,13 +137,6 @@ export const ProgrammForm = ({
                   </Select.Item>
                 ))}
               </Select.Content>
-              <select {...register("type", { required: true })} hidden>
-                {programmTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {t(`events.programm.types.${type}`)}
-                  </option>
-                ))}
-              </select>
             </Select.Root>
           </Field.Root>
 

@@ -53,7 +53,7 @@ export const SessionForm = ({
     ? new Date(session.endTime).toTimeString().slice(0, 5)
     : "";
 
-  const { register, handleSubmit } = useForm<SessionFormValues>({
+  const { register, handleSubmit, setValue } = useForm<SessionFormValues>({
     defaultValues: {
       name: session?.name || "",
       date: defaultDate,
@@ -61,6 +61,9 @@ export const SessionForm = ({
       end_time: defaultEndTime,
     },
   });
+
+  // Register date field manually
+  register("date", { required: true });
 
   const dateCollection = createListCollection({
     items: availableDates.map((date) => ({
@@ -101,6 +104,14 @@ export const SessionForm = ({
               collection={dateCollection}
               defaultValue={[defaultDate]}
               positioning={{ sameWidth: true }}
+              onValueChange={(details) => {
+                if (details.value[0]) {
+                  setValue("date", details.value[0], {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }
+              }}
             >
               <Select.Trigger>
                 <Select.ValueText placeholder="Select date" />
@@ -112,17 +123,6 @@ export const SessionForm = ({
                   </Select.Item>
                 ))}
               </Select.Content>
-              <select
-                {...register("date", { required: true })}
-                hidden
-                defaultValue={defaultDate}
-              >
-                {availableDates.map((date) => (
-                  <option key={date} value={date}>
-                    {date}
-                  </option>
-                ))}
-              </select>
             </Select.Root>
           </Field.Root>
 

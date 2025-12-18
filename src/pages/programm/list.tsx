@@ -5,7 +5,6 @@ import {
   HStack,
   IconButton,
   Separator,
-  Stack,
   Tabs,
   Text,
   Timeline,
@@ -22,7 +21,7 @@ import {
 } from "@refinedev/core";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LuCheck, LuPencil, LuPlus, LuX } from "react-icons/lu";
+import { LuPencil, LuPlus } from "react-icons/lu";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ProgrammForm } from "../../components/Events/Sessions/ProgrammForm";
 import { SessionForm } from "../../components/Events/Sessions/SessionForm";
@@ -65,22 +64,38 @@ const AddItemSeparator = ({
   onClick,
   size = "sm",
   ml,
+  isHovered: externalIsHovered,
+  onHoverChange,
 }: {
   label: string;
   onClick: () => void;
   size?: "xs" | "sm";
   ml?: string | number;
+  isHovered?: boolean;
+  onHoverChange?: (hovered: boolean) => void;
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [internalIsHovered, setInternalIsHovered] = useState(false);
+  const isHovered = externalIsHovered ?? internalIsHovered;
+
+  const handleMouseEnter = () => {
+    setInternalIsHovered(true);
+    onHoverChange?.(true);
+  };
+
+  const handleMouseLeave = () => {
+    setInternalIsHovered(false);
+    onHoverChange?.(false);
+  };
 
   return (
     <Box
       position="relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       ml={ml}
       transform={isHovered ? "scale(1)" : "scale(0.2)"}
       transition="transform 0.3s cubic-bezier(0.1, 0, 0.2, 1)"
+      pointerEvents="auto"
     >
       <HStack
         justify="center"
@@ -178,7 +193,7 @@ const ProgrammsListPage = () => {
   const { setTitle, setActions } = useLayout();
   const { eventId } = useParams<{ eventId: string }>();
   const [searchParams] = useSearchParams();
-  
+
   const editSessionId = searchParams.get("editSession");
   const editProgrammId = searchParams.get("editProgramm");
 
@@ -186,8 +201,20 @@ const ProgrammsListPage = () => {
     null,
   );
   const [selectedDay, setSelectedDay] = useState<string>("");
-  const [editingSessionId, setEditingSessionId] = useState<string | null>(editSessionId);
-  const [editingProgrammId, setEditingProgrammId] = useState<string | null>(editProgrammId);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(
+    editSessionId,
+  );
+  const [editingProgrammId, setEditingProgrammId] = useState<string | null>(
+    editProgrammId,
+  );
+
+  // Hover states for add item separators
+  const [sessionHoverStates, setSessionHoverStates] = useState<
+    Record<string, boolean>
+  >({});
+  const [programmHoverStates, setProgrammHoverStates] = useState<
+    Record<string, boolean>
+  >({});
 
   // Fetch event details
   const { result: event } = useOne({
@@ -222,7 +249,7 @@ const ProgrammsListPage = () => {
   // Create mutations
   const { mutate: createSession } = useCreate();
   const { mutate: createProgramm } = useCreate();
-  
+
   // Update mutations
   const { mutate: updateSession } = useUpdate();
   const { mutate: updateProgramm } = useUpdate();
@@ -285,36 +312,48 @@ const ProgrammsListPage = () => {
   useEffect(() => {
     // If editing a session, find its day and select it
     if (editSessionId && sessions.length > 0) {
-      const sessionToEdit = sessions.find(s => s.id === editSessionId);
+      const sessionToEdit = sessions.find((s) => s.id === editSessionId);
       if (sessionToEdit) {
-        const sessionDay = new Date(sessionToEdit.startTime).toISOString().split("T")[0];
+        const sessionDay = new Date(sessionToEdit.startTime)
+          .toISOString()
+          .split("T")[0];
         setSelectedDay(sessionDay);
         setEditingSessionId(editSessionId);
         return;
       }
     }
-    
+
     // If editing a programm, find its session's day and select it
     if (editProgrammId && allProgramms.length > 0) {
-      const programmToEdit = allProgramms.find(p => p.id === editProgrammId);
+      const programmToEdit = allProgramms.find((p) => p.id === editProgrammId);
       if (programmToEdit) {
-        const session = sessions.find(s => s.id === programmToEdit.sessionId);
+        const session = sessions.find((s) => s.id === programmToEdit.sessionId);
         if (session) {
-          const sessionDay = new Date(session.startTime).toISOString().split("T")[0];
+          const sessionDay = new Date(session.startTime)
+            .toISOString()
+            .split("T")[0];
           setSelectedDay(sessionDay);
           setEditingProgrammId(editProgrammId);
           return;
         }
       }
     }
-    
+
     // Default: select first day with sessions or first event day
     if (!selectedDay && daysWithSessions.length > 0) {
       setSelectedDay(daysWithSessions[0]);
     } else if (!selectedDay && eventDays.length > 0) {
       setSelectedDay(eventDays[0]);
     }
-  }, [selectedDay, daysWithSessions, eventDays, editSessionId, editProgrammId, sessions, allProgramms]);
+  }, [
+    selectedDay,
+    daysWithSessions,
+    eventDays,
+    editSessionId,
+    editProgrammId,
+    sessions,
+    allProgramms,
+  ]);
 
   // Filter sessions by selected day
   const sessionsForDay = useMemo(() => {
@@ -556,295 +595,508 @@ const ProgrammsListPage = () => {
               </Box>
             ) : (
               sessionsForDay.map(
-                (session: EventSession, sessionIndex: number) => (
-                  <Box key={session.id}>
-                    {/* Add session button above */}
-                    {canCreateSession?.can && (
-                      <>
-                        {insertPosition?.type === "session" &&
-                        insertPosition.afterSessionId ===
-                          (sessionIndex > 0
-                            ? sessions[sessionIndex - 1].id
-                            : undefined) ? (
-                          <Box mb={4}>
-                            <InlineSessionForm
-                              eventId={eventId}
-                              availableDates={availableDatesWithCurrent}
-                              selectedDate={selectedDay}
-                              onSave={handleSaveSession}
-                              onCancel={() => setInsertPosition(null)}
-                            />
-                          </Box>
-                        ) : (
-                          <AddItemSeparator
-                            label={t("events.programm.actions.addSession")}
-                            ml={4}
-                            onClick={() =>
-                              setInsertPosition({
-                                type: "session",
-                                afterSessionId:
-                                  sessionIndex > 0
-                                    ? sessions[sessionIndex - 1].id
-                                    : undefined,
-                              })
-                            }
-                          />
-                        )}
-                      </>
-                    )}
+                (session: EventSession, sessionIndex: number) => {
+                  const sessionKey = `session-${sessionIndex}`;
+                  const isSessionHovered =
+                    sessionHoverStates[sessionKey] || false;
+                  return (
+                    <Box key={session.id} position="relative">
+                      {/* Add session button above */}
+                      {canCreateSession?.can && (
+                        <>
+                          {insertPosition?.type === "session" &&
+                          insertPosition.afterSessionId ===
+                            (sessionIndex > 0
+                              ? sessions[sessionIndex - 1].id
+                              : undefined) ? (
+                            <Box mb={4}>
+                              <InlineSessionForm
+                                eventId={eventId}
+                                availableDates={availableDatesWithCurrent}
+                                selectedDate={selectedDay}
+                                onSave={handleSaveSession}
+                                onCancel={() => setInsertPosition(null)}
+                              />
+                            </Box>
+                          ) : (
+                            <>
+                              <Box
+                                position="absolute"
+                                top="-12px"
+                                left="0"
+                                right="0"
+                                height="24px"
+                                onMouseEnter={() =>
+                                  setSessionHoverStates((prev) => ({
+                                    ...prev,
+                                    [sessionKey]: true,
+                                  }))
+                                }
+                                onMouseLeave={() =>
+                                  setSessionHoverStates((prev) => ({
+                                    ...prev,
+                                    [sessionKey]: false,
+                                  }))
+                                }
+                                zIndex={1}
+                              />
+                              <AddItemSeparator
+                                label={t("events.programm.actions.addSession")}
+                                ml={4}
+                                isHovered={isSessionHovered}
+                                onHoverChange={(hovered) =>
+                                  setSessionHoverStates((prev) => ({
+                                    ...prev,
+                                    [sessionKey]: hovered,
+                                  }))
+                                }
+                                onClick={() =>
+                                  setInsertPosition({
+                                    type: "session",
+                                    afterSessionId:
+                                      sessionIndex > 0
+                                        ? sessions[sessionIndex - 1].id
+                                        : undefined,
+                                  })
+                                }
+                              />
+                            </>
+                          )}
+                        </>
+                      )}
 
-                    {/* Session Card */}
-                    <Timeline.Item>
-                      <Timeline.Indicator />
-                      <Timeline.Content>
-                        {editingSessionId === session.id ? (
-                          <Box mb={4}>
-                            <SessionForm
-                              eventId={eventId}
-                              session={session}
-                              availableDates={availableDatesWithCurrent}
-                              onSave={(data) => {
-                                handleUpdateSession(session.id, data);
-                              }}
-                              onCancel={() => {
-                                setEditingSessionId(null);
-                                navigate(`/admin/events/${eventId}/programm`, { replace: true });
-                              }}
-                              isInline={true}
-                            />
-                          </Box>
-                        ) : (
-                          <Card.Root mb={4}>
-                            <Card.Header>
-                              <HStack justify="space-between" align="start">
-                                <Box flex="1">
-                                  <Card.Title>{session.name}</Card.Title>
-                                  <Card.Description>
-                                    {new Date(session.startTime).toLocaleString()} -{" "}
-                                    {new Date(session.endTime).toLocaleString()}
-                                  </Card.Description>
-                                </Box>
-                                <CanAccess resource="sessions" action="update">
-                                  <IconButton
-                                    aria-label={t("actions.edit")}
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => setEditingSessionId(session.id)}
-                                  >
-                                    <LuPencil />
-                                  </IconButton>
-                                </CanAccess>
-                              </HStack>
-                            </Card.Header>
-                            <Card.Body>
-                            <VStack align="stretch" gap={2}>
-                              {programmsBySession[session.id]?.map(
-                                (programm: Programm, programmIndex: number) => (
-                                  <Box key={programm.id}>
-                                    {/* Add programm button */}
-                                    {canCreateProgramm?.can && (
-                                      <Box ml={4}>
-                                        {insertPosition?.type === "programm" &&
-                                        insertPosition.sessionId ===
-                                          session.id &&
-                                        insertPosition.afterProgrammId ===
-                                          (programmIndex > 0
-                                            ? programmsBySession[session.id][
-                                                programmIndex - 1
-                                              ].id
-                                            : undefined) ? (
-                                          <Box mb={2}>
-                                            <InlineProgrammForm
-                                              sessionId={session.id}
-                                              onSave={handleSaveProgramm}
-                                              onCancel={() =>
-                                                setInsertPosition(null)
-                                              }
-                                            />
-                                          </Box>
-                                        ) : (
-                                          <AddItemSeparator
-                                            label={t(
-                                              "events.programm.actions.addProgramm",
-                                            )}
-                                            size="xs"
-                                            onClick={() =>
-                                              setInsertPosition({
-                                                type: "programm",
-                                                sessionId: session.id,
-                                                afterProgrammId:
-                                                  programmIndex > 0
-                                                    ? programmsBySession[
-                                                        session.id
-                                                      ][programmIndex - 1].id
-                                                    : undefined,
-                                              })
-                                            }
-                                          />
-                                        )}
-                                      </Box>
-                                    )}
-
-                                    {/* Programm Item */}
-                                    {editingProgrammId === programm.id ? (
-                                      <Box mb={2} ml={4}>
-                                        <ProgrammForm
-                                          sessionId={session.id}
-                                          programm={programm}
-                                          onSave={(data) => {
-                                            handleUpdateProgramm(programm.id, data);
-                                          }}
-                                          onCancel={() => {
-                                            setEditingProgrammId(null);
-                                            navigate(`/admin/events/${eventId}/programm`, { replace: true });
-                                          }}
-                                          isInline={true}
-                                        />
-                                      </Box>
-                                    ) : (
-                                      <HStack
-                                        p={3}
-                                        bg="gray.50"
-                                        borderRadius="md"
-                                        borderLeft="3px solid"
-                                        borderColor="blue.400"
-                                        ml={4}
-                                      >
-                                        <VStack align="start" flex={1} gap={1}>
-                                          <HStack>
-                                            <Text fontWeight="semibold">
-                                              {programm.title}
-                                            </Text>
-                                            <Text fontSize="xs" color="gray.600">
-                                              (
-                                              {t(
-                                                `events.programm.types.${programm.type}`,
-                                              )}
-                                              )
-                                            </Text>
-                                          </HStack>
-                                          {programm.description && (
-                                            <Text fontSize="sm" color="gray.600">
-                                              {programm.description}
-                                            </Text>
-                                          )}
-                                          <Text fontSize="xs" color="gray.500">
-                                            {new Date(
-                                              programm.startTime,
-                                            ).toLocaleTimeString()}{" "}
-                                            -{" "}
-                                            {new Date(
-                                              programm.endTime,
-                                            ).toLocaleTimeString()}
-                                          </Text>
-                                        </VStack>
-                                        <CanAccess
-                                          resource="programm"
-                                          action="update"
-                                        >
-                                          <IconButton
-                                            aria-label="Edit programm"
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => setEditingProgrammId(programm.id)}
-                                          >
-                                            <LuPencil />
-                                          </IconButton>
-                                        </CanAccess>
-                                      </HStack>
-                                    )}
+                      {/* Session Card */}
+                      <Timeline.Item>
+                        <Timeline.Indicator />
+                        <Timeline.Content>
+                          {editingSessionId === session.id ? (
+                            <Box mb={4}>
+                              <SessionForm
+                                eventId={eventId}
+                                session={session}
+                                availableDates={availableDatesWithCurrent}
+                                onSave={(data) => {
+                                  handleUpdateSession(session.id, data);
+                                }}
+                                onCancel={() => {
+                                  setEditingSessionId(null);
+                                  navigate(
+                                    `/admin/events/${eventId}/programm`,
+                                    {
+                                      replace: true,
+                                    },
+                                  );
+                                }}
+                                isInline={true}
+                              />
+                            </Box>
+                          ) : (
+                            <Card.Root mb={4}>
+                              <Card.Header>
+                                <HStack justify="space-between" align="start">
+                                  <Box flex="1">
+                                    <Card.Title>{session.name}</Card.Title>
+                                    <Card.Description>
+                                      {new Date(
+                                        session.startTime,
+                                      ).toLocaleString()}{" "}
+                                      -{" "}
+                                      {new Date(
+                                        session.endTime,
+                                      ).toLocaleString()}
+                                    </Card.Description>
                                   </Box>
-                                ),
-                              )}
-
-                              {/* Add programm button at end */}
-                              {canCreateProgramm?.can && (
-                                <Box ml={4}>
-                                  {insertPosition?.type === "programm" &&
-                                  insertPosition.sessionId === session.id &&
-                                  insertPosition.afterProgrammId ===
-                                    (programmsBySession[session.id]?.length > 0
-                                      ? programmsBySession[session.id][
-                                          programmsBySession[session.id]
-                                            .length - 1
-                                        ].id
-                                      : undefined) ? (
-                                    <Box mb={2}>
-                                      <InlineProgrammForm
-                                        sessionId={session.id}
-                                        onSave={handleSaveProgramm}
-                                        onCancel={() => setInsertPosition(null)}
-                                      />
-                                    </Box>
-                                  ) : (
-                                    <AddItemSeparator
-                                      label={t(
-                                        "events.programm.actions.addProgramm",
-                                      )}
-                                      size="xs"
+                                  <CanAccess
+                                    resource="sessions"
+                                    action="update"
+                                  >
+                                    <IconButton
+                                      aria-label={t("actions.edit")}
+                                      size="sm"
+                                      variant="ghost"
                                       onClick={() =>
-                                        setInsertPosition({
-                                          type: "programm",
-                                          sessionId: session.id,
-                                          afterProgrammId:
-                                            programmsBySession[session.id]
+                                        setEditingSessionId(session.id)
+                                      }
+                                    >
+                                      <LuPencil />
+                                    </IconButton>
+                                  </CanAccess>
+                                </HStack>
+                              </Card.Header>
+                              <Card.Body>
+                                <VStack align="stretch" gap={2}>
+                                  {programmsBySession[session.id]?.map(
+                                    (
+                                      programm: Programm,
+                                      programmIndex: number,
+                                    ) => {
+                                      const programmKey = `programm-${session.id}-${programmIndex}`;
+                                      const isProgrammHovered =
+                                        programmHoverStates[programmKey] ||
+                                        false;
+                                      return (
+                                        <Box
+                                          key={programm.id}
+                                          position="relative"
+                                        >
+                                          {/* Add programm button */}
+                                          {canCreateProgramm?.can && (
+                                            <Box ml={4}>
+                                              {insertPosition?.type ===
+                                                "programm" &&
+                                              insertPosition.sessionId ===
+                                                session.id &&
+                                              insertPosition.afterProgrammId ===
+                                                (programmIndex > 0
+                                                  ? programmsBySession[
+                                                      session.id
+                                                    ][programmIndex - 1].id
+                                                  : undefined) ? (
+                                                <Box mb={2}>
+                                                  <InlineProgrammForm
+                                                    sessionId={session.id}
+                                                    onSave={handleSaveProgramm}
+                                                    onCancel={() =>
+                                                      setInsertPosition(null)
+                                                    }
+                                                  />
+                                                </Box>
+                                              ) : (
+                                                <>
+                                                  <Box
+                                                    position="absolute"
+                                                    top="-8px"
+                                                    left="0"
+                                                    right="0"
+                                                    height="16px"
+                                                    onMouseEnter={() =>
+                                                      setProgrammHoverStates(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          [programmKey]: true,
+                                                        }),
+                                                      )
+                                                    }
+                                                    onMouseLeave={() =>
+                                                      setProgrammHoverStates(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          [programmKey]: false,
+                                                        }),
+                                                      )
+                                                    }
+                                                    zIndex={1}
+                                                  />
+                                                  <AddItemSeparator
+                                                    label={t(
+                                                      "events.programm.actions.addProgramm",
+                                                    )}
+                                                    size="xs"
+                                                    isHovered={
+                                                      isProgrammHovered
+                                                    }
+                                                    onHoverChange={(hovered) =>
+                                                      setProgrammHoverStates(
+                                                        (prev) => ({
+                                                          ...prev,
+                                                          [programmKey]:
+                                                            hovered,
+                                                        }),
+                                                      )
+                                                    }
+                                                    onClick={() =>
+                                                      setInsertPosition({
+                                                        type: "programm",
+                                                        sessionId: session.id,
+                                                        afterProgrammId:
+                                                          programmIndex > 0
+                                                            ? programmsBySession[
+                                                                session.id
+                                                              ][
+                                                                programmIndex -
+                                                                  1
+                                                              ].id
+                                                            : undefined,
+                                                      })
+                                                    }
+                                                  />
+                                                </>
+                                              )}
+                                            </Box>
+                                          )}
+
+                                          {/* Programm Item */}
+                                          {editingProgrammId === programm.id ? (
+                                            <Box mb={2} ml={4}>
+                                              <ProgrammForm
+                                                sessionId={session.id}
+                                                programm={programm}
+                                                onSave={(data) => {
+                                                  handleUpdateProgramm(
+                                                    programm.id,
+                                                    data,
+                                                  );
+                                                }}
+                                                onCancel={() => {
+                                                  setEditingProgrammId(null);
+                                                  navigate(
+                                                    `/admin/events/${eventId}/programm`,
+                                                    { replace: true },
+                                                  );
+                                                }}
+                                                isInline={true}
+                                              />
+                                            </Box>
+                                          ) : (
+                                            <HStack
+                                              p={3}
+                                              bg="gray.50"
+                                              borderRadius="md"
+                                              borderLeft="3px solid"
+                                              borderColor="blue.400"
+                                              ml={4}
+                                            >
+                                              <VStack
+                                                align="start"
+                                                flex={1}
+                                                gap={1}
+                                              >
+                                                <HStack>
+                                                  <Text fontWeight="semibold">
+                                                    {programm.title}
+                                                  </Text>
+                                                  <Text
+                                                    fontSize="xs"
+                                                    color="gray.600"
+                                                  >
+                                                    (
+                                                    {t(
+                                                      `events.programm.types.${programm.type}`,
+                                                    )}
+                                                    )
+                                                  </Text>
+                                                </HStack>
+                                                {programm.description && (
+                                                  <Text
+                                                    fontSize="sm"
+                                                    color="gray.600"
+                                                  >
+                                                    {programm.description}
+                                                  </Text>
+                                                )}
+                                                <Text
+                                                  fontSize="xs"
+                                                  color="gray.500"
+                                                >
+                                                  {new Date(
+                                                    programm.startTime,
+                                                  ).toLocaleTimeString()}{" "}
+                                                  -{" "}
+                                                  {new Date(
+                                                    programm.endTime,
+                                                  ).toLocaleTimeString()}
+                                                </Text>
+                                              </VStack>
+                                              <CanAccess
+                                                resource="programm"
+                                                action="update"
+                                              >
+                                                <IconButton
+                                                  aria-label="Edit programm"
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  onClick={() =>
+                                                    setEditingProgrammId(
+                                                      programm.id,
+                                                    )
+                                                  }
+                                                >
+                                                  <LuPencil />
+                                                </IconButton>
+                                              </CanAccess>
+                                            </HStack>
+                                          )}
+                                        </Box>
+                                      );
+                                    },
+                                  )}
+
+                                  {/* Add programm button at end */}
+                                  {canCreateProgramm?.can &&
+                                    (() => {
+                                      const endProgrammKey = `programm-end-${session.id}`;
+                                      const isEndProgrammHovered =
+                                        programmHoverStates[endProgrammKey] ||
+                                        false;
+                                      return (
+                                        <Box ml={4} position="relative">
+                                          {insertPosition?.type ===
+                                            "programm" &&
+                                          insertPosition.sessionId ===
+                                            session.id &&
+                                          insertPosition.afterProgrammId ===
+                                            (programmsBySession[session.id]
                                               ?.length > 0
                                               ? programmsBySession[session.id][
                                                   programmsBySession[session.id]
                                                     .length - 1
                                                 ].id
-                                              : undefined,
-                                        })
-                                      }
-                                    />
-                                  )}
-                                </Box>
-                              )}
-                            </VStack>
-                          </Card.Body>
-                        </Card.Root>
-                        )}
-                      </Timeline.Content>
-                    </Timeline.Item>
-                  </Box>
-                ),
+                                              : undefined) ? (
+                                            <Box mb={2}>
+                                              <InlineProgrammForm
+                                                sessionId={session.id}
+                                                onSave={handleSaveProgramm}
+                                                onCancel={() =>
+                                                  setInsertPosition(null)
+                                                }
+                                              />
+                                            </Box>
+                                          ) : (
+                                            <>
+                                              <Box
+                                                position="absolute"
+                                                top="-8px"
+                                                left="0"
+                                                right="0"
+                                                height="16px"
+                                                onMouseEnter={() =>
+                                                  setProgrammHoverStates(
+                                                    (prev) => ({
+                                                      ...prev,
+                                                      [endProgrammKey]: true,
+                                                    }),
+                                                  )
+                                                }
+                                                onMouseLeave={() =>
+                                                  setProgrammHoverStates(
+                                                    (prev) => ({
+                                                      ...prev,
+                                                      [endProgrammKey]: false,
+                                                    }),
+                                                  )
+                                                }
+                                                zIndex={1}
+                                              />
+                                              <AddItemSeparator
+                                                label={t(
+                                                  "events.programm.actions.addProgramm",
+                                                )}
+                                                size="xs"
+                                                isHovered={isEndProgrammHovered}
+                                                onHoverChange={(hovered) =>
+                                                  setProgrammHoverStates(
+                                                    (prev) => ({
+                                                      ...prev,
+                                                      [endProgrammKey]: hovered,
+                                                    }),
+                                                  )
+                                                }
+                                                onClick={() =>
+                                                  setInsertPosition({
+                                                    type: "programm",
+                                                    sessionId: session.id,
+                                                    afterProgrammId:
+                                                      programmsBySession[
+                                                        session.id
+                                                      ]?.length > 0
+                                                        ? programmsBySession[
+                                                            session.id
+                                                          ][
+                                                            programmsBySession[
+                                                              session.id
+                                                            ].length - 1
+                                                          ].id
+                                                        : undefined,
+                                                  })
+                                                }
+                                              />
+                                            </>
+                                          )}
+                                        </Box>
+                                      );
+                                    })()}
+                                </VStack>
+                              </Card.Body>
+                            </Card.Root>
+                          )}
+                        </Timeline.Content>
+                      </Timeline.Item>
+                    </Box>
+                  );
+                },
               )
             )}
 
             {/* Add session button at end */}
-            {sessions.length > 0 && canCreateSession?.can && (
-              <>
-                {insertPosition?.type === "session" &&
-                insertPosition.afterSessionId ===
-                  (sessions.length > 0
-                    ? sessions[sessions.length - 1].id
-                    : undefined) ? (
-                  <Box mt={4}>
-                    <InlineSessionForm
-                      eventId={eventId}
-                      availableDates={availableDatesWithCurrent}
-                      selectedDate={selectedDay}
-                      onSave={handleSaveSession}
-                      onCancel={() => setInsertPosition(null)}
-                    />
+            {sessions.length > 0 &&
+              canCreateSession?.can &&
+              (() => {
+                const endSessionKey = "session-end";
+                const isEndSessionHovered =
+                  sessionHoverStates[endSessionKey] || false;
+                return (
+                  <Box position="relative">
+                    {insertPosition?.type === "session" &&
+                    insertPosition.afterSessionId ===
+                      (sessions.length > 0
+                        ? sessions[sessions.length - 1].id
+                        : undefined) ? (
+                      <Box mt={4}>
+                        <InlineSessionForm
+                          eventId={eventId}
+                          availableDates={availableDatesWithCurrent}
+                          selectedDate={selectedDay}
+                          onSave={handleSaveSession}
+                          onCancel={() => setInsertPosition(null)}
+                        />
+                      </Box>
+                    ) : (
+                      <>
+                        <Box
+                          position="absolute"
+                          top="-12px"
+                          left="0"
+                          right="0"
+                          height="24px"
+                          onMouseEnter={() =>
+                            setSessionHoverStates((prev) => ({
+                              ...prev,
+                              [endSessionKey]: true,
+                            }))
+                          }
+                          onMouseLeave={() =>
+                            setSessionHoverStates((prev) => ({
+                              ...prev,
+                              [endSessionKey]: false,
+                            }))
+                          }
+                          zIndex={1}
+                        />
+                        <AddItemSeparator
+                          label={t("events.programm.actions.addSession")}
+                          ml={4}
+                          isHovered={isEndSessionHovered}
+                          onHoverChange={(hovered) =>
+                            setSessionHoverStates((prev) => ({
+                              ...prev,
+                              [endSessionKey]: hovered,
+                            }))
+                          }
+                          onClick={() =>
+                            setInsertPosition({
+                              type: "session",
+                              afterSessionId:
+                                sessions.length > 0
+                                  ? sessions[sessions.length - 1].id
+                                  : undefined,
+                            })
+                          }
+                        />
+                      </>
+                    )}
                   </Box>
-                ) : (
-                  <AddItemSeparator
-                    label={t("events.programm.actions.addSession")}
-                    ml={4}
-                    onClick={() =>
-                      setInsertPosition({
-                        type: "session",
-                        afterSessionId:
-                          sessions.length > 0
-                            ? sessions[sessions.length - 1].id
-                            : undefined,
-                      })
-                    }
-                  />
-                )}
-              </>
-            )}
+                );
+              })()}
           </Timeline.Root>
         </Tabs.Content>
       </Tabs.Root>
