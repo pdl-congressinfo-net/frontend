@@ -16,6 +16,7 @@ import {
 import {
   EventCreatePage,
   EventEditPage,
+  EventsAdminListPage,
   EventShowPage,
   EventsListPage,
   EventTypeCreatePage,
@@ -158,6 +159,7 @@ function AppRoutes() {
             </Route>
 
             <Route path="events">
+              <Route index element={<EventsAdminListPage />} />
               <Route path="create" element={<EventCreatePage />} />
               <Route path="edit/:id" element={<EventEditPage />} />
               <Route path="show/:id" element={<EventShowPage />} />

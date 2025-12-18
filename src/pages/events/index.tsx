@@ -1,3 +1,4 @@
+import EventsAdminListPage from "./adminlist";
 import EventCreatePage from "./create";
 import EventEditPage from "./edit";
 import EventsListPage from "./list";
@@ -11,6 +12,7 @@ import {
 export {
   EventCreatePage,
   EventEditPage,
+  EventsAdminListPage,
   EventShowPage,
   EventsListPage,
   EventTypeCreatePage,

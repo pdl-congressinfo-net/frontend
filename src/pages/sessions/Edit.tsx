@@ -7,7 +7,9 @@ const SessionEditPage = () => {
 
   useEffect(() => {
     // Redirect to list page with edit query param
-    navigate(`/admin/events/${eventId}/programm?editSession=${id}`, { replace: true });
+    navigate(`/admin/events/${eventId}/programm?editSession=${id}`, {
+      replace: true,
+    });
   }, [id, eventId, navigate]);
 
   return null;

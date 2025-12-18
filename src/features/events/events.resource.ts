@@ -11,7 +11,7 @@ export const eventTypeResource = {
 
 export const eventResource = {
   name: "events",
-  list: "/events",
+  list: "/admin/events",
   create: "/admin/events/create",
   edit: "/admin/events/edit/:id",
   show: "/admin/events/show/:id",
