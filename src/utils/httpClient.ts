@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-
-const API_URL = "https://api.dpfurner.xyz/api/v1";
+import { API_URL } from "../config/api";
 
 export const httpClient: AxiosInstance = axios.create({
   baseURL: API_URL,

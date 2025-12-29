@@ -1,11 +1,10 @@
 import { AuthProvider } from "@refinedev/core";
 import { ApiResponse } from "../common/types/api";
+import { API_URL } from "../config/api";
 import users from "../features/users/users.mapper";
 import { CreateUserRequest } from "../features/users/users.requests";
 import { UserDTO } from "../features/users/users.responses";
 import { resetPermissionCache } from "./access-control-provider";
-
-const API_URL = "https://api.dpfurner.xyz/api/v1";
 
 /**
  * Check out the Auth Provider documentation for detailed information

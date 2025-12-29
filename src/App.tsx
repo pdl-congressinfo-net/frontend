@@ -17,6 +17,7 @@ import { notificationProvider } from "./providers/notification-provider";
 import "./providers/rest-data-provider/mapping/feature.loader";
 import { system } from "./theme";
 
+import { API_URL } from "./config/api";
 import {
   companyEmployeeResource,
   companyResource,
@@ -56,10 +57,7 @@ function App() {
               <Refine
                 accessControlProvider={accessControlProvider}
                 authProvider={authProvider}
-                dataProvider={dataProvider(
-                  "https://api.dpfurner.xyz/api/v1",
-                  httpClient,
-                )}
+                dataProvider={dataProvider(API_URL, httpClient)}
                 routerProvider={routerProvider}
                 i18nProvider={i18nProvider}
                 notificationProvider={notificationProvider}

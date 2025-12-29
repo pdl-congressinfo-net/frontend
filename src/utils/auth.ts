@@ -1,4 +1,4 @@
-const API_URL = "https://api.dpfurner.xyz/api/v1";
+import { API_URL } from "../config/api";
 
 /**
  * Request an OTP to be sent to the user's email
