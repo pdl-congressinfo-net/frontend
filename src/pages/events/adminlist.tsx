@@ -3,7 +3,6 @@ import {
   CanAccess,
   useCustomMutation,
   useGo,
-  useList,
   useNavigation,
   useTranslation,
 } from "@refinedev/core";
@@ -21,7 +20,6 @@ import { useNavigate } from "react-router";
 import { DataTable } from "../../components/Common/DataTable";
 import { Tooltip } from "../../components/ui/tooltip";
 import { Event } from "../../features/events/events.model";
-import { Location } from "../../features/locations/location.model";
 import { useLayout } from "../../providers/layout-provider";
 
 const EventAdminListActions = () => {
@@ -53,30 +51,12 @@ const EventAdminListActions = () => {
 
 const EventsAdminListPage = () => {
   const { setTitle, setActions } = useLayout();
-  const [eventData, setEventData] = useState<Event[]>([]);
+  const [, setEventData] = useState<Event[]>([]);
   const [query, setQuery] = useState<any>(null);
   const { translate: t } = useTranslation();
   const { edit } = useNavigation();
 
   const go = useGo();
-
-  const {
-    result: { data: locations },
-    query: { isLoading },
-  } = useList<Location>({
-    resource: "locations",
-    filters:
-      eventData.length > 0
-        ? [
-            {
-              field: "id",
-              operator: "in",
-              value: eventData.map((event) => event.locationId),
-            },
-          ]
-        : [],
-    queryOptions: { enabled: eventData.length > 0 },
-  });
 
   const { mutate: publishEvent } = useCustomMutation();
 
@@ -108,7 +88,7 @@ const EventsAdminListPage = () => {
         onDataChange={useCallback((items: Event[]) => {
           setEventData(items);
         }, [])}
-        onQuery={useCallback((q) => {
+        onQuery={useCallback((q: any) => {
           setQuery(q);
         }, [])}
         columns={[
@@ -173,7 +153,7 @@ const EventsAdminListPage = () => {
                       >
                         <IconButton
                           size="sm"
-                          onClick={() => edit("locations", record.locationId)}
+                          onClick={() => edit("locations", record.locationId!)}
                           variant="ghost"
                           rounded="full"
                           aria-label="View Location"
@@ -230,7 +210,6 @@ const EventsAdminListPage = () => {
             },
           },
         ]}
-        loading={isLoading}
       />
     </Box>
   );

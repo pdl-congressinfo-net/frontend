@@ -1,31 +1,13 @@
-import { Badge, Box, HStack, IconButton, Spinner } from "@chakra-ui/react";
-import {
-  useDelete,
-  useList,
-  useNavigation,
-  useTranslation,
-} from "@refinedev/core";
+import { Badge, Box, HStack, IconButton } from "@chakra-ui/react";
+import { useDelete, useNavigation, useTranslation } from "@refinedev/core";
 import { LuBadgeInfo, LuPencil, LuTrash2 } from "react-icons/lu";
-import { useLocation, useNavigate } from "react-router";
 import { DataTable } from "../../../components/Common/DataTable";
 import { EventType } from "../../../features/events/events.model";
 
 const EventTypesListPage = () => {
   const { translate: t } = useTranslation();
-  const { create, edit, show } = useNavigation();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { edit } = useNavigation();
   const { mutate: deleteEventType } = useDelete();
-
-  const {
-    result: data,
-    query: { isLoading },
-  } = useList<EventType>({
-    resource: "types",
-    meta: {
-      parentModule: "events",
-    },
-  });
 
   const handleDelete = (id: string) => {
     if (window.confirm(t("admin.eventTypes.confirmDelete"))) {
@@ -38,10 +20,6 @@ const EventTypesListPage = () => {
       });
     }
   };
-
-  if (isLoading) {
-    return <Spinner />;
-  }
 
   return (
     <Box p={4}>

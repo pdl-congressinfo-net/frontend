@@ -2,12 +2,10 @@ import { IconButton } from "@chakra-ui/react";
 import { useNavigation } from "@refinedev/core";
 import { useEffect } from "react";
 import { LuCirclePlus, LuClipboardPenLine } from "react-icons/lu";
-import { useNavigate } from "react-router";
 import { EventList } from "../../components/Events/EventList";
 import { useLayout } from "../../providers/layout-provider";
 
 const EventArchiveListActions = () => {
-  const navigate = useNavigate();
   const { create, list } = useNavigation();
 
   return (

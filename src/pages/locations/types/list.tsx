@@ -26,13 +26,13 @@ const LocationTypesListPage = () => {
       <Table.Root>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
+            <Table.ColumnHeader>Code</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {data?.data.map((type) => (
             <Table.Row key={type.id}>
-              <Table.Cell>{type.name}</Table.Cell>
+              <Table.Cell>{type.code}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>

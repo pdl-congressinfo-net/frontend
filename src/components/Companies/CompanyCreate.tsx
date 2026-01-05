@@ -1,25 +1,16 @@
-import {
-  Checkbox,
-  Combobox,
-  Field,
-  Fieldset,
-  Input,
-  useFilter,
-  useListCollection,
-} from "@chakra-ui/react";
+import { Button, Checkbox, Field, Fieldset, Input } from "@chakra-ui/react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useCreate, useList, useTranslation } from "@refinedev/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import z from "zod";
-import { CreateCompanyRequest } from "../../features/companies/companies.requests";
 import { Location } from "../../features/locations/location.model";
 import { CustomCombobox } from "../ui/forms/combobox";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  locationId: z.string().optional(),
+  location_id: z.string().optional(),
   sponsoring: z.boolean().optional(),
 });
 
@@ -31,16 +22,16 @@ export const CompanyCreate = () => {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<CreateCompanyRequest>({
+  } = useForm<z.infer<typeof formSchema>>({
     resolver: standardSchemaResolver(formSchema),
   });
 
   const [searchValue, setSearchValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
+  // Server-side async fetch with search filter
   const {
     result: { data: locationsResult },
-    query: { isLoading: listIsLoading },
+    query: { isLoading },
   } = useList<Location>({
     resource: "locations",
     pagination: { pageSize: 1000 },
@@ -57,32 +48,12 @@ export const CompanyCreate = () => {
 
   const locations = locationsResult || [];
 
-  // Update loading state when list is loading
-  useEffect(() => {
-    setIsLoading(listIsLoading);
-  }, [listIsLoading]);
-
-  console.log("locations", locations);
-
-  const { contains } = useFilter({ sensitivity: "base" });
-
-  const { collection, filter } = useListCollection({
-    initialItems: locations,
-    itemToString: (item) => item.name,
-    itemToValue: (item) => item.id,
-    filter: contains,
-  });
-
-  console.log("collection", collection);
-
-  const handleInputChange = (details: Combobox.InputValueChangeDetails) => {
-    // Update search value for async loading via useList
-    setSearchValue(details.inputValue);
-    // Also apply local filtering for immediate UI feedback
-    filter(details.inputValue);
+  const handleInputChange = (inputValue: string) => {
+    // Update search value to trigger server-side filtering
+    setSearchValue(inputValue);
   };
 
-  const onSubmit = handleSubmit((data: CreateCompanyRequest) => {
+  const onSubmit = handleSubmit((data) => {
     createCompany(
       {
         resource: "companies",
@@ -115,9 +86,10 @@ export const CompanyCreate = () => {
             field="location_id"
             control={control}
             errors={errors}
-            value="name"
+            items={locations}
+            itemLabel="name"
+            itemValue="id"
             isLoading={isLoading}
-            collection={collection}
             handleInputChange={handleInputChange}
             translation={{
               field: t("companies.fields.location"),
@@ -152,6 +124,9 @@ export const CompanyCreate = () => {
               </Field.Root>
             )}
           />
+          <Button type="submit" mt="4" colorScheme="blue">
+            {t("companies.create.submitButton")}
+          </Button>
         </form>
       </Fieldset.Content>
     </Fieldset.Root>

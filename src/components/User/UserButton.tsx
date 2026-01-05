@@ -25,7 +25,7 @@ export const UserButton: React.FC<UserButtonProps> = ({
   onCloseDialog,
 }) => {
   const { mutate: logout } = useLogout();
-  const { isLoading, isSuccess } = useIsAuthenticated();
+  const { isLoading } = useIsAuthenticated();
   const { data: user } = useGetIdentity<User>();
   const { t } = useTranslation();
   const [internalIsDialogOpen, setInternalIsDialogOpen] = React.useState(false);

@@ -1,10 +1,5 @@
 import { Stack, Text } from "@chakra-ui/react";
-import {
-  useCan,
-  useCustomMutation,
-  useList,
-  useTranslation,
-} from "@refinedev/core";
+import { useCustomMutation, useList, useTranslation } from "@refinedev/core";
 import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Event } from "../../features/events/events.model";
@@ -18,8 +13,7 @@ type EventListProps = {
 
 export const EventList = ({ archive }: EventListProps) => {
   const { translate: t } = useTranslation();
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [isPublished, setIsPublished] = useState<boolean>(true);
+  const [order] = useState<"asc" | "desc">("asc");
   const startDate = useMemo(() => {
     var d: Date;
     if (archive) {
@@ -41,16 +35,6 @@ export const EventList = ({ archive }: EventListProps) => {
     sorters: [{ field: "start_date", order: order }],
     filters: [{ field: "end_date", operator: "gte", value: startDate }],
   });
-
-  const { result: eventTypesDto } = useList({
-    resource: "types",
-    meta: {
-      parentModule: "events",
-    },
-  });
-
-  const { data: canShow } = useCan({ resource: "events", action: "show" });
-  const { data: canUpdate } = useCan({ resource: "events", action: "update" });
 
   const { mutate: publishEvent } = useCustomMutation();
 

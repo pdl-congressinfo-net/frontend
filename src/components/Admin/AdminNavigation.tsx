@@ -13,7 +13,7 @@ interface AdminNavigationProps {}
 
 export const AdminNavigation: React.FC<AdminNavigationProps> = () => {
   const { translate: t } = useTranslation();
-  const { show, list } = useNavigation();
+  const { list } = useNavigation();
 
   // Control open accordion values and cap at 2 simultaneously
   const [openValues, setOpenValues] = React.useState<string[]>([]);

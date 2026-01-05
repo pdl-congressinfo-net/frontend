@@ -3,16 +3,12 @@ import {
   CanAccess,
   useList,
   useNavigation,
-  useOne,
   useParsed,
   useTranslation,
 } from "@refinedev/core";
 import { useEffect, useMemo } from "react";
 import { DataTable } from "../../../components/Common/DataTable";
-import {
-  Company,
-  CompanyEmployee,
-} from "../../../features/companies/companies.model";
+import { CompanyEmployee } from "../../../features/companies/companies.model";
 import { Contact } from "../../../features/users/users.model";
 import { useLayout } from "../../../providers/layout-provider";
 
@@ -24,21 +20,12 @@ const CompanyEmployeesListPage = () => {
   const { translate: t } = useTranslation();
   const { edit } = useNavigation();
   const { setActions, setTitle } = useLayout();
-  const {
-    resource,
-    action,
-    id,
-    pathname,
-    params: { companyId },
-  } = useParsed<MyParams>();
+  const { params } = useParsed<MyParams>();
+  const companyId = params?.companyId;
   useEffect(() => {
     setTitle(t("admin.companies.employees.title", "Company Employees"));
     setActions(null);
   }, [setTitle, setActions, t]);
-  const { result: company } = useOne<Company>({
-    resource: "companies",
-    id: companyId!,
-  });
 
   const {
     result: { data: employees },
@@ -63,7 +50,7 @@ const CompanyEmployeesListPage = () => {
     () => [
       {
         field: "id",
-        operator: "in",
+        operator: "in" as const,
         value: employees?.map((e) => e.contactId) ?? [],
       },
     ],

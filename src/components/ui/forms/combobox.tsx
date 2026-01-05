@@ -1,4 +1,11 @@
-import { Combobox, Field, Portal, Spinner } from "@chakra-ui/react";
+import {
+  Combobox,
+  Field,
+  Portal,
+  Spinner,
+  createListCollection,
+} from "@chakra-ui/react";
+import { useMemo } from "react";
 import { Controller } from "react-hook-form";
 
 interface ComboboxTranslation {
@@ -11,44 +18,60 @@ interface ComboboxTranslation {
 
 interface CustomComboBoxProps {
   field: string;
-  key?: string;
-  value?: string;
   control: any;
   errors: any;
   isLoading: boolean;
-  collection: any;
-  handleInputChange: (details: Combobox.InputValueChangeDetails) => void;
+  items: any[];
+  itemLabel: string;
+  itemValue: string;
+  handleInputChange: (inputValue: string) => void;
   translation: ComboboxTranslation;
 }
 
 export const CustomCombobox = ({
   field,
-  key = "id",
-  value = "value",
   control,
   errors,
   isLoading,
-  collection,
+  items,
+  itemLabel,
+  itemValue,
   handleInputChange,
   translation,
 }: CustomComboBoxProps) => {
+  // Create collection from items
+  const collection = useMemo(
+    () =>
+      createListCollection({
+        items,
+        itemToString: (item) => item[itemLabel],
+        itemToValue: (item) => String(item[itemValue]),
+      }),
+    [items, itemLabel, itemValue],
+  );
+
   return (
     <Controller
       control={control}
       name={field}
-      render={({ field }) => (
-        <Field.Root invalid={!!errors[field.name]} required>
+      render={({ field: fieldProps }) => (
+        <Field.Root invalid={!!errors[fieldProps.name]}>
           <Field.Label>{translation.field}</Field.Label>
           <Combobox.Root
             collection={collection}
-            value={field.value ? [field.value] : []}
-            onValueChange={({ value }) => field.onChange(value[0] || "")}
-            onInputValueChange={handleInputChange}
-            onInteractOutside={() => field.onBlur()}
-            openOnClick
+            value={fieldProps.value ? [String(fieldProps.value)] : []}
+            onValueChange={({ value }) => {
+              fieldProps.onChange(value[0] || "");
+            }}
+            onInputValueChange={({ inputValue }) => {
+              handleInputChange(inputValue);
+            }}
           >
             <Combobox.Control>
-              <Combobox.Input placeholder={translation.fieldsPlaceholder} />
+              <Combobox.Input
+                placeholder={translation.fieldsPlaceholder}
+                onBlur={() => fieldProps.onBlur()}
+              />
               <Combobox.IndicatorGroup>
                 <Combobox.ClearTrigger />
                 {isLoading && <Spinner size="sm" />}
@@ -59,16 +82,16 @@ export const CustomCombobox = ({
             <Portal>
               <Combobox.Positioner>
                 <Combobox.Content>
-                  {collection.items.length === 0 ? (
+                  {isLoading ? (
+                    <Combobox.Empty>{translation.loading}</Combobox.Empty>
+                  ) : collection.items.length === 0 ? (
                     <Combobox.Empty>
-                      {isLoading
-                        ? translation.loading
-                        : translation.noOptionsFound}
+                      {translation.noOptionsFound}
                     </Combobox.Empty>
                   ) : (
                     collection.items.map((item) => (
-                      <Combobox.Item key={item[key]} item={item}>
-                        {item[value]}
+                      <Combobox.Item key={String(item[itemValue])} item={item}>
+                        {item[itemLabel]}
                         <Combobox.ItemIndicator />
                       </Combobox.Item>
                     ))
@@ -78,7 +101,7 @@ export const CustomCombobox = ({
             </Portal>
           </Combobox.Root>
           <Field.ErrorText>
-            {errors[field.name] && translation.error}
+            {errors[fieldProps.name] && translation.error}
           </Field.ErrorText>
         </Field.Root>
       )}

@@ -141,7 +141,7 @@ const LocationCreatePage = () => {
               </option>
               {locationTypes?.data.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.name}
+                  {type.code}
                 </option>
               ))}
             </select>

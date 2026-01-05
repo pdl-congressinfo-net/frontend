@@ -11,13 +11,7 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import {
-  CanAccess,
-  useGo,
-  useList,
-  useNavigation,
-  useTranslation,
-} from "@refinedev/core";
+import { CanAccess, useGo, useList, useTranslation } from "@refinedev/core";
 import { useMemo, useState } from "react";
 import { LuPencil } from "react-icons/lu";
 import { Event } from "../../../features/events/events.model";
@@ -32,7 +26,6 @@ interface ProgramProps {
 
 export default function Program({ event }: ProgramProps) {
   const { translate: t } = useTranslation();
-  const { edit } = useNavigation();
   const go = useGo();
   const [selectedDay, setSelectedDay] = useState<string>("");
 
@@ -66,21 +59,6 @@ export default function Program({ event }: ProgramProps) {
       enabled: sessionIds.length > 0,
     },
   });
-
-  // Calculate all days between event start and end
-  const eventDays = useMemo(() => {
-    if (!event?.startDate || !event?.endDate) return [];
-
-    const days: string[] = [];
-    const start = new Date(event.startDate);
-    const end = new Date(event.endDate);
-
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      days.push(new Date(d).toISOString().split("T")[0]);
-    }
-
-    return days;
-  }, [event]);
 
   // Get days that have sessions (sorted chronologically)
   const daysWithSessions = useMemo(() => {

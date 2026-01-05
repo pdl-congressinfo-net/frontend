@@ -2,7 +2,7 @@ import { Box, Button, Field, Input, Spinner, VStack } from "@chakra-ui/react";
 import { useBack, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { EventType } from "../../../features/events/events.model";
 import { UpdateEventTypeRequest } from "../../../features/events/events.requests";
 import { useLayout } from "../../../providers/layout-provider";
@@ -11,7 +11,6 @@ const EventTypeEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const back = useBack();
   const { setTitle, setActions } = useLayout();
-  const navigate = useNavigate();
   const { mutate: updateEventType } = useUpdate();
 
   const {

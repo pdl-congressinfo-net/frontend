@@ -1,5 +1,5 @@
 import { Badge, Box, Flex, IconButton } from "@chakra-ui/react";
-import { useGo, useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
 import { useCallback, useEffect, useState } from "react";
 import { LuCirclePlus, LuExternalLink, LuEye } from "react-icons/lu";
 import { DataTable } from "../../components/Common/DataTable";
@@ -26,7 +26,6 @@ const LocationsListPage = () => {
   const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const { show } = useNavigation();
-  const go = useGo();
 
   const onDataChange = useCallback((data: Location[]) => {
     const ids = Array.from(

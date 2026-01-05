@@ -1,5 +1,5 @@
 import { Box, IconButton } from "@chakra-ui/react";
-import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useNavigation, useTranslation } from "@refinedev/core";
 import { useEffect } from "react";
 import { LuCirclePlus } from "react-icons/lu";
 import { DataTable } from "../../components/Common/DataTable";
@@ -23,21 +23,12 @@ const UserCreateActions = () => {
 
 const UsersListPage = () => {
   const { translate: t } = useTranslation();
-  const { show } = useNavigation();
 
   const { setActions, setTitle } = useLayout();
   useEffect(() => {
     setTitle(t("admin.users.title", "Users"));
     setActions(<UserCreateActions />);
   }, [setTitle, setActions]);
-  const {
-    result: data,
-    query: { isLoading },
-  } = useList<User>({
-    resource: "users",
-  });
-
-  if (isLoading) return <Box>{t("common.loading")}</Box>;
 
   return (
     <Box p={4}>

@@ -1,5 +1,4 @@
 import { Box, Container, Flex, Heading } from "@chakra-ui/react";
-import { useTranslation } from "@refinedev/core";
 import * as React from "react";
 import { useLayout } from "../../providers/layout-provider";
 
@@ -8,7 +7,6 @@ interface UserLayoutProps {
 }
 
 export const UserLayout: React.FC<UserLayoutProps> = ({ children }) => {
-  const { translate } = useTranslation();
   const { title, actions } = useLayout();
 
   return (

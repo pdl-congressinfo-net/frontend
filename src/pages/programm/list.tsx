@@ -15,7 +15,6 @@ import {
   useCan,
   useCreate,
   useList,
-  useNavigation,
   useOne,
   useUpdate,
 } from "@refinedev/core";
@@ -188,7 +187,6 @@ const InlineSessionForm = ({
 
 const ProgrammsListPage = () => {
   const navigate = useNavigate();
-  const { edit } = useNavigation();
   const { t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const { eventId } = useParams<{ eventId: string }>();

@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   GetListResponse,
+  HttpError,
   useTable,
   type BaseRecord,
   type CrudFilters,
@@ -48,7 +49,7 @@ type DataTableProps<T extends BaseRecord> = {
   defaultPageSizeOptions?: number[];
   interactive?: boolean;
   onDataChange?: (data: T[], total: number) => void;
-  onQuery?: (query: QueryObserverResult<GetListResponse<T>, T>) => void;
+  onQuery?: (query: QueryObserverResult<GetListResponse<T>, HttpError>) => void;
   globalFilters?: CrudFilters;
   caption?: React.ReactNode;
 };
@@ -74,7 +75,6 @@ export function DataTable<T extends BaseRecord>({
     setCurrentPage,
     pageSize,
     setPageSize,
-    pageCount,
     tableQuery,
   } = useTable<T>({
     resource,
@@ -231,15 +231,6 @@ export function DataTable<T extends BaseRecord>({
     ) : (
       <LuChevronDown size={14} />
     );
-  };
-
-  const getSortNumber = (columnKey: string) => {
-    if (sorters.length <= 1) return null;
-
-    const field = columnKey;
-
-    const sorterIndex = sorters.findIndex((s) => s.field === field);
-    return sorterIndex !== -1 ? sorterIndex + 1 : null;
   };
 
   useEffect(() => {

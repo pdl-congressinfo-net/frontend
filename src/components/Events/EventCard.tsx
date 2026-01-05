@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import {
   CanAccess,
-  useGo,
   useNavigation,
   useOne,
   useTranslation,
@@ -35,7 +34,6 @@ export const EventCard = ({
 }: EventCardInterface) => {
   const { translate: t } = useTranslation();
   const { edit } = useNavigation();
-  const go = useGo();
 
   const {
     result: location,

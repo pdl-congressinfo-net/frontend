@@ -57,50 +57,6 @@ const EventTypeCreatePage = () => {
             )}
           </Field.Root>
 
-          <Field.Root invalid={!!errors.name_de}>
-            <Field.Label>Name (German)</Field.Label>
-            <Input
-              {...register("name_de", { required: "German name is required" })}
-              placeholder="e.g., Workshop"
-            />
-            {errors.name_de && (
-              <Field.ErrorText>{errors.name_de.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.name_en}>
-            <Field.Label>Name (English)</Field.Label>
-            <Input
-              {...register("name_en", { required: "English name is required" })}
-              placeholder="e.g., Workshop"
-            />
-            {errors.name_en && (
-              <Field.ErrorText>{errors.name_en.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.description_de}>
-            <Field.Label>Description (German)</Field.Label>
-            <Input
-              {...register("description_de")}
-              placeholder="Optional description in German"
-            />
-            {errors.description_de && (
-              <Field.ErrorText>{errors.description_de.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
-          <Field.Root invalid={!!errors.description_en}>
-            <Field.Label>Description (English)</Field.Label>
-            <Input
-              {...register("description_en")}
-              placeholder="Optional description in English"
-            />
-            {errors.description_en && (
-              <Field.ErrorText>{errors.description_en.message}</Field.ErrorText>
-            )}
-          </Field.Root>
-
           <Button type="submit">Create Event Type</Button>
         </VStack>
       </form>

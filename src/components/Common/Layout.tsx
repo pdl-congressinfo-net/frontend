@@ -1,5 +1,4 @@
 import { Flex } from "@chakra-ui/react";
-import { useTranslation } from "@refinedev/core";
 import * as React from "react";
 import { Footer } from "./Footer";
 import NavBar from "./NavBar";
@@ -9,8 +8,6 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { translate } = useTranslation();
-
   return (
     <Flex direction="column" minHeight="100vh">
       {/* Header */}

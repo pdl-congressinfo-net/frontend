@@ -25,10 +25,7 @@ const CountrySelector = ({
 }: CountrySelectorProps) => {
   const { translate: t } = useTranslation();
 
-  const {
-    result: countries,
-    query: { isLoading },
-  } = useList<Country>({
+  const { result: countries } = useList<Country>({
     resource: "countries",
     meta: { parentModule: "locations" },
     pagination: {

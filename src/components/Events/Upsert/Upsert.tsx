@@ -775,7 +775,7 @@ const Upsert = ({
                           onPrevious={goPrevious}
                           onStatus={handleBasicStatus}
                           onSave={(data) => handleSave(data, "event")}
-                          initialValues={eventValuesForRender}
+                          initialValues={eventValuesForRender || undefined}
                           onChange={handleBasicChange}
                         />
                       </Steps.Content>
@@ -790,7 +790,7 @@ const Upsert = ({
                           onPrevious={goPrevious}
                           onStatus={handleLocationStatus}
                           onSave={(data) => handleSave(data, "location")}
-                          initialValues={locationInitialValues}
+                          initialValues={locationInitialValues || undefined}
                           isWebinar={isWebinar}
                         />
                       </Steps.Content>

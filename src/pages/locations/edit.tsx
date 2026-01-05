@@ -1,15 +1,11 @@
 import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
-import { useBack, useList, useOne, useUpdate } from "@refinedev/core";
+import { useBack, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useParams } from "react-router";
 import CountrySelector from "../../components/Location/CountrySelector";
 import LocationTypeSelector from "../../components/Location/LocationTypeSelector";
-import {
-  Country,
-  Location,
-  LocationType,
-} from "../../features/locations/location.model";
+import { Location } from "../../features/locations/location.model";
 import { UpdateLocationRequest } from "../../features/locations/location.requests";
 import { useLayout } from "../../providers/layout-provider";
 
@@ -32,16 +28,6 @@ const LocationEditPage = () => {
   } = useOne<Location>({
     resource: "locations",
     id: id!,
-  });
-
-  const { result: countries } = useList<Country>({
-    resource: "countries",
-    meta: { parentModule: "locations" },
-  });
-
-  const { result: locationTypes } = useList<LocationType>({
-    resource: "types",
-    meta: { parentModule: "locations" },
   });
 
   const location = data;

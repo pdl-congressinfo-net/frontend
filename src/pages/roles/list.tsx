@@ -32,20 +32,20 @@ const RolesListPage = () => {
 
   const {
     query: { isLoading: isRolesLoading },
-    result: { data: rolesData, total: rolesTotal },
+    result: { data: rolesData },
   } = useList<Role>({
     resource: "roles",
   });
 
   const {
-    result: { data: usersData, total: usersTotal },
+    result: { data: usersData },
     query: { isLoading: isUsersLoading },
   } = useList<User>({
     resource: "users",
   });
 
   const {
-    result: { data: userRolesData, total: userRolesTotal },
+    result: { data: userRolesData },
     query: { isLoading: isUserRolesLoading },
   } = useList<UserRole>({
     resource: "roles",
@@ -119,7 +119,7 @@ const RolesListPage = () => {
 
     if (q && autoOpenItems.length > 0) {
       // When searching, merge auto-open items with manually opened items
-      setAccordionValue((prev) => {
+      setAccordionValue(() => {
         const newItems = [
           ...new Set([...manuallyOpenedItems, ...autoOpenItems]),
         ];

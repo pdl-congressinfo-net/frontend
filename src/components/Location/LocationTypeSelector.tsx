@@ -18,10 +18,7 @@ const LocationTypeSelector = ({
 }: LocationTypeSelectorProps) => {
   const { translate: t } = useTranslation();
 
-  const {
-    result: types,
-    query: { isLoading },
-  } = useList<LocationType>({
+  const { result: types } = useList<LocationType>({
     resource: "types",
     meta: { parentModule: "locations" },
     pagination: { pageSize: 200 },

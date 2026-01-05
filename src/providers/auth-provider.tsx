@@ -99,7 +99,6 @@ export const authProvider: AuthProvider = {
         };
       }
 
-      const data = await response.json();
       resetPermissionCache();
 
       return {

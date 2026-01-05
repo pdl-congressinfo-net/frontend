@@ -7,7 +7,7 @@ import {
 } from "@refinedev/core";
 import { LuPencil } from "react-icons/lu";
 import { Event } from "../../../features/events/events.model";
-import { Country, Location } from "../../../features/locations/location.model";
+import { Location } from "../../../features/locations/location.model";
 import TabsLayout from "./TabsLayout";
 
 interface InformationProps {
@@ -17,10 +17,7 @@ interface InformationProps {
 export default function Information({ event }: InformationProps) {
   const { translate: t } = useTranslation();
   const { edit } = useNavigation();
-  const {
-    result: location,
-    query: { isLoading, isError },
-  } = useOne<Location>({
+  const { result: location } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -28,16 +25,6 @@ export default function Information({ event }: InformationProps) {
     },
   });
 
-  const { result: country } = useOne<Country>({
-    resource: "countries",
-    id: location?.countryId || "",
-    queryOptions: {
-      enabled: !!location?.countryId,
-    },
-    meta: {
-      parentModule: "locations",
-    },
-  });
   return (
     <TabsLayout>
       {/* Organizer */}

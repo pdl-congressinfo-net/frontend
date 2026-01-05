@@ -83,7 +83,6 @@ export function MapPicker({
   );
   const [open, setOpen] = useState(false);
 
-  const [refreshing, setRefreshing] = useState(false);
   const europeBounds = useMemo(
     () => bounds ?? L.latLngBounds([34, -25], [72, 45]),
     [bounds],
