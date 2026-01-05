@@ -44,6 +44,8 @@ COPY public/env.js ./dist/env.js
 COPY docker/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
+# 👇 Fix permissions BEFORE switching user
+RUN chown -R refine:refine /app/dist
 
 EXPOSE 3000
 
