@@ -1,55 +1,12 @@
-FROM refinedev/node:18 AS base
+FROM nginx:alpine
 
-WORKDIR /app
+# Remove default config if needed
+RUN rm /etc/nginx/conf.d/default.conf
 
-# ----------------------
-# Dependencies
-# ----------------------
-FROM base AS deps
+# Copy your nginx config
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+# Copy prebuilt frontend
+COPY dist /usr/share/nginx/html
 
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# ----------------------
-# Build
-# ----------------------
-FROM base AS builder
-
-ENV NODE_ENV=production
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-RUN npm run build
-
-# ----------------------
-# Runtime
-# ----------------------
-FROM base AS runner
-
-ENV NODE_ENV=production
-
-WORKDIR /app
-
-RUN npm install -g serve
-
-COPY --from=builder /app/dist ./dist
-COPY public/env.js ./dist/env.js
-COPY docker/entrypoint.sh /entrypoint.sh
-
-RUN chmod +x /entrypoint.sh
-RUN chown -R refine:refine ./dist
-
-EXPOSE 3000
-
-USER refine
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["serve", "-s", "dist", "-l", "3000"]
-
+EXPOSE 80

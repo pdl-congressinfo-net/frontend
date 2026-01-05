@@ -1,4 +1,4 @@
-name: Frontend CD (Docker & Pages)
+name: Frontend CD (Build Once, Reuse Everywhere)
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   # -----------------------
-  # 1) Build frontend
+  # 1) Build frontend ONCE
   # -----------------------
   build:
     runs-on: ubuntu-latest
@@ -24,17 +24,20 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
-      - run: npx refine build
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Build frontend
+        run: npx refine build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: dist
           path: dist
 
   # -----------------------
-  # 2) Build Docker image
+  # 2) Docker (NO BUILD)
   # -----------------------
   docker:
     needs: build
@@ -49,7 +52,7 @@ jobs:
           name: dist
           path: dist
 
-      - name: Set up Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.12.0
 
       - name: Login to GHCR
@@ -59,7 +62,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push image
+      - name: Build & push image (NO frontend build)
         uses: docker/build-push-action@v6.18.0
         with:
           context: .
@@ -69,7 +72,7 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ github.sha }}
 
   # -----------------------
-  # 3) Publish to build branch
+  # 3) Pages (NO BUILD)
   # -----------------------
   pages:
     needs: build
