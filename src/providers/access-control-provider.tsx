@@ -1,4 +1,5 @@
 import { AccessControlProvider } from "@refinedev/core";
+import { API_URL } from "../config/api";
 
 const PERMISSION_CACHE_KEY = "__permissions_v1";
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
@@ -37,12 +38,9 @@ function saveToCache(list: string[]) {
 }
 
 async function fetchPermissions(): Promise<Set<string>> {
-  const response = await fetch(
-    "https://api.dpfurner.xyz/api/v1/auth/permissions",
-    {
-      credentials: "include",
-    },
-  );
+  const response = await fetch(`${API_URL}/auth/permissions`, {
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch permissions");
@@ -102,7 +100,7 @@ export const accessControlProvider: AccessControlProvider = {
   options: {
     buttons: {
       enableAccessControl: true,
-      hideIfUnauthorized: false,
+      hideIfUnauthorized: true, // Auto-hide Create/Edit/Delete buttons when user lacks permission
     },
   },
 };

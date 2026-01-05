@@ -1,26 +1,26 @@
 import {
   Button,
-  Input,
-  Field,
-  Stack,
   Checkbox,
-  Flex,
+  Field,
   Fieldset,
+  Flex,
+  Input,
   Portal,
   Select,
+  Stack,
   createListCollection,
 } from "@chakra-ui/react";
-import { useList } from "@refinedev/core";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useList, useTranslation } from "@refinedev/core";
 import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { EventType } from "../../../features/events/events.model";
 import {
   SaveResult,
   StepStatus,
-  normalizeEventValues,
   isSameEventValues,
+  normalizeEventValues,
 } from "./form-shared";
 import { BasicInformationValues } from "./types";
 export type { BasicInformationValues } from "./types";
@@ -35,43 +35,43 @@ const toYMD = (v: unknown) => {
   return v;
 };
 
-const BasicInformationSchema = z
-  .object({
-    name: z.string().min(1, "Name is required"),
-    startDate: z.preprocess(toYMD, z.string().min(1, "Start date is required")),
-    oneDay: z.preprocess((val) => {
-      if (typeof val === "string") return val === "true" || val === "on";
-      return Boolean(val);
-    }, z.boolean().default(false)),
-    endDate: z.preprocess((v) => {
-      if (v === "" || v == null) return undefined;
-      return toYMD(v);
-    }, z.string().optional()),
-    typeId: z.string().min(1, "Event type is required"),
-    typeCode: z.string().min(1, "Event type code is required").default("CON"),
-    field: z.string().default("MED"),
-  })
-  .superRefine((data, ctx) => {
-    const start = data.startDate; // yyyy-MM-dd
-    if (!data.oneDay) {
-      if (!data.endDate) {
-        ctx.addIssue({
-          path: ["endDate"],
-          message: "End date is required for multi-day events",
-          code: z.ZodIssueCode.custom,
-        });
-      } else {
-        const end = data.endDate; // yyyy-MM-dd
-        if (end < start) {
+const createBasicInformationSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z.string().min(1, t("events.form.validation.nameRequired")),
+      startDate: z.preprocess(
+        toYMD,
+        z.string().min(1, t("events.form.validation.startDateRequired")),
+      ),
+      oneDay: z.boolean().default(false),
+      endDate: z.preprocess((v) => {
+        if (v === "" || v == null) return undefined;
+        return toYMD(v);
+      }, z.string().optional()),
+      eventTypeId: z.string().min(1, t("common.validation.required")),
+      isPublic: z.boolean().default(false),
+    })
+    .superRefine((data, ctx) => {
+      const start = data.startDate;
+      if (!data.oneDay) {
+        if (!data.endDate) {
           ctx.addIssue({
             path: ["endDate"],
-            message: "End date must be after start date",
+            message: t("events.form.validation.endDateRequired"),
             code: z.ZodIssueCode.custom,
           });
+        } else {
+          const end = data.endDate;
+          if (end < start) {
+            ctx.addIssue({
+              path: ["endDate"],
+              message: t("events.form.validation.endDateAfterStart"),
+              code: z.ZodIssueCode.custom,
+            });
+          }
         }
       }
-    }
-  });
+    });
 
 type BasicInformationProps = {
   onNext?: () => void;
@@ -94,6 +94,7 @@ const BasicInformation = ({
   initialValues,
   onChange,
 }: BasicInformationProps) => {
+  const { translate: t } = useTranslation();
   const syncingRef = useRef(false);
   const defaultValues = useMemo<BasicInformationValues>(() => {
     const d = new Date();
@@ -105,11 +106,15 @@ const BasicInformation = ({
       startDate: `${y}-${m}-${day}`,
       oneDay: false,
       endDate: undefined,
-      typeId: "",
-      typeCode: "CON",
-      field: "",
+      eventTypeId: "",
+      isPublic: false,
     };
   }, []);
+
+  const BasicInformationSchema = useMemo(
+    () => createBasicInformationSchema(t),
+    [t],
+  );
 
   const {
     watch,
@@ -146,10 +151,10 @@ const BasicInformation = ({
         (initialValues.oneDay ?? current.oneDay)
           ? (initialValues.startDate ?? current.startDate)
           : (initialValues.endDate ?? current.endDate),
-      typeId: initialValues.typeId ?? current.typeId,
-      typeCode: initialValues.typeCode ?? current.typeCode,
-      field: initialValues.field ?? current.field,
+      eventTypeId: initialValues.eventTypeId ?? current.eventTypeId,
+      isPublic: initialValues.isPublic ?? current.isPublic,
     };
+
     const normalizedCurrent = normalizeEventValues(
       current as BasicInformationValues,
     );
@@ -170,17 +175,18 @@ const BasicInformation = ({
     resource: "types",
     sorters: [{ field: "nameDe", order: "asc" }],
     meta: {
-      parentmodule: "events",
+      parentModule: "events",
     },
   });
-
-  console.log("Event Types:", eventTypes);
 
   const eventTypeCollection = useMemo(
     () =>
       createListCollection<{ label: string; value: string }>({
         items: (Array.isArray(eventTypes.data) ? eventTypes.data : []).map(
-          (t: EventType) => ({ label: t.nameDe, value: t.id }),
+          (type: EventType) => ({
+            label: t(`events.types.name.${type.code}`),
+            value: type.id,
+          }),
         ),
       }),
     [eventTypes.data],
@@ -188,31 +194,7 @@ const BasicInformation = ({
 
   const oneDay = watch("oneDay");
   const startDate = watch("startDate");
-  const selectedField = watch("field");
-  const selectedType = watch("typeId");
-
-  // Set default type by code 'CON' or first available
-  useEffect(() => {
-    const preferredTypeCode = "CON";
-    const preferredType = (eventTypes.data as EventType[]).find(
-      (t) => t.code === preferredTypeCode,
-    );
-    const fallbackType = (eventTypes.data as EventType[])[0];
-    const nextDefault = preferredType?.id ?? fallbackType?.id;
-    if (nextDefault && !selectedType) {
-      setValue("typeId", nextDefault, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      const nextCode = preferredType?.code ?? fallbackType?.code ?? "";
-      setValue("typeCode", nextCode, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    }
-  }, [eventTypes, selectedType, setValue]);
+  const selectedEventType = watch("eventTypeId");
 
   useEffect(() => {
     if (oneDay && startDate) {
@@ -261,21 +243,23 @@ const BasicInformation = ({
     <form onSubmit={onSubmit}>
       <Fieldset.Root size="lg">
         <Stack>
-          <Fieldset.Legend>Basic Information</Fieldset.Legend>
+          <Fieldset.Legend>
+            {t("events.form.sections.basicInformation")}
+          </Fieldset.Legend>
           <Fieldset.HelperText>
-            Provide the basic details of your event.
+            {t("events.form.sections.basicInformationHelp")}
           </Fieldset.HelperText>
         </Stack>
         <Fieldset.Content mt={4}>
           <Stack gap="4" align="flex-start">
             <Field.Root invalid={!!errors.name} width={"40vw"}>
-              <Field.Label>Event Name</Field.Label>
+              <Field.Label>{t("events.form.fields.eventName")}</Field.Label>
               <Input size="md" {...register("name")} />
               <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
             </Field.Root>
             <Flex gap="2vw">
               <Field.Root invalid={!!errors.startDate} width="19vw">
-                <Field.Label>Start Date</Field.Label>
+                <Field.Label>{t("events.form.fields.startDate")}</Field.Label>
                 <Input type="date" {...register("startDate")} />
                 <Field.ErrorText>
                   {errors.startDate?.message || errors.oneDay?.message}
@@ -283,92 +267,89 @@ const BasicInformation = ({
               </Field.Root>
 
               <Flex align="center" height="40px" mt="28px">
-                <Checkbox.Root width="20vw">
+                <Checkbox.Root width="20vw" checked={oneDay}>
                   <Checkbox.HiddenInput
-                    {...register("oneDay")}
+                    name="oneDay"
                     onChange={(e) => {
                       const target = e.target as HTMLInputElement;
                       const checked = !!target.checked;
+                      const currentStartDate = watch("startDate");
+
                       setValue("oneDay", checked, {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true,
                       });
-                      if (checked) {
-                        const sd = watch("startDate");
-                        if (sd) {
-                          setValue("endDate", sd, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                            shouldTouch: true,
-                          });
-                        }
+
+                      if (checked && currentStartDate) {
+                        // When checking, set endDate to same as startDate
+                        setValue("endDate", currentStartDate, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                          shouldTouch: true,
+                        });
                       }
                     }}
                   />
                   <Checkbox.Control />
-                  <Checkbox.Label>One Day</Checkbox.Label>
+                  <Checkbox.Label>
+                    {t("events.form.fields.oneDay")}
+                  </Checkbox.Label>
                 </Checkbox.Root>
               </Flex>
             </Flex>
 
             <Field.Root invalid={!!errors.endDate} width={"19vw"}>
-              <Field.Label>End Date</Field.Label>
+              <Field.Label>{t("events.form.fields.endDate")}</Field.Label>
               <Input type="date" disabled={oneDay} {...register("endDate")} />
               <Field.ErrorText>{errors.endDate?.message}</Field.ErrorText>
             </Field.Root>
-            <Flex gap="2vw" wrap={"wrap"} direction="row">
-              {eventTypeCollection && (
-                <Select.Root
-                  collection={eventTypeCollection}
-                  size="sm"
-                  width="19vw"
-                  value={selectedType ? [selectedType] : []}
-                  onValueChange={(e) => {
-                    const next = Array.isArray(e.value) ? e.value[0] : e.value;
-                    setValue("typeId", next ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                    const selectedTypeObj = eventTypes.data.find(
-                      (t) => t.id === next,
-                    );
-                    setValue("typeCode", selectedTypeObj?.code ?? "", {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    });
-                  }}
-                >
-                  <Select.HiddenSelect name="typeId" />
-                  <Select.Label>Select Type</Select.Label>
-                  <Select.Control>
-                    <Select.Trigger>
-                      <Select.ValueText placeholder="Select Type" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Portal>
-                    <Select.Positioner>
-                      <Select.Content>
-                        {eventTypeCollection.items.map((item) => (
-                          <Select.Item item={item} key={item.value}>
-                            {item.label}
-                            <Select.ItemIndicator />
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Positioner>
-                  </Portal>
-                </Select.Root>
-              )}
-            </Flex>
+            {eventTypeCollection && (
+              <Select.Root
+                collection={eventTypeCollection}
+                size="sm"
+                width="19vw"
+                value={selectedEventType ? [selectedEventType] : []}
+                onValueChange={(e) => {
+                  const next = Array.isArray(e.value) ? e.value[0] : e.value;
+                  setValue("eventTypeId", next ?? "", {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
+                }}
+              >
+                <Select.HiddenSelect name="eventTypeId" />
+                <Select.Label>{t("events.form.fields.eventType")}</Select.Label>
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText
+                      placeholder={t(
+                        "events.form.placeholders.selectEventType",
+                      )}
+                    />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {eventTypeCollection.items.map((item) => (
+                        <Select.Item item={item} key={item.value}>
+                          {item.label}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+            )}
             <Flex gap="2">
               <Button type="submit" disabled={!isValid}>
-                Next
+                {t("common.next")}
               </Button>
             </Flex>
           </Stack>

@@ -1,10 +1,6 @@
 export interface EventTypeDTO {
   id: string;
   code: string;
-  name_de: string;
-  name_en: string;
-  description_de?: string;
-  description_en?: string;
 }
 
 export interface EventDTO {
@@ -13,6 +9,9 @@ export interface EventDTO {
   start_date: Date;
   end_date: Date;
   is_public: boolean;
+  subject?: string;
+  url?: string;
+  language: string;
   event_type_id?: string;
   location_id?: string;
 }

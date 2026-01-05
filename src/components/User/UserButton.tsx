@@ -1,15 +1,16 @@
-import React from "react";
-import { LuCircleUserRound } from "react-icons/lu";
-import { useTranslation } from "react-i18next";
-import { Icon, Button, Menu, Portal } from "@chakra-ui/react";
-import { AccountDialog } from "./AccountDialog";
+import { Button, Icon, Menu, Portal } from "@chakra-ui/react";
 import {
-  useLogout,
-  useIsAuthenticated,
-  useGo,
+  CanAccess,
   useGetIdentity,
+  useGo,
+  useIsAuthenticated,
+  useLogout,
 } from "@refinedev/core";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { LuCircleUserRound } from "react-icons/lu";
 import { User } from "../../features/users/users.model";
+import { AccountDialog } from "./AccountDialog";
 
 interface UserButtonProps {
   className?: string;
@@ -24,7 +25,7 @@ export const UserButton: React.FC<UserButtonProps> = ({
   onCloseDialog,
 }) => {
   const { mutate: logout } = useLogout();
-  const { isLoading, isSuccess } = useIsAuthenticated();
+  const { isLoading } = useIsAuthenticated();
   const { data: user } = useGetIdentity<User>();
   const { t } = useTranslation();
   const [internalIsDialogOpen, setInternalIsDialogOpen] = React.useState(false);
@@ -57,15 +58,18 @@ export const UserButton: React.FC<UserButtonProps> = ({
           <Icon>
             <LuCircleUserRound size={20} />
           </Icon>
-          <span>{user.fullName}</span>
+          {user.contact?.lastName && <span>{user.contact.lastName} </span>}
+          {!user.contact?.lastName && <span>{user.contact?.firstName}</span>}
         </Button>
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
           <Menu.Content>
-            <Menu.Item value="profile" onClick={() => go({ to: "admin" })}>
-              {t("user.admin")}
-            </Menu.Item>
+            <CanAccess action="view" resource="admin">
+              <Menu.Item value="profile" onClick={() => go({ to: "admin" })}>
+                {t("user.admin")}
+              </Menu.Item>
+            </CanAccess>
             <Menu.Item value="settings" onClick={() => go({ to: "settings" })}>
               {t("user.settings")}
             </Menu.Item>

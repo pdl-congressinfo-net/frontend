@@ -1,13 +1,14 @@
+import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { useCreate, useList, useTranslation } from "@refinedev/core";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
-import { useCreate, useList } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { CreateLocationRequest } from "../../features/locations/location.requests";
+import { useNavigate } from "react-router";
 import { Country, LocationType } from "../../features/locations/location.model";
+import { CreateLocationRequest } from "../../features/locations/location.requests";
+import { useLayout } from "../../providers/layout-provider";
 
 const LocationCreatePage = () => {
+  const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
   const navigate = useNavigate();
   const { mutate: createLocation } = useCreate();
@@ -19,18 +20,18 @@ const LocationCreatePage = () => {
 
   const { result: countries } = useList<Country>({
     resource: "countries",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
   });
 
   const { result: locationTypes } = useList<LocationType>({
     resource: "locationtypes",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
   });
 
   useEffect(() => {
-    setTitle("Create Location");
+    setTitle(t("admin.locations.actions.create"));
     setActions(null);
-  }, [setTitle, setActions]);
+  }, [setTitle, setActions, t]);
 
   const onSubmit = (data: CreateLocationRequest) => {
     createLocation(
@@ -51,40 +52,46 @@ const LocationCreatePage = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={4} align="stretch">
           <Field.Root invalid={!!errors.name}>
-            <Field.Label>Name</Field.Label>
+            <Field.Label>{t("locations.form.fields.name.label")}</Field.Label>
             <Input {...register("name", { required: true })} />
             {errors.name && (
-              <Field.ErrorText>This field is required</Field.ErrorText>
+              <Field.ErrorText>
+                {t("common.validation.required")}
+              </Field.ErrorText>
             )}
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Road</Field.Label>
+            <Field.Label>{t("locations.form.fields.road.label")}</Field.Label>
             <Input {...register("road")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Number</Field.Label>
+            <Field.Label>{t("locations.form.fields.number.label")}</Field.Label>
             <Input {...register("number")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>City</Field.Label>
+            <Field.Label>{t("locations.form.fields.city.label")}</Field.Label>
             <Input {...register("city")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>State</Field.Label>
+            <Field.Label>{t("locations.form.fields.state.label")}</Field.Label>
             <Input {...register("state")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Postal Code</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.postalCode.label")}
+            </Field.Label>
             <Input {...register("postal_code")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Latitude</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.latitude.label")}
+            </Field.Label>
             <Input
               type="number"
               step="any"
@@ -93,7 +100,9 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Longitude</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.longitude.label")}
+            </Field.Label>
             <Input
               type="number"
               step="any"
@@ -102,14 +111,18 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Link</Field.Label>
+            <Field.Label>{t("locations.form.fields.link.label")}</Field.Label>
             <Input {...register("link")} />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Country</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.country.label")}
+            </Field.Label>
             <select {...register("country_id")}>
-              <option value="">Select a country</option>
+              <option value="">
+                {t("locations.form.fields.country.placeholder")}
+              </option>
               {countries?.data.map((country) => (
                 <option key={country.id} value={country.id}>
                   {country.name}
@@ -119,18 +132,22 @@ const LocationCreatePage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Location Type</Field.Label>
+            <Field.Label>
+              {t("locations.form.fields.locationType.label")}
+            </Field.Label>
             <select {...register("location_type_id")}>
-              <option value="">Select a type</option>
+              <option value="">
+                {t("locations.form.fields.locationType.placeholder")}
+              </option>
               {locationTypes?.data.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.name}
+                  {type.code}
                 </option>
               ))}
             </select>
           </Field.Root>
 
-          <Button type="submit">Create Location</Button>
+          <Button type="submit">{t("admin.locations.actions.create")}</Button>
         </VStack>
       </form>
     </Box>

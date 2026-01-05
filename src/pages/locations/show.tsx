@@ -1,9 +1,9 @@
+import { Box, Button, Text, VStack } from "@chakra-ui/react";
+import { Link, useNavigation, useOne } from "@refinedev/core";
 import { useEffect } from "react";
 import { useParams } from "react-router";
-import { useLayout } from "../../providers/layout-provider";
-import { useOne, useNavigation, Link } from "@refinedev/core";
-import { Box, Button, VStack, Text } from "@chakra-ui/react";
 import { Location } from "../../features/locations/location.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const LocationShowPage = () => {
   const { id } = useParams<{ id: string }>();

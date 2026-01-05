@@ -1,4 +1,4 @@
-import { Button, Dialog, Portal, Image, Flex } from "@chakra-ui/react";
+import { Dialog, Flex, Image, Portal } from "@chakra-ui/react";
 
 interface EventDialogProps {
   isOpen: boolean;

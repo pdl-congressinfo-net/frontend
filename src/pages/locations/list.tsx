@@ -1,59 +1,138 @@
-import { useEffect } from "react";
-import { useLayout } from "../../providers/layout-provider";
-import { useList, useNavigation } from "@refinedev/core";
-import { Box, Button, Table } from "@chakra-ui/react";
+import { Badge, Box, Flex, IconButton } from "@chakra-ui/react";
+import { useList, useNavigation, useTranslation } from "@refinedev/core";
+import { useCallback, useEffect, useState } from "react";
+import { LuCirclePlus, LuExternalLink, LuEye } from "react-icons/lu";
+import { DataTable } from "../../components/Common/DataTable";
 import { Location } from "../../features/locations/location.model";
+import { useLayout } from "../../providers/layout-provider";
+
+const LocationsCreateActions = () => {
+  const { create } = useNavigation();
+
+  return (
+    <IconButton
+      onClick={() => create("locations")}
+      variant="ghost"
+      aria-label="Create Location"
+      rounded="full"
+    >
+      <LuCirclePlus />
+    </IconButton>
+  );
+};
 
 const LocationsListPage = () => {
+  const [countryIds, setCountryIds] = useState<string[]>([]);
+  const { translate: t } = useTranslation();
   const { setTitle, setActions } = useLayout();
-  const { create } = useNavigation();
+  const { show } = useNavigation();
+
+  const onDataChange = useCallback((data: Location[]) => {
+    const ids = Array.from(
+      new Set(
+        data
+          .map((location) => location.countryId)
+          .filter((id): id is string => id != null),
+      ),
+    );
+    // Only update state if ids actually changed to avoid render loops
+    setCountryIds((prev) => {
+      if (prev.length === ids.length && prev.every((v, i) => v === ids[i])) {
+        return prev;
+      }
+      return ids;
+    });
+  }, []);
+
   const {
-    result: data,
-    query: { isLoading },
-  } = useList<Location>({
-    resource: "locations",
+    result: { data: countries },
+  } = useList({
+    resource: "countries",
+    meta: { parentModule: "locations" },
+    filters:
+      countryIds.length > 0
+        ? [
+            {
+              field: "id",
+              operator: "in",
+              value: countryIds,
+            },
+          ]
+        : [],
   });
 
   useEffect(() => {
-    setTitle("Locations");
-    setActions(
-      <Button onClick={() => create("locations")}>Create Location</Button>,
-    );
-  }, [setTitle, setActions, create]);
-
-  if (isLoading) return <Box>Loading...</Box>;
-
+    setTitle(t("admin.locations.title"));
+    setActions(<LocationsCreateActions />);
+    return () => setActions(null);
+  }, [setTitle, setActions, t]);
   return (
     <Box p={4}>
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
-            <Table.ColumnHeader>City</Table.ColumnHeader>
-            <Table.ColumnHeader>State</Table.ColumnHeader>
-            <Table.ColumnHeader>Actions</Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {data?.data.map((location) => (
-            <Table.Row key={location.id}>
-              <Table.Cell>{location.name}</Table.Cell>
-              <Table.Cell>{location.city}</Table.Cell>
-              <Table.Cell>{location.state}</Table.Cell>
-              <Table.Cell>
-                <Button
+      <DataTable
+        resource="locations"
+        onDataChange={onDataChange}
+        columns={[
+          {
+            key: "name",
+            header: t("admin.locations.table.name"),
+            searchable: true,
+            sortable: true,
+            render: (record: Location) => (
+              <Flex gap={2} alignItems="center">
+                {record.name}
+                {record.link && (
+                  <Badge>{t("admin.locations.table.online")}</Badge>
+                )}
+              </Flex>
+            ),
+          },
+          {
+            key: "city",
+            header: t("admin.locations.table.city"),
+            searchable: true,
+            sortable: true,
+          },
+          {
+            key: "countryId",
+            header: t("admin.locations.table.country"),
+            searchable: true,
+            sortable: true,
+            render: (record: Location) => {
+              const country = countries?.find(
+                (country) => country.id === record.countryId,
+              );
+              return country ? country.name : "";
+            },
+          },
+          {
+            key: "actions",
+            header: t("admin.locations.table.actions"),
+            textAlign: "right",
+            render: (record: Location) => (
+              <Flex gap={2}>
+                {record.link && (
+                  <IconButton
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      window.open(record.link!, "_blank", "noopener,noreferrer")
+                    }
+                  >
+                    <LuExternalLink />
+                  </IconButton>
+                )}
+                <IconButton
                   size="sm"
-                  onClick={() =>
-                    (window.location.href = `/locations/show/${location.id}`)
-                  }
+                  variant="ghost"
+                  onClick={() => show("locations", record.id.toString())}
                 >
-                  View
-                </Button>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+                  <LuEye />
+                </IconButton>
+              </Flex>
+            ),
+          },
+        ]}
+      />
     </Box>
   );
 };

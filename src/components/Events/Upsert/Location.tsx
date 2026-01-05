@@ -1,26 +1,26 @@
 import {
   Button,
-  Input,
-  Field,
-  Stack,
-  Flex,
-  Fieldset,
   createListCollection,
-  Select,
+  Field,
+  Fieldset,
+  Flex,
+  Input,
   Portal,
+  Select,
   Separator,
+  Stack,
 } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useList, useTranslation } from "@refinedev/core";
+import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import L from "leaflet";
-import { MapPicker } from "../../Common/Map";
+import { ApiResponse } from "../../../common/types/api";
 import { Country, Location } from "../../../features/locations/location.model";
-import { useList } from "@refinedev/core";
+import { MapPicker } from "../../Common/Map";
 import { SaveResult, StepStatus } from "./form-shared";
 import { PhysicalLocationFormValues, WebinarLocationFormValues } from "./types";
-import { ApiResponse } from "../../../common/types/api";
 
 type LocationProps = {
   onNext?: () => void;
@@ -29,54 +29,53 @@ type LocationProps = {
   onSave?: (
     data: PhysicalLocationFormValues | WebinarLocationFormValues,
   ) => Promise<SaveResult | void> | SaveResult | void;
-  eventTypeCode?: string | null;
   initialValues?:
     | Partial<PhysicalLocationFormValues>
     | Partial<WebinarLocationFormValues>;
+  isWebinar?: boolean;
 };
 
-const physicalSchema = z
-  .object({
-    name: z.string().min(1, "Name is required"),
-    road: z.string().min(1, "Street is required"),
-    number: z.number().min(1, "Number is required").or(z.string().min(1)),
-    postalCode: z
-      .number()
-      .min(1, "Postal code is required")
-      .or(z.string().min(1)),
-    city: z.string().min(1, "City is required"),
-    country: z.string().min(1, "Country is required"),
-    countryId: z.string().min(1, "CountryId is required"),
-    lat: z.number().optional(),
-    lng: z.number().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.lat == null || data.lng == null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["lat"],
-        message: "Please locate the address on the map",
-      });
-    }
-  });
+const createPhysicalSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z.string().min(1, t("common.validation.required")),
+      road: z.string().optional(),
+      number: z.string().optional(),
+      postalCode: z.string().optional(),
+      city: z.string().optional(),
+      countryId: z.string().optional(),
+      latitude: z.number().optional(),
+      longitude: z.number().optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.latitude == null || data.longitude == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["latitude"],
+          message: t("locations.form.validation.locateOnMap"),
+        });
+      }
+    });
 
-const webinarSchema = z.object({
-  name: z.string().min(1, "Webinar name is required"),
-  link: z.string().min(1, "Webinar link is required"),
-});
+const createWebinarSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("locations.form.validation.webinarNameRequired")),
+    link: z.string().min(1, t("locations.form.validation.webinarLinkRequired")),
+  });
 
 const LocationPage = ({
   onNext,
   onPrevious,
   onStatus,
   onSave,
-  eventTypeCode,
   initialValues,
+  isWebinar = false,
 }: LocationProps) => {
-  const isWeb = eventTypeCode === "WEB";
+  const { translate: t } = useTranslation();
+  const isWeb = isWebinar || (initialValues && "link" in initialValues);
   const schema = useMemo(
-    () => (isWeb ? webinarSchema : physicalSchema),
-    [isWeb],
+    () => (isWeb ? createWebinarSchema(t) : createPhysicalSchema(t)),
+    [isWeb, t],
   );
 
   const { result: countries } = useList<Country>({
@@ -84,7 +83,7 @@ const LocationPage = ({
     pagination: { pageSize: 1000 },
     sorters: [{ field: "name", order: "asc" }],
     meta: {
-      parentmodule: "locations",
+      parentModule: "locations",
     },
   });
 
@@ -107,9 +106,8 @@ const LocationPage = ({
       number: "",
       postalCode: "",
       city: "",
-      lat: undefined,
-      lng: undefined,
-      country: "",
+      latitude: undefined,
+      longitude: undefined,
       countryId: "",
       link: "",
     }),
@@ -142,14 +140,13 @@ const LocationPage = ({
   } = formState as any;
 
   const name = watch("name");
-  const lat = watch("lat");
-  const lng = watch("lng");
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
   const road = watch("road");
   const number = watch("number");
   const postalCode = watch("postalCode");
   const city = watch("city");
   const selectedCountry = watch("countryId");
-  const country = watch("country");
   const europeBounds = useMemo(() => L.latLngBounds([34, -25], [72, 45]), []);
   const defaultCenter = useMemo<[number, number]>(() => [54, 15], []);
 
@@ -158,8 +155,10 @@ const LocationPage = ({
     const house = (number || "").trim();
     const postal = (postalCode || "").trim();
     const cityTrimmed = (city || "").trim();
-    const countryTrimmed = (country || "").trim();
-    const query = [street, house, postal, cityTrimmed, countryTrimmed]
+    const countryName = selectedCountry
+      ? countries.data.find((c) => c.id === selectedCountry)?.name
+      : "";
+    const query = [street, house, postal, cityTrimmed, countryName]
       .filter(Boolean)
       .join(", ");
     if (!query) return;
@@ -182,11 +181,11 @@ const LocationPage = ({
         const nlat = parseFloat(lat);
         const nlng = parseFloat(lon);
         if (!isNaN(nlat) && !isNaN(nlng)) {
-          setValue("lat", nlat, {
+          setValue("latitude", nlat, {
             shouldValidate: true,
             shouldDirty: true,
           });
-          setValue("lng", nlng, {
+          setValue("longitude", nlng, {
             shouldValidate: true,
             shouldDirty: true,
           });
@@ -240,11 +239,13 @@ const LocationPage = ({
     <form onSubmit={onSubmit}>
       <Fieldset.Root size="lg">
         <Stack>
-          <Fieldset.Legend>Location</Fieldset.Legend>
+          <Fieldset.Legend>
+            {t("locations.form.sections.location")}
+          </Fieldset.Legend>
           <Fieldset.HelperText>
             {isWeb
-              ? "Provide webinar link"
-              : "Enter the address and fine-tune it on the map."}
+              ? t("locations.form.sections.webinarHelp")
+              : t("locations.form.sections.physicalHelp")}
           </Fieldset.HelperText>
         </Stack>
         {isWeb ? (
@@ -252,14 +253,18 @@ const LocationPage = ({
             <Stack gap="2vh" align="flex-start">
               <Flex gap="1vw" wrap="wrap">
                 <Field.Root invalid={!!errors?.name} width={"40vw"}>
-                  <Field.Label>Webinar Name</Field.Label>
+                  <Field.Label>
+                    {t("locations.form.fields.webinarName")}
+                  </Field.Label>
                   <Input {...register("name")} />
                   <Field.ErrorText>
                     {(errors as any)?.name?.message as any}
                   </Field.ErrorText>
                 </Field.Root>
                 <Field.Root invalid={!!errors?.link} width={"40vw"}>
-                  <Field.Label>Webinar Link</Field.Label>
+                  <Field.Label>
+                    {t("locations.form.fields.webinarLink")}
+                  </Field.Label>
                   <Input {...register("link")} />
                   <Field.ErrorText>
                     {(errors as any)?.link?.message as any}
@@ -272,10 +277,10 @@ const LocationPage = ({
                   variant="outline"
                   onClick={() => onPrevious?.()}
                 >
-                  Previous
+                  {t("common.previous")}
                 </Button>
                 <Button type="submit" disabled={!isValid}>
-                  Next
+                  {t("common.next")}
                 </Button>
               </Flex>
             </Stack>
@@ -285,7 +290,7 @@ const LocationPage = ({
             <Stack gap="2vh" align="flex-start">
               <Flex gap="1vw" wrap="wrap">
                 <Field.Root invalid={!!errors?.name} width={"40vw"}>
-                  <Field.Label>Name</Field.Label>
+                  <Field.Label>{t("locations.form.fields.name")}</Field.Label>
                   <Input {...register("name")} />
                   <Field.ErrorText>
                     {(errors as any)?.name?.message as any}
@@ -294,14 +299,14 @@ const LocationPage = ({
               </Flex>
               <Flex gap="1vw" wrap="wrap">
                 <Field.Root invalid={!!errors?.road} width={"30vw"}>
-                  <Field.Label>Street</Field.Label>
+                  <Field.Label>{t("locations.form.fields.street")}</Field.Label>
                   <Input {...register("road")} />
                   <Field.ErrorText>
                     {(errors as any)?.road?.message as any}
                   </Field.ErrorText>
                 </Field.Root>
                 <Field.Root invalid={!!errors?.number} width={"9vw"}>
-                  <Field.Label>No.</Field.Label>
+                  <Field.Label>{t("locations.form.fields.number")}</Field.Label>
                   <Input {...register("number")} />
                   <Field.ErrorText>
                     {(errors as any)?.number?.message as any}
@@ -310,14 +315,16 @@ const LocationPage = ({
               </Flex>
               <Flex gap="1vw" wrap="wrap">
                 <Field.Root invalid={!!errors?.postalCode} width={"7vw"}>
-                  <Field.Label>Postal Code</Field.Label>
+                  <Field.Label>
+                    {t("locations.form.fields.postalCode")}
+                  </Field.Label>
                   <Input {...register("postalCode")} />
                   <Field.ErrorText>
                     {(errors as any)?.postalCode?.message as any}
                   </Field.ErrorText>
                 </Field.Root>
                 <Field.Root invalid={!!errors?.city} width={"13vw"}>
-                  <Field.Label>City</Field.Label>
+                  <Field.Label>{t("locations.form.fields.city")}</Field.Label>
                   <Input {...register("city")} />
                   <Field.ErrorText>
                     {(errors as any)?.city?.message as any}
@@ -333,15 +340,7 @@ const LocationPage = ({
                       const nextId = Array.isArray(e.value)
                         ? e.value[0]
                         : e.value;
-                      const nextCountry = countries.data.find(
-                        (c) => c.id === nextId,
-                      );
                       setValue("countryId", nextId ?? "", {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                        shouldTouch: true,
-                      });
-                      setValue("country", nextCountry?.name || "", {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true,
@@ -349,10 +348,16 @@ const LocationPage = ({
                     }}
                   >
                     <Select.HiddenSelect name="country" />
-                    <Select.Label>Select Country</Select.Label>
+                    <Select.Label>
+                      {t("locations.form.fields.country")}
+                    </Select.Label>
                     <Select.Control>
                       <Select.Trigger>
-                        <Select.ValueText placeholder="Select country" />
+                        <Select.ValueText
+                          placeholder={t(
+                            "locations.form.placeholders.selectCountry",
+                          )}
+                        />
                       </Select.Trigger>
                       <Select.Indicator />
                     </Select.Control>
@@ -394,7 +399,7 @@ const LocationPage = ({
               </Flex>
               <Flex gap="2vh" align="center">
                 <Button type="button" onClick={onGeocode}>
-                  Find on map
+                  {t("locations.form.actions.findOnMap")}
                 </Button>
               </Flex>
               <MapPicker
@@ -406,14 +411,13 @@ const LocationPage = ({
                     number: (number || "").trim(),
                     postalCode: (postalCode || "").trim(),
                     city: (city || "").trim(),
-                    lat: lat,
-                    lng: lng,
-                    country: country,
+                    latitude: latitude,
+                    longitude: longitude,
                     countryId: selectedCountry,
                     locationTypeId: "",
                   } as unknown as Location
                 }
-                title="Adjust Location"
+                title={t("locations.form.actions.adjustLocation")}
                 previewHeight={180}
                 bounds={europeBounds}
                 defaultCenter={defaultCenter}
@@ -425,10 +429,6 @@ const LocationPage = ({
                       shouldValidate: true,
                       shouldDirty: true,
                     });
-                    setValue("country", match.name, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    });
                   }
 
                   setValue("name", loc.name || "");
@@ -437,10 +437,10 @@ const LocationPage = ({
                   setValue("postalCode", loc.postalCode || "");
                   setValue("city", loc.city || "");
 
-                  if (loc.lat != null)
-                    setValue("lat", loc.lat, { shouldDirty: true });
-                  if (loc.lng != null)
-                    setValue("lng", loc.lng, { shouldDirty: true });
+                  if (loc.latitude != null)
+                    setValue("latitude", loc.latitude, { shouldDirty: true });
+                  if (loc.longitude != null)
+                    setValue("longitude", loc.longitude, { shouldDirty: true });
                 }}
               />
               <Flex gap="2">
@@ -449,10 +449,10 @@ const LocationPage = ({
                   variant="outline"
                   onClick={() => onPrevious?.()}
                 >
-                  Previous
+                  {t("common.previous")}
                 </Button>
                 <Button type="submit" disabled={!isValid}>
-                  Next
+                  {t("common.next")}
                 </Button>
               </Flex>
             </Stack>

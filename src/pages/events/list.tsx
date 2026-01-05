@@ -1,13 +1,44 @@
+import { IconButton } from "@chakra-ui/react";
+import { useNavigation } from "@refinedev/core";
 import { useEffect } from "react";
-import { useLayout } from "../../providers/layout-provider";
+import { LuArchive, LuCirclePlus } from "react-icons/lu";
+import { useNavigate } from "react-router";
 import { EventList } from "../../components/Events/EventList";
+import { useLayout } from "../../providers/layout-provider";
+
+const EventListActions = () => {
+  const navigate = useNavigate();
+  const { create } = useNavigation();
+
+  return (
+    <>
+      <IconButton
+        onClick={() => navigate("/events/archive")}
+        variant="ghost"
+        rounded="full"
+        aria-label="Add Event"
+        onMouseDown={(e) => e.preventDefault()}
+      >
+        <LuArchive />
+      </IconButton>
+      <IconButton
+        onClick={() => create("adminEvents")}
+        variant="ghost"
+        rounded="full"
+        aria-label="Add Event"
+      >
+        <LuCirclePlus />
+      </IconButton>
+    </>
+  );
+};
 
 const EventsListPage = () => {
   const { setTitle, setActions } = useLayout();
 
   useEffect(() => {
     setTitle("Events");
-    setActions(null);
+    setActions(<EventListActions />);
   }, [setTitle, setActions]);
 
   return <EventList />;

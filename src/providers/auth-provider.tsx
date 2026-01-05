@@ -1,10 +1,10 @@
 import { AuthProvider } from "@refinedev/core";
-import users from "../features/users/users.mapper";
 import { ApiResponse } from "../common/types/api";
+import { API_URL } from "../config/api";
+import users from "../features/users/users.mapper";
+import { CreateUserRequest } from "../features/users/users.requests";
 import { UserDTO } from "../features/users/users.responses";
 import { resetPermissionCache } from "./access-control-provider";
-
-const API_URL = "https://api.dpfurner.xyz/api/v1";
 
 /**
  * Check out the Auth Provider documentation for detailed information
@@ -99,7 +99,6 @@ export const authProvider: AuthProvider = {
         };
       }
 
-      const data = await response.json();
       resetPermissionCache();
 
       return {
@@ -118,16 +117,14 @@ export const authProvider: AuthProvider = {
     }
   },
 
-  register: async (params) => {
-    const { full_name, email, password } = params;
-
+  register: async (params: CreateUserRequest) => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ full_name, email, password }),
+        body: JSON.stringify(params),
       });
 
       if (!response.ok) {

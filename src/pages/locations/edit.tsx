@@ -1,26 +1,25 @@
+import { Box, Button, Field, Input, VStack } from "@chakra-ui/react";
+import { useBack, useOne, useUpdate } from "@refinedev/core";
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { useUpdate, useOne, useList } from "@refinedev/core";
-import { useLayout } from "../../providers/layout-provider";
-import { Box, Button, VStack, Input, Field } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { useParams } from "react-router";
+import CountrySelector from "../../components/Location/CountrySelector";
+import LocationTypeSelector from "../../components/Location/LocationTypeSelector";
+import { Location } from "../../features/locations/location.model";
 import { UpdateLocationRequest } from "../../features/locations/location.requests";
-import {
-  Location,
-  Country,
-  LocationType,
-} from "../../features/locations/location.model";
+import { useLayout } from "../../providers/layout-provider";
 
 const LocationEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const { setTitle, setActions } = useLayout();
-  const navigate = useNavigate();
+  const back = useBack();
   const { mutate: updateLocation } = useUpdate();
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<UpdateLocationRequest>();
 
   const {
@@ -29,16 +28,6 @@ const LocationEditPage = () => {
   } = useOne<Location>({
     resource: "locations",
     id: id!,
-  });
-
-  const { result: countries } = useList<Country>({
-    resource: "countries",
-    meta: { parentmodule: "locations" },
-  });
-
-  const { result: locationTypes } = useList<LocationType>({
-    resource: "locationtypes",
-    meta: { parentmodule: "locations" },
   });
 
   const location = data;
@@ -75,7 +64,7 @@ const LocationEditPage = () => {
       },
       {
         onSuccess: () => {
-          navigate(`/locations/show/${id}`);
+          back();
         },
       },
     );
@@ -145,27 +134,34 @@ const LocationEditPage = () => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Country</Field.Label>
-            <select {...register("country_id")}>
-              <option value="">Select a country</option>
-              {countries?.data.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="country_id"
+              control={control}
+              render={({ field }) => (
+                <CountrySelector
+                  value={field.value ?? null}
+                  onChange={(val) => field.onChange(val ?? "")}
+                  preferredFirst
+                  width="100%"
+                  size="md"
+                />
+              )}
+            />
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Location Type</Field.Label>
-            <select {...register("location_type_id")}>
-              <option value="">Select a type</option>
-              {locationTypes?.data.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="location_type_id"
+              control={control}
+              render={({ field }) => (
+                <LocationTypeSelector
+                  value={field.value ?? null}
+                  onChange={(val) => field.onChange(val ?? "")}
+                  width="100%"
+                  size="md"
+                />
+              )}
+            />
           </Field.Root>
 
           <Button type="submit">Update Location</Button>

@@ -1,17 +1,22 @@
-const API_URL = "https://api.dpfurner.xyz/api/v1";
+import { API_URL } from "../config/api";
 
 /**
  * Request an OTP to be sent to the user's email
  */
-export async function requestOTP(email: string): Promise<{ success: boolean; error?: string }> {
+export async function requestOTP(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`${API_URL}/auth/request-otp?email=${encodeURIComponent(email)}`, {
-      method: "POST",
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
+    const response = await fetch(
+      `${API_URL}/auth/request-otp?email=${encodeURIComponent(email)}`,
+      {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        credentials: "include",
       },
-      credentials: "include",
-    });
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -33,7 +38,10 @@ export async function requestOTP(email: string): Promise<{ success: boolean; err
 /**
  * Refresh the access token using the refresh token cookie
  */
-export async function refreshAccessToken(): Promise<{ success: boolean; accessToken?: string }> {
+export async function refreshAccessToken(): Promise<{
+  success: boolean;
+  accessToken?: string;
+}> {
   try {
     const response = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",

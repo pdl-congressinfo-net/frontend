@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { useLayout } from "../../../providers/layout-provider";
-import { useList } from "@refinedev/core";
 import { Box, Table } from "@chakra-ui/react";
+import { useList } from "@refinedev/core";
+import { useEffect } from "react";
 import { Country } from "../../../features/locations/location.model";
+import { useLayout } from "../../../providers/layout-provider";
 
 const CountriesListPage = () => {
   const { setTitle, setActions } = useLayout();
@@ -11,7 +11,7 @@ const CountriesListPage = () => {
     query: { isLoading },
   } = useList<Country>({
     resource: "countries",
-    meta: { parentmodule: "locations" },
+    meta: { parentModule: "locations" },
     filters: [{ field: "preferred", operator: "eq", value: true }],
   });
 

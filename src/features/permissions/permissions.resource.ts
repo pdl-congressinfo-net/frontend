@@ -1,9 +1,6 @@
 export const permissionResource = {
   name: "permissions",
-  list: "/permissions",
-  create: "/permissions/create",
-  edit: "/permissions/edit/:id",
-  show: "/permissions/show/:id",
+  list: "/admin/permissions",
   meta: {
     canDelete: true,
   },

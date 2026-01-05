@@ -1,25 +1,30 @@
 export const eventTypeResource = {
-  name: "eventtypes",
-  list: "/events/types",
-  create: "/events/types",
-  edit: "/events/types/edit/:id",
-  show: "/events/types/show/:id",
+  name: "types",
+  list: "/admin/events/types",
+  create: "/admin/events/types",
+  edit: "/admin/events/types/edit/:id",
   meta: {
     canDelete: true,
-    parentmodule: "events",
+    parentModule: "events",
   },
 };
 
 export const eventResource = {
   name: "events",
   list: "/events",
-  create: "/events",
-  edit: "/events/edit/:id",
-  show: "/events/show/:id",
   meta: {
     canDelete: true,
   },
 };
 
-// Legacy exports for backward compatibility
-export const eventCategoryResource = eventTypeResource;
+export const eventAdminResource = {
+  name: "adminEvents",
+  list: "/admin/events",
+  create: "/admin/events/create",
+  edit: "/admin/events/edit/:id",
+  show: "/admin/events/show/:id",
+  meta: {
+    canDelete: true,
+    adminModule: true,
+  },
+};

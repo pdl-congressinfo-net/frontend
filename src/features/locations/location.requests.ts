@@ -1,9 +1,9 @@
 export interface CreateLocationTypeRequest {
-  name: string;
+  code: string;
 }
 
 export interface UpdateLocationTypeRequest {
-  name?: string;
+  code?: string;
 }
 
 export interface CreateCountryRequest {

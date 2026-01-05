@@ -1,6 +1,6 @@
 export interface LocationType {
   id: string;
-  name: string;
+  code: string;
 }
 
 export interface Country {

@@ -1,5 +1,6 @@
 export interface CreatePermissionRequest {
-  name: string;
+  name?: string;
+  resource_name?: string;
 }
 
 export interface UpdatePermissionRequest {

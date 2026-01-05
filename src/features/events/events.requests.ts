@@ -1,17 +1,9 @@
 export interface CreateEventTypeRequest {
   code: string;
-  name_de: string;
-  name_en: string;
-  description_de?: string;
-  description_en?: string;
 }
 
 export interface UpdateEventTypeRequest {
   code?: string;
-  name_de?: string;
-  name_en?: string;
-  description_de?: string;
-  description_en?: string;
 }
 
 export interface CreateEventRequest {
@@ -19,6 +11,9 @@ export interface CreateEventRequest {
   start_date: Date;
   end_date: Date;
   is_public: boolean;
+  subject?: string;
+  url?: string;
+  language?: string;
   event_type_id?: string;
   location_id?: string;
 }
@@ -28,6 +23,9 @@ export interface UpdateEventRequest {
   start_date?: Date;
   end_date?: Date;
   is_public?: boolean;
+  subject?: string;
+  url?: string;
+  language?: string;
   event_type_id?: string;
   location_id?: string;
 }

@@ -1,18 +1,23 @@
-import { Box, Heading, Text, DataList, Link } from "@chakra-ui/react";
-import TabsLayout from "./TabsLayout";
-import { useOne } from "@refinedev/core";
-import { Country, Location } from "../../../features/locations/location.model";
+import { Box, Heading, IconButton, Text } from "@chakra-ui/react";
+import {
+  CanAccess,
+  useNavigation,
+  useOne,
+  useTranslation,
+} from "@refinedev/core";
+import { LuPencil } from "react-icons/lu";
 import { Event } from "../../../features/events/events.model";
+import { Location } from "../../../features/locations/location.model";
+import TabsLayout from "./TabsLayout";
 
 interface InformationProps {
   event: Event;
 }
 
 export default function Information({ event }: InformationProps) {
-  const {
-    result: location,
-    query: { isLoading, isError },
-  } = useOne<Location>({
+  const { translate: t } = useTranslation();
+  const { edit } = useNavigation();
+  const { result: location } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
     queryOptions: {
@@ -20,22 +25,12 @@ export default function Information({ event }: InformationProps) {
     },
   });
 
-  const { result: country } = useOne<Country>({
-    resource: "countries",
-    id: location?.countryId || "",
-    queryOptions: {
-      enabled: !!location?.countryId,
-    },
-    meta: {
-      parentmodule: "locations",
-    },
-  });
   return (
     <TabsLayout>
-      {/* Veranstalter */}
+      {/* Organizer */}
       <Box>
         <Heading size="md" color="gray.800">
-          Veranstalter
+          {t("events.details.organizer")}
         </Heading>
         <Text mt={2} whiteSpace="pre-line">
           {event.startDate?.toLocaleDateString()} -{" "}
@@ -43,11 +38,24 @@ export default function Information({ event }: InformationProps) {
         </Text>
       </Box>
 
-      {/* Veranstaltungsadresse */}
+      {/* Event Address */}
       {location && (
         <Box>
           <Heading size="md" color="gray.800">
-            Veranstaltungsadresse
+            {t("events.details.eventAddress")}
+            <CanAccess resource="locations" action="update">
+              <IconButton
+                aria-label="Edit Location"
+                size="sm"
+                variant="ghost"
+                ml={2}
+                onClick={() => {
+                  edit("locations", location.id);
+                }}
+              >
+                <LuPencil />
+              </IconButton>
+            </CanAccess>
           </Heading>
           <Text mt={2} fontWeight={"bold"}>
             {location.name}

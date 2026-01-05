@@ -1,19 +1,19 @@
 import { Stack, Text } from "@chakra-ui/react";
+import { useCustomMutation, useList, useTranslation } from "@refinedev/core";
 import { useMemo, useState } from "react";
-import { EventCard } from "./EventCard";
-import EventLoginDialog from "./EventLoginDialog";
-import { useCan, useList, useCustomMutation } from "@refinedev/core";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Event } from "../../features/events/events.model";
+import { EventCard } from "./EventCard";
 import { EventCardLoading } from "./EventCardLoading";
+import EventLoginDialog from "./EventLoginDialog";
 
 type EventListProps = {
   archive?: boolean;
 };
 
 export const EventList = ({ archive }: EventListProps) => {
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [isPublished, setIsPublished] = useState<boolean>(true);
+  const { translate: t } = useTranslation();
+  const [order] = useState<"asc" | "desc">("asc");
   const startDate = useMemo(() => {
     var d: Date;
     if (archive) {
@@ -36,16 +36,6 @@ export const EventList = ({ archive }: EventListProps) => {
     filters: [{ field: "end_date", operator: "gte", value: startDate }],
   });
 
-  const { result: eventTypesDto } = useList({
-    resource: "types",
-    meta: {
-      parentmodule: "events",
-    },
-  });
-
-  const { data: canShow } = useCan({ resource: "events", action: "show" });
-  const { data: canUpdate } = useCan({ resource: "events", action: "update" });
-
   const { mutate: publishEvent } = useCustomMutation();
 
   const [loginDialog, setLoginDialog] = useState<{
@@ -66,7 +56,7 @@ export const EventList = ({ archive }: EventListProps) => {
   }
 
   if (query.isError) {
-    return <Text>Error loading events.</Text>;
+    return <Text>{t("events.errors.loadingError")}</Text>;
   }
 
   const handleCardClick = (event: any) => {
@@ -83,7 +73,7 @@ export const EventList = ({ archive }: EventListProps) => {
     const endpoint = shouldPublish ? "publish" : "unpublish";
     publishEvent(
       {
-        url: `/api/v1/events/${eventId}/${endpoint}`,
+        url: `events/${eventId}/${endpoint}`,
         method: "post",
         values: {},
       },
@@ -91,12 +81,12 @@ export const EventList = ({ archive }: EventListProps) => {
         onSuccess: () => {
           query.refetch();
         },
-      }
+      },
     );
   };
 
   if (events.total === 0) {
-    return <Text>No upcoming events found. Try to look in the archive.</Text>;
+    return <Text>{t("events.messages.noUpcomingEvents")}</Text>;
   }
 
   return (

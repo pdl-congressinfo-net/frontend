@@ -1,11 +1,11 @@
 import { Tabs } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { LuInfo, LuClipboardList, LuLogIn, LuUsers } from "react-icons/lu";
+import { LuClipboardList, LuInfo, LuLogIn, LuUsers } from "react-icons/lu";
 
+import { useCan } from "@refinedev/core";
 import Information from "./Tabs/Information";
 import Login from "./Tabs/Login";
 import Program from "./Tabs/Program";
-import { any } from "zod";
 
 type EventDetailsProps = {
   event: any;
@@ -13,26 +13,40 @@ type EventDetailsProps = {
 
 export const EventDetails = (event: EventDetailsProps) => {
   const { t } = useTranslation();
+  const { data: canParticipate } = useCan({
+    action: "participate",
+    resource: "events",
+  });
+
+  const { data: canShowEvent } = useCan({
+    action: "show",
+    resource: "events",
+  });
   const tabs = [
     {
-      label: t("events.information"),
+      label: t("events.tabs.information"),
       icon: LuInfo,
       value: "information",
-      depends: true,
+      depends: canShowEvent?.can,
     },
     {
-      label: t("events.program"),
+      label: t("events.tabs.program"),
       icon: LuClipboardList,
       value: "program",
       depends: true,
     },
     {
-      label: t("events.partner"),
+      label: t("events.tabs.partner"),
       icon: LuUsers,
       value: "partner",
       depends: false,
     },
-    { label: t("events.login"), icon: LuLogIn, value: "login", depends: true },
+    {
+      label: t("events.tabs.login"),
+      icon: LuLogIn,
+      value: "login",
+      depends: canParticipate?.can,
+    },
   ];
 
   return (

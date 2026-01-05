@@ -1,15 +1,26 @@
 import {
   Box,
   Button,
-  Card,
+  Field,
   Flex,
+  Group,
   Heading,
+  IconButton,
   Input,
-  Separator,
+  Popover,
   Tabs,
 } from "@chakra-ui/react";
-import { CanAccess, useCreate, useList, useDelete } from "@refinedev/core";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CanAccess,
+  useCreate,
+  useDelete,
+  useList,
+  useTranslation,
+} from "@refinedev/core";
 import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Permission } from "../../features/permissions/permissions.model";
 import {
   User,
@@ -17,10 +28,40 @@ import {
   UserRole,
 } from "../../features/users/users.model";
 
+import { LuCirclePlus } from "react-icons/lu";
 import { Role, RolePermission } from "../../features/roles/roles.model";
 import { TanstackPermissionMatrix } from "../Common/Matrix";
 
-export const AdminTemp = () => {
+// Zod schema for permission/resource creation
+const permissionSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Permission name is required")
+    .refine(
+      (val) => {
+        // If it contains ":", validate as permission (resource:action)
+        if (val.includes(":")) {
+          const parts = val.split(":");
+          return (
+            parts.length === 2 &&
+            parts[0].trim().length > 0 &&
+            parts[1].trim().length > 0
+          );
+        }
+        // If no ":", validate as resource name (alphanumeric, underscore, hyphen)
+        return /^[a-zA-Z0-9_-]+$/.test(val);
+      },
+      {
+        message:
+          "Must be either 'resource:action' format or a valid resource name (alphanumeric, underscore, hyphen)",
+      },
+    ),
+});
+
+type PermissionFormData = z.infer<typeof permissionSchema>;
+
+export const Permissions = () => {
+  const { translate: t } = useTranslation();
   const HISTORY_LIMIT = 20;
 
   const [changes, setChanges] = useState<{
@@ -38,10 +79,20 @@ export const AdminTemp = () => {
   const [permissionSearch, setPermissionSearch] = useState("");
   const isDirty = changes.add.length > 0 || changes.remove.length > 0;
   const [isSaving, setIsSaving] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { mutateAsync: create } = useCreate();
 
   const { mutateAsync: del } = useDelete();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<PermissionFormData>({
+    resolver: zodResolver(permissionSchema),
+  });
 
   const { result: permissions } = useList<Permission>({
     resource: "permissions",
@@ -50,17 +101,17 @@ export const AdminTemp = () => {
   const { result: users } = useList<User>({ resource: "users" });
   const { result: userPermissions } = useList<UserPermission>({
     resource: "permissions",
-    meta: { parentmodule: "users" },
+    meta: { parentModule: "users" },
   });
   const { result: userRoles } = useList<UserRole>({
     resource: "roles",
-    meta: { parentmodule: "users" },
+    meta: { parentModule: "users" },
   });
 
   const { result: roles } = useList<Role>({ resource: "roles" });
   const { result: rolePermissions } = useList<RolePermission>({
     resource: "permissions",
-    meta: { parentmodule: "roles" },
+    meta: { parentModule: "roles" },
     pagination: { pageSize: 1000 },
   });
 
@@ -127,16 +178,28 @@ export const AdminTemp = () => {
     return "none";
   };
 
-  const submitHandler = (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const name = formData.get("name") as string;
+  const onSubmit = async (data: PermissionFormData) => {
+    const { name } = data;
 
-    create({
-      resource: "permissions",
-      values: { name },
-    });
-    (e.target as HTMLFormElement).reset();
+    try {
+      if (name.includes(":")) {
+        // Create a single permission (resource:action format)
+        await create({
+          resource: "permissions",
+          values: { name },
+        });
+      } else {
+        // Create a new resource with default actions
+        await create({
+          resource: "permissions",
+          values: { resource_name: name },
+        });
+      }
+      reset();
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to create permission/resource:", error);
+    }
   };
 
   const handleUserToggle = (
@@ -257,13 +320,13 @@ export const AdminTemp = () => {
           if (isUser) {
             await create({
               resource: "permissions",
-              meta: { parentmodule: "users" },
+              meta: { parentModule: "users" },
               values: { user_id: entityId, permission_id: permissionId },
             });
           } else if (isRole) {
             await create({
               resource: "permissions",
-              meta: { parentmodule: "roles" },
+              meta: { parentModule: "roles" },
               values: { role_id: entityId, permission_id: permissionId },
             });
           } else {
@@ -289,7 +352,7 @@ export const AdminTemp = () => {
               await del({
                 resource: "permissions",
                 meta: {
-                  parentmodule: "users",
+                  parentModule: "users",
                   relation_ids: [entityId, permissionId],
                 },
                 id: "relation",
@@ -304,7 +367,7 @@ export const AdminTemp = () => {
               await del({
                 resource: "permissions",
                 meta: {
-                  parentmodule: "roles",
+                  parentModule: "roles",
                   relation_ids: [entityId, permissionId],
                 },
                 id: "relation",
@@ -342,93 +405,128 @@ export const AdminTemp = () => {
   };
 
   return (
-    <Card.Root p={4}>
-      <Flex direction="column" gap={6}>
-        <Heading size="lg">Admin Area</Heading>
-
-        <Box>
-          <Heading size="sm">Create Permission</Heading>
-          <Separator my={2} />
-          <CanAccess resource="permissions" action="create">
-            <form onSubmit={submitHandler}>
-              <Flex gap={2}>
-                <Input name="name" placeholder="Permission name" />
-                <Button type="submit">Create</Button>
-              </Flex>
-            </form>
-          </CanAccess>
-        </Box>
-        <Box maxW="300px">
-          <Input
-            placeholder="Search permissions…"
-            value={permissionSearch}
-            onChange={(e) => setPermissionSearch(e.target.value)}
-            size="sm"
-          />
-        </Box>
-
-        <Tabs.Root defaultValue="users">
-          <Tabs.List>
-            <Tabs.Trigger value="users">User Permissions</Tabs.Trigger>
-            <Tabs.Trigger value="roles">Role Permissions</Tabs.Trigger>
-          </Tabs.List>
-
-          <Tabs.Content value="users">
-            <TanstackPermissionMatrix
-              title="Users × Permissions"
-              rows={users.data}
-              rowKey="id"
-              rowLabel={(u) => u.fullName}
-              groupedPermissions={groupedPermissions}
-              isChecked={isUserChecked}
-              onToggle={handleUserToggle}
-              getChangeType={getChangeType}
-              getUserPermissionSource={getUserPermissionSource}
-              search={permissionSearch}
-            />
-          </Tabs.Content>
-
-          <Tabs.Content value="roles">
-            <TanstackPermissionMatrix
-              title="Roles × Permissions"
-              rows={roles.data}
-              rowKey="id"
-              rowLabel={(r) => r.name}
-              groupedPermissions={groupedPermissions}
-              isChecked={isRoleChecked}
-              onToggle={handleRoleToggle}
-              getChangeType={getChangeType}
-              search={permissionSearch}
-            />
-          </Tabs.Content>
-        </Tabs.Root>
-        <Flex justify="flex-end" mt={4} gap={2} align="center">
-          {isDirty && (
-            <Box fontSize="sm" color="orange.500" mr="auto">
-              You have unsaved changes
-            </Box>
-          )}
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={undo}
-            disabled={history.length === 0}
-          >
-            Undo
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={saveHandler}
-            disabled={!isDirty}
-            loading={isSaving}
-          >
-            Save changes
-          </Button>
-        </Flex>
+    <Flex direction="column" gap={6}>
+      <Flex direction="row" align="center" justify="space-between">
+        <Heading size="lg">{t("admin.permissions.title")}</Heading>
       </Flex>
-    </Card.Root>
+
+      <Tabs.Root defaultValue="userpermissions">
+        <Flex flex={1} gap={4} align="center" justify="space-between">
+          <Tabs.List>
+            <Tabs.Trigger value="userpermissions">
+              {t("admin.permissions.userPermissions")}
+            </Tabs.Trigger>
+            <Tabs.Trigger value="rolepermissions">
+              {t("admin.permissions.rolePermissions")}
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Flex gap={2} align="center">
+            <CanAccess resource="permissions" action="create">
+              <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+                <Popover.Trigger
+                  as={IconButton}
+                  aria-label={t("admin.permissions.addPermission")}
+                  onClick={() => setOpen(true)}
+                  type="button"
+                >
+                  <LuCirclePlus />
+                </Popover.Trigger>
+                <Popover.Positioner>
+                  <Popover.Content p={4} bg="white" boxShadow="md">
+                    <Popover.Arrow />
+                    <Popover.Body>
+                      <form onSubmit={handleSubmit(onSubmit)}>
+                        <Field.Root invalid={!!errors.name}>
+                          <Group attached w="full">
+                            <Input
+                              {...register("name")}
+                              placeholder={t(
+                                "admin.permissions.permissionPlaceholder",
+                              )}
+                            />
+
+                            <Button type="submit" colorScheme="blue">
+                              {t("common.create")}
+                            </Button>
+                          </Group>
+                          {errors.name && (
+                            <Field.ErrorText>
+                              {errors.name.message}
+                            </Field.ErrorText>
+                          )}
+                        </Field.Root>
+                      </form>
+                    </Popover.Body>
+                  </Popover.Content>
+                </Popover.Positioner>
+              </Popover.Root>
+            </CanAccess>
+            <Input
+              variant="flushed"
+              placeholder={t("admin.permissions.searchPermissions")}
+              value={permissionSearch}
+              onChange={(e) => setPermissionSearch(e.target.value)}
+            />
+          </Flex>
+        </Flex>
+
+        <Tabs.Content value="userpermissions">
+          <TanstackPermissionMatrix
+            ressource="users"
+            title={t("admin.permissions.usersPermissionsMatrix")}
+            rows={users.data}
+            rowKey="id"
+            rowLabel={(u) => u.contact?.firstName + " " + u.contact?.lastName}
+            groupedPermissions={groupedPermissions}
+            isChecked={isUserChecked}
+            onToggle={handleUserToggle}
+            getChangeType={getChangeType}
+            getUserPermissionSource={getUserPermissionSource}
+            search={permissionSearch}
+          />
+        </Tabs.Content>
+
+        <Tabs.Content value="rolepermissions">
+          <TanstackPermissionMatrix
+            ressource="roles"
+            title={t("admin.permissions.rolesPermissionsMatrix")}
+            rows={roles.data}
+            rowKey="id"
+            rowLabel={(r) => r.name}
+            groupedPermissions={groupedPermissions}
+            isChecked={isRoleChecked}
+            onToggle={handleRoleToggle}
+            getChangeType={getChangeType}
+            search={permissionSearch}
+          />
+        </Tabs.Content>
+      </Tabs.Root>
+      <Flex justify="flex-end" mt={4} gap={2} align="center">
+        {isDirty && (
+          <Box fontSize="sm" color="orange.500" mr="auto">
+            {t("admin.permissions.unsavedChanges")}
+          </Box>
+        )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={undo}
+          disabled={history.length === 0}
+        >
+          {t("admin.permissions.undo")}
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={saveHandler}
+          disabled={!isDirty}
+          loading={isSaving}
+        >
+          {t("admin.permissions.saveChanges")}
+        </Button>
+      </Flex>
+    </Flex>
   );
 };

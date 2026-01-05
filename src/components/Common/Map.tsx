@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { Box, Card, Dialog, Text, Flex, Button } from "@chakra-ui/react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { Box, Button, Card, Dialog, Flex, Text } from "@chakra-ui/react";
+import { useTranslation } from "@refinedev/core";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useEffect, useMemo, useState } from "react";
+import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import { Location } from "../../features/locations/location.model";
 
 const markerIcon = new L.Icon({
@@ -76,12 +77,12 @@ export function MapPicker({
   onSave,
   saveDisabled,
 }: MapPickerProps) {
+  const { translate: t } = useTranslation();
   const [locationState, setLocationState] = useState<Location | undefined>(
     location,
   );
   const [open, setOpen] = useState(false);
 
-  const [refreshing, setRefreshing] = useState(false);
   const europeBounds = useMemo(
     () => bounds ?? L.latLngBounds([34, -25], [72, 45]),
     [bounds],
@@ -149,7 +150,7 @@ export function MapPicker({
       <Card.Root width="md">
         <Card.Body>
           <Text fontSize="sm" color="fg.muted" mb={2}>
-            Preview
+            {t("locations.map.preview")}
           </Text>
           {locationState?.latitude != null &&
           locationState?.longitude != null ? (
@@ -194,7 +195,7 @@ export function MapPicker({
               cursor="pointer"
             >
               <Text color="fg.muted">
-                No location selected — click to open map
+                {t("locations.map.noLocationSelected")}
               </Text>
             </Box>
           )}
@@ -254,7 +255,7 @@ export function MapPicker({
             <Flex justify="space-between" align="center" mt={3}>
               <Flex gap={2}>
                 <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={async () => {
@@ -270,7 +271,7 @@ export function MapPicker({
                   }}
                   disabled={saveDisabled}
                 >
-                  Save
+                  {t("common.save")}
                 </Button>
               </Flex>
             </Flex>

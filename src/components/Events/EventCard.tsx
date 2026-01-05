@@ -1,5 +1,20 @@
-import { Box, Button, Card, Flex, Heading, Image } from "@chakra-ui/react";
-import { CanAccess, useOne, useNavigation } from "@refinedev/core";
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Image,
+  Skeleton,
+  Tooltip,
+} from "@chakra-ui/react";
+import {
+  CanAccess,
+  useNavigation,
+  useOne,
+  useTranslation,
+} from "@refinedev/core";
+import { LuEye, LuEyeOff, LuPencil, LuUserPlus } from "react-icons/lu";
 import { Event } from "../../features/events/events.model";
 import { Country, Location } from "../../features/locations/location.model";
 import { toDate } from "../../utils/helpers";
@@ -17,11 +32,12 @@ export const EventCard = ({
   onParticipateClick,
   onPublishClick,
 }: EventCardInterface) => {
+  const { translate: t } = useTranslation();
   const { edit } = useNavigation();
 
   const {
     result: location,
-    query: { isLoading, isError },
+    query: { isLoading: locationLoading },
   } = useOne<Location>({
     resource: "locations",
     id: event.locationId,
@@ -30,14 +46,17 @@ export const EventCard = ({
     },
   });
 
-  const { result: country } = useOne<Country>({
+  const {
+    result: country,
+    query: { isLoading: countryLoading },
+  } = useOne<Country>({
     resource: "countries",
     id: location?.countryId || "",
     queryOptions: {
       enabled: !!location?.countryId,
     },
     meta: {
-      parentmodule: "locations",
+      parentModule: "locations",
     },
   });
 
@@ -78,7 +97,13 @@ export const EventCard = ({
                   })()}
                 </Box>
               </Flex>
-              {location && (
+              {locationLoading ||
+                (countryLoading && (
+                  <Box fontSize="sm" mt={2}>
+                    <Skeleton height="14px" width="30%" />
+                  </Box>
+                ))}
+              {location && country && (
                 <Box fontSize="sm" color="ui.muted">
                   {location.name}
                   {country && `, ${country?.name}`}
@@ -86,43 +111,70 @@ export const EventCard = ({
               )}
             </Flex>
             <Flex direction="column" justifyContent="space-between" ml="auto">
-              <Flex direction="column" alignItems="flex-end" mt="auto" gap={2}>
-                <CanAccess resource="events" action="participate">
-                  <Button
-                    width={"8vw"}
-                    size="md"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onParticipateClick?.();
-                    }}
-                  >
-                    Anmelden
-                  </Button>
-                </CanAccess>
-                <CanAccess resource="events" action="update">
-                  <Button
-                    width={"8vw"}
-                    size="md"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      edit("events", event.id);
-                    }}
-                  >
-                    Bearbeiten
-                  </Button>
-                </CanAccess>
+              <Flex direction="row" alignItems="flex-end" mt="auto" gap={2}>
                 <CanAccess resource="events" action="publish">
-                  <Button
-                    width={"8vw"}
-                    size="md"
-                    colorPalette={event.isPublic ? "yellow" : "green"}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPublishClick?.(!event.isPublic);
-                    }}
-                  >
-                    {event.isPublic ? "Unpublish" : "Publish"}
-                  </Button>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <Button
+                        size="md"
+                        colorPalette={event.isPublic ? "yellow" : "green"}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onPublishClick?.(!event.isPublic);
+                        }}
+                      >
+                        {event.isPublic ? <LuEye /> : <LuEyeOff />}
+                      </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content>
+                        {event.isPublic
+                          ? t("events.actions.unpublish")
+                          : t("events.actions.publish")}
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Tooltip.Root>
+                </CanAccess>
+
+                <CanAccess resource="events" action="update">
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <Button
+                        size="md"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          edit("adminEvents", event.id);
+                        }}
+                      >
+                        <LuPencil />
+                      </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content>
+                        {t("events.actions.edit")}
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Tooltip.Root>
+                </CanAccess>
+                <CanAccess resource="events" action="participate">
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <Button
+                        size="md"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onParticipateClick?.();
+                        }}
+                      >
+                        <LuUserPlus />
+                      </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Positioner>
+                      <Tooltip.Content>
+                        {t("events.actions.register")}
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Tooltip.Root>
                 </CanAccess>
               </Flex>
             </Flex>

@@ -1,9 +1,10 @@
-import { Button, Field, Input, Stack } from "@chakra-ui/react";
-import { useForm, useFormState } from "react-hook-form";
-import { PasswordInput } from "../ui/password-input";
-import { z } from "zod";
+import { Badge, Button, Field, Flex, Input, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRegister } from "@refinedev/core";
+import { useRegister, useTranslation } from "@refinedev/core";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { CreateUserRequest } from "../../features/users/users.requests";
+import { PasswordInput } from "../ui/password-input";
 
 interface AccountDialogProps {
   isOpen: boolean;
@@ -11,32 +12,32 @@ interface AccountDialogProps {
 }
 
 interface RegisterLoginFormValues {
-  name: string;
+  titles?: string;
+  firstName: string;
+  lastName?: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 
-interface RegisterFormValues {
-  full_name: string;
-  email: string;
-  password: string;
-}
-
-const RegisterSchema = z
-  .object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
 export const RegisterAccount = ({ onClose }: AccountDialogProps) => {
-  const { mutate: registerUser } = useRegister<RegisterFormValues>();
+  const { translate: t } = useTranslation();
+  const { mutate: registerUser } = useRegister<CreateUserRequest>();
+
+  const RegisterSchema = z
+    .object({
+      titles: z.string().optional(),
+      firstName: z.string().min(1, t("auth.validation.firstNameRequired")),
+      lastName: z.string().optional(),
+      email: z.string().email(t("auth.validation.invalidEmail")),
+      password: z.string().min(6, t("auth.validation.passwordMinLength")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("auth.validation.passwordsNoMatch"),
+      path: ["confirmPassword"],
+    });
+
   const {
     register,
     handleSubmit,
@@ -45,7 +46,9 @@ export const RegisterAccount = ({ onClose }: AccountDialogProps) => {
     resolver: zodResolver(RegisterSchema),
     mode: "onChange",
     defaultValues: {
-      name: "",
+      titles: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -54,7 +57,11 @@ export const RegisterAccount = ({ onClose }: AccountDialogProps) => {
 
   const onSubmit = handleSubmit((data) => {
     registerUser({
-      full_name: data.name,
+      contact: {
+        titles: data.titles,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      },
       email: data.email,
       password: data.password,
     });
@@ -63,33 +70,77 @@ export const RegisterAccount = ({ onClose }: AccountDialogProps) => {
 
   return (
     <form onSubmit={onSubmit}>
-      <Stack gap="4" align="flex-start" maxW="sm">
-        <Field.Root invalid={!!errors.name}>
-          <Field.Label>Name</Field.Label>
-          <Input {...register("name")} />
-          <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
-        </Field.Root>
+      <Stack gap="4" align="flex-start">
+        <Flex gap="4" width="100%">
+          <Field.Root invalid={!!errors.titles} maxW={"20%"}>
+            <Field.Label>
+              {t("auth.fields.titles")}
+              <Field.RequiredIndicator
+                fallback={
+                  <Badge size="xs" variant="subtle">
+                    {t("common.optional")}
+                  </Badge>
+                }
+              />
+            </Field.Label>
+            <Input {...register("titles")} />
+            <Field.ErrorText>{errors.titles?.message}</Field.ErrorText>
+          </Field.Root>
 
-        <Field.Root invalid={!!errors.email}>
-          <Field.Label>Email</Field.Label>
+          <Field.Root invalid={!!errors.firstName} required>
+            <Field.Label>
+              {t("auth.fields.firstName")}
+              <Field.RequiredIndicator />
+            </Field.Label>
+            <Input {...register("firstName")} />
+            <Field.ErrorText>{errors.firstName?.message}</Field.ErrorText>
+          </Field.Root>
+
+          <Field.Root invalid={!!errors.lastName}>
+            <Field.Label>
+              {t("auth.fields.lastName")}
+              <Field.RequiredIndicator
+                fallback={
+                  <Badge size="xs" variant="subtle">
+                    {t("common.optional")}
+                  </Badge>
+                }
+              />
+            </Field.Label>
+            <Input {...register("lastName")} />
+            <Field.ErrorText>{errors.lastName?.message}</Field.ErrorText>
+          </Field.Root>
+        </Flex>
+
+        <Field.Root invalid={!!errors.email} required>
+          <Field.Label>
+            {t("auth.fields.email")}
+            <Field.RequiredIndicator />
+          </Field.Label>
           <Input {...register("email")} />
           <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.password}>
-          <Field.Label>Password</Field.Label>
+        <Field.Root invalid={!!errors.password} required>
+          <Field.Label>
+            {t("auth.fields.password")}
+            <Field.RequiredIndicator />
+          </Field.Label>
           <PasswordInput {...register("password")} />
           <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.confirmPassword}>
-          <Field.Label>Confirm Password</Field.Label>
+        <Field.Root invalid={!!errors.confirmPassword} required>
+          <Field.Label>
+            {t("auth.fields.confirmPassword")}
+            <Field.RequiredIndicator />
+          </Field.Label>
           <PasswordInput {...register("confirmPassword")} />
           <Field.ErrorText>{errors.confirmPassword?.message}</Field.ErrorText>
         </Field.Root>
 
         <Button type="submit" disabled={!isValid}>
-          Submit
+          {t("auth.submit")}
         </Button>
       </Stack>
     </form>

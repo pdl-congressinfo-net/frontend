@@ -1,10 +1,6 @@
 export interface EventType {
   id: string;
   code: string;
-  nameDe: string;
-  nameEn: string;
-  descriptionDe?: string;
-  descriptionEn?: string;
 }
 
 export interface Event {
@@ -13,6 +9,9 @@ export interface Event {
   startDate: Date;
   endDate: Date;
   isPublic: boolean;
+  subject?: string;
+  url?: string;
+  language: string;
   eventTypeId?: string;
   locationId?: string;
 }

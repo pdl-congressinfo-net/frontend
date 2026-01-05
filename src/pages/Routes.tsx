@@ -1,86 +1,185 @@
+import { CanAccess } from "@refinedev/core";
 import { NavigateToResource } from "@refinedev/react-router";
-import { useLocation, Routes, Route, Outlet } from "react-router";
 import type { Location } from "react-router";
+import { Outlet, Route, Routes, useLocation } from "react-router";
+import { AdminLayout } from "../components/Admin/AdminLayout";
 import { Layout } from "../components/Common/Layout";
-import AdminTempPage from "./admin/temp";
-import EventsListPage from "./events/list";
-import EventShowPage from "./events/show";
-import EventCreatePage from "./events/create";
-import EventEditPage from "./events/edit";
-import EventTypesListPage from "./events/types/list";
-import EventTypeShowPage from "./events/types/show";
-import EventTypeCreatePage from "./events/types/create";
-import EventTypeEditPage from "./events/types/edit";
-import LocationsListPage from "./locations/list";
-import LocationShowPage from "./locations/show";
-import LocationCreatePage from "./locations/create";
-import LocationEditPage from "./locations/edit";
-import LocationTypesListPage from "./locations/types/list";
-import CountriesListPage from "./locations/countries/list";
-import PermissionsListPage from "./permissions/list";
-import PermissionCreatePage from "./permissions/create";
-import PermissionEditPage from "./permissions/edit";
-import PermissionShowPage from "./permissions/show";
-import RolesListPage from "./roles/list";
-import RoleCreatePage from "./roles/create";
-import RoleEditPage from "./roles/edit";
-import RoleShowPage from "./roles/show";
-
+import NotFound from "../components/Common/NotFound";
+import { UserLayout } from "../components/Common/UserLayout";
+import { AdminDashboard } from "./admin";
+import {
+  CompaniesListPage,
+  CompanyCreatePage,
+  CompanyEditPage,
+  CompanyEmployeesListPage,
+} from "./companies";
+import {
+  EventCreatePage,
+  EventEditPage,
+  EventsAdminListPage,
+  EventShowPage,
+  EventsListPage,
+  EventTypeCreatePage,
+  EventTypeEditPage,
+  EventTypesListPage,
+} from "./events";
+import EventsArchiveListPage from "./events/archive";
+import {
+  CountriesListPage,
+  LocationCreatePage,
+  LocationEditPage,
+  LocationShowPage,
+  LocationsListPage,
+  LocationTypesListPage,
+} from "./locations";
+import { PermissionsListPage } from "./permissions";
+import { ProgrammsListPage } from "./programm";
+import ProgrammEditPage from "./programm/Edit";
+import { RolesListPage } from "./roles";
+import SessionEditPage from "./sessions/Edit";
+import {
+  SponsoringCreatePage,
+  SponsoringEditPage,
+  SponsoringShowPage,
+  SponsoringsListPage,
+} from "./sponsorings";
+import {
+  ContactCreatePage,
+  ContactEditPage,
+  ContactShowPage,
+  ContactsListPage,
+  UserCreatePage,
+  UserEditPage,
+  UserShowPage,
+  UsersListPage,
+} from "./users";
 
 function AppRoutes() {
   const location = useLocation();
   const state = location.state as { background?: Location };
-
   return (
     <>
       {/* Background routing */}
       <Routes location={state?.background || location}>
+        {/* Root layout wraps everything */}
         <Route
-          path="/"
           element={
             <Layout>
               <Outlet />
             </Layout>
           }
         >
-          <Route index element={<NavigateToResource resource="events" />} />
+          {/* User routes with UserLayout */}
+          <Route
+            path="/"
+            element={
+              <UserLayout>
+                <Outlet />
+              </UserLayout>
+            }
+          >
+            <Route index element={<NavigateToResource resource="events" />} />
 
-          {/* Events routes */}
-          <Route path="/events" element={<EventsListPage />} />
-          <Route path="/events/create" element={<EventCreatePage />} />
-          <Route path="/events/edit/:id" element={<EventEditPage />} />
+            {/* Events routes */}
+            <Route path="events">
+              <Route index element={<EventsListPage />} />
+              <Route path="archive" element={<EventsArchiveListPage />} />
+            </Route>
 
-          {/* Event Types routes */}
-          <Route path="/events/types" element={<EventTypesListPage />} />
-          <Route path="/events/types/create" element={<EventTypeCreatePage />} />
-          <Route path="/events/types/edit/:id" element={<EventTypeEditPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
 
-          {/* Locations routes */}
-          <Route path="/locations" element={<LocationsListPage />} />
-          <Route path="/locations/create" element={<LocationCreatePage />} />
-          <Route path="/locations/edit/:id" element={<LocationEditPage />} />
-          <Route path="/locations/show/:id" element={<LocationShowPage />} />
+          {/* Admin routes with AdminLayout - Protected at layout level */}
+          <Route
+            path="admin"
+            element={
+              <CanAccess resource="admin" action="view" fallback={<NotFound />}>
+                <AdminLayout>
+                  <Outlet />
+                </AdminLayout>
+              </CanAccess>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
 
-          {/* Location Types routes */}
-          <Route path="/locations/types" element={<LocationTypesListPage />} />
+            <Route path="permissions">
+              <Route index element={<PermissionsListPage />} />
+            </Route>
 
-          {/* Countries routes */}
-          <Route path="/locations/countries" element={<CountriesListPage />} />
+            <Route path="users">
+              <Route index element={<UsersListPage />} />
+              <Route path="create" element={<UserCreatePage />} />
+              <Route path="edit/:id" element={<UserEditPage />} />
+              <Route path="show/:id" element={<UserShowPage />} />
+            </Route>
 
-          {/* Permissions routes */}
-          <Route path="/permissions" element={<PermissionsListPage />} />
-          <Route path="/permissions/create" element={<PermissionCreatePage />} />
-          <Route path="/permissions/edit/:id" element={<PermissionEditPage />} />
-          <Route path="/permissions/show/:id" element={<PermissionShowPage />} />
+            <Route path="contacts">
+              <Route index element={<ContactsListPage />} />
+              <Route path="create" element={<ContactCreatePage />} />
+              <Route path="edit/:id" element={<ContactEditPage />} />
+              <Route path="show/:id" element={<ContactShowPage />} />
+            </Route>
 
-          {/* Roles routes */}
-          <Route path="/roles" element={<RolesListPage />} />
-          <Route path="/roles/create" element={<RoleCreatePage />} />
-          <Route path="/roles/edit/:id" element={<RoleEditPage />} />
-          <Route path="/roles/show/:id" element={<RoleShowPage />} />
+            <Route path="sponsorings">
+              <Route index element={<SponsoringsListPage />} />
+              <Route path="create" element={<SponsoringCreatePage />} />
+              <Route path="edit/:id" element={<SponsoringEditPage />} />
+              <Route path="show/:id" element={<SponsoringShowPage />} />
+            </Route>
 
-          <Route path="/admin" element={<AdminTempPage />} />
-          <Route path="*" element={<div>404 Not Found</div>} />
+            <Route path="roles">
+              <Route index element={<RolesListPage />} />
+            </Route>
+
+            <Route path="companies">
+              <Route index element={<CompaniesListPage />} />
+              <Route path="create" element={<CompanyCreatePage />} />
+              <Route path="edit/:id" element={<CompanyEditPage />} />
+              <Route path="employees">
+                <Route
+                  index
+                  element={<NavigateToResource resource="companies" />}
+                />
+                <Route
+                  path="show/:companyId"
+                  element={<CompanyEmployeesListPage />}
+                />
+              </Route>
+            </Route>
+
+            <Route path="locations">
+              <Route index element={<LocationsListPage />} />
+              <Route path="create" element={<LocationCreatePage />} />
+              <Route path="edit/:id" element={<LocationEditPage />} />
+              <Route path="show/:id" element={<LocationShowPage />} />
+
+              {/* Country & Location Types */}
+              <Route path="countries" element={<CountriesListPage />} />
+              <Route path="types" element={<LocationTypesListPage />} />
+            </Route>
+
+            <Route path="events">
+              <Route index element={<EventsAdminListPage />} />
+              <Route path="create" element={<EventCreatePage />} />
+              <Route path="edit/:id" element={<EventEditPage />} />
+              <Route path="show/:id" element={<EventShowPage />} />
+              <Route path="types">
+                <Route index element={<EventTypesListPage />} />
+                <Route path="create" element={<EventTypeCreatePage />} />
+                <Route path="edit/:id" element={<EventTypeEditPage />} />
+              </Route>
+              <Route path=":eventId">
+                <Route path="programm" element={<ProgrammsListPage />} />
+                <Route
+                  path="programm/edit/:id"
+                  element={<ProgrammEditPage />}
+                />
+                <Route path="sessions/edit/:id" element={<SessionEditPage />} />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Route>
       </Routes>
 
@@ -88,9 +187,6 @@ function AppRoutes() {
       {state?.background && (
         <Routes>
           <Route path="/events/show/:id" element={<EventShowPage />} />
-          <Route path="/events/types/show/:id" element={<EventTypeShowPage />} />
-          <Route path="/permissions/show/:id" element={<PermissionShowPage />} />
-          <Route path="/roles/show/:id" element={<RoleShowPage />} />
         </Routes>
       )}
     </>
