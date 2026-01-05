@@ -1,5 +1,5 @@
 import { AccessControlProvider } from "@refinedev/core";
-import { API_URL } from "../config/api";
+import { httpClient } from "../utils/httpClient";
 
 const PERMISSION_CACHE_KEY = "__permissions_v1";
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
@@ -38,15 +38,8 @@ function saveToCache(list: string[]) {
 }
 
 async function fetchPermissions(): Promise<Set<string>> {
-  const response = await fetch(`${API_URL}/auth/permissions`, {
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch permissions");
-  }
-
-  const data = await response.json();
+  const response = await httpClient.get("/auth/permissions");
+  const data = response.data;
 
   const permission_names: string[] = Array.isArray(data)
     ? data.map((perm: { name: string }) => perm.name)

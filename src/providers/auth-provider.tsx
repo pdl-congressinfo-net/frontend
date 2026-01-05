@@ -1,6 +1,6 @@
 import { AuthProvider } from "@refinedev/core";
 import { ApiResponse } from "../common/types/api";
-import { API_URL } from "../config/api";
+import { httpClient } from "../utils/httpClient";
 import users from "../features/users/users.mapper";
 import { CreateUserRequest } from "../features/users/users.requests";
 import { UserDTO } from "../features/users/users.responses";
@@ -18,86 +18,49 @@ export const authProvider: AuthProvider = {
       // Handle OTP login
       if (providerName === "otp") {
         const { otp } = params;
-        const response = await fetch(
-          `${API_URL}/auth/verify-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`,
-          {
-            method: "POST",
-            headers: {
-              "X-Requested-With": "XMLHttpRequest",
-            },
-            credentials: "include",
-          },
-        );
-
-        if (!response.ok) {
-          const error = await response.json();
+        try {
+          await httpClient.post(
+            `/auth/verify-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`,
+          );
+          return {
+            success: true,
+            redirectTo: "/",
+          };
+        } catch (error: any) {
           return {
             success: false,
             error: {
               name: "LoginError",
-              message: error.detail || "OTP verification failed",
+              message: error.response?.data?.detail || "OTP verification failed",
             },
           };
         }
-        return {
-          success: true,
-          redirectTo: "/",
-        };
       }
 
       // Handle magic link login
       if (providerName === "magic") {
         const { token } = params;
-        const response = await fetch(`${API_URL}/auth/magic-login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-          },
-          body: JSON.stringify({ token }),
-          credentials: "include",
-        });
+        try {
+          const response = await httpClient.post("/auth/magic-login", { token });
+          const data = response.data;
+          localStorage.setItem("access_token", data.access_token);
 
-        if (!response.ok) {
-          const error = await response.json();
+          return {
+            success: true,
+            redirectTo: "/",
+          };
+        } catch (error: any) {
           return {
             success: false,
             error: {
               name: "LoginError",
-              message: error.detail || "Magic link login failed",
+              message: error.response?.data?.detail || "Magic link login failed",
             },
           };
         }
-
-        const data = await response.json();
-        localStorage.setItem("access_token", data.access_token);
-
-        return {
-          success: true,
-          redirectTo: "/",
-        };
       }
 
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        return {
-          success: false,
-          error: {
-            name: "LoginError",
-            message: error.detail || "Login failed",
-          },
-        };
-      }
+      await httpClient.post("/auth/login", { email, password });
 
       resetPermissionCache();
 
@@ -106,12 +69,12 @@ export const authProvider: AuthProvider = {
         redirectTo: "/",
         message: "Login successful",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: {
           name: "LoginError",
-          message: "An error occurred during login",
+          message: error.response?.data?.detail || "Login failed",
         },
       };
     }
@@ -119,38 +82,21 @@ export const authProvider: AuthProvider = {
 
   register: async (params: CreateUserRequest) => {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        return {
-          success: false,
-          error: {
-            name: "RegisterError",
-            message:
-              response.status === 400
-                ? "Email is already registered"
-                : error.detail || "An error occurred during registration",
-          },
-        };
-      }
+      await httpClient.post("/auth/register", params);
 
       return {
         success: true,
         redirectTo: "/",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: {
           name: "RegisterError",
-          message: "An error occurred during registration",
+          message:
+            error.response?.status === 400
+              ? "Email is already registered"
+              : error.response?.data?.detail || "An error occurred during registration",
         },
       };
     }
@@ -166,13 +112,7 @@ export const authProvider: AuthProvider = {
 
   logout: async () => {
     try {
-      await fetch(`${API_URL}/auth/logout`, {
-        method: "POST",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        credentials: "include",
-      });
+      await httpClient.post("/auth/logout");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -220,20 +160,8 @@ export const authProvider: AuthProvider = {
 
   getIdentity: async () => {
     try {
-      // Assuming you have a /users/me endpoint or similar
-      const res = await fetch(`${API_URL}/users/me`, {
-        method: "GET",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        return null;
-      }
-
-      const apiResponse: ApiResponse<UserDTO> = await res.json();
+      const response = await httpClient.get("/users/me");
+      const apiResponse: ApiResponse<UserDTO> = response.data;
       const user = users.users(apiResponse.data);
 
       return user;

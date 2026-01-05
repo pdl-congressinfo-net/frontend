@@ -17,7 +17,6 @@ import { notificationProvider } from "./providers/notification-provider";
 import "./providers/rest-data-provider/mapping/feature.loader";
 import { system } from "./theme";
 
-import { API_URL } from "./config/api";
 import {
   companyEmployeeResource,
   companyResource,
@@ -45,7 +44,6 @@ import {
 } from "./features/users/users.resource";
 import AppRoutes from "./pages/Routes";
 import { LayoutProvider } from "./providers/layout-provider";
-import { httpClient } from "./utils/httpClient";
 
 function App() {
   return (
@@ -57,7 +55,7 @@ function App() {
               <Refine
                 accessControlProvider={accessControlProvider}
                 authProvider={authProvider}
-                dataProvider={dataProvider(API_URL, httpClient)}
+                dataProvider={dataProvider()}
                 routerProvider={routerProvider}
                 i18nProvider={i18nProvider}
                 notificationProvider={notificationProvider}

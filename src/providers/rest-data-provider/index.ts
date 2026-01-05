@@ -1,9 +1,9 @@
 import type { CrudFilters, CrudSorting, DataProvider } from "@refinedev/core";
-import type { AxiosInstance } from "axios";
 import { stringify } from "query-string";
 import { ApiResponse } from "../../common/types/api";
+import { httpClient } from "../../utils/httpClient";
 import { getMapper } from "../rest-data-provider/mapping/mapper.registry";
-import { axiosInstance, generateFilter, generateSort } from "./utils";
+import { generateFilter, generateSort } from "./utils";
 
 const removeEmptyFields = (obj: Record<string, any>): Record<string, any> => {
   return Object.entries(obj).reduce(
@@ -90,10 +90,10 @@ export type DeleteOneParams = {
   };
 };
 
-export const dataProvider = (
-  apiUrl: string,
-  httpClient: AxiosInstance = axiosInstance,
-): Omit<Required<DataProvider>, "createMany" | "updateMany" | "deleteMany"> =>
+export const dataProvider = (): Omit<
+  Required<DataProvider>,
+  "createMany" | "updateMany" | "deleteMany"
+> =>
   ({
     getList: async ({
       resource,
@@ -121,8 +121,8 @@ export const dataProvider = (
       }
 
       const url = parentModule
-        ? `${apiUrl}/${parentModule}/${resource}`
-        : `${apiUrl}/${resource}`;
+        ? `/${parentModule}/${resource}`
+        : `/${resource}`;
 
       const queryFilters = generateFilter(filters);
 
@@ -176,8 +176,8 @@ export const dataProvider = (
       }
 
       const url = parentModule
-        ? `${apiUrl}/${parentModule}/${resource}?${stringify({ id: ids })}`
-        : `${apiUrl}/${resource}?${stringify({ id: ids })}`;
+        ? `/${parentModule}/${resource}?${stringify({ id: ids })}`
+        : `/${resource}?${stringify({ id: ids })}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
         headers,
@@ -206,8 +206,8 @@ export const dataProvider = (
       }
 
       const url = parentModule
-        ? `${apiUrl}/${parentModule}/${resource}`
-        : `${apiUrl}/${resource}`;
+        ? `/${parentModule}/${resource}`
+        : `/${resource}`;
 
       const cleanedVariables = removeEmptyFields(variables);
 
@@ -242,8 +242,8 @@ export const dataProvider = (
       const selector = id === "relation" ? `${relation_ids?.join("/")}` : id;
 
       const url = parentModule
-        ? `${apiUrl}/${parentModule}/${resource}/${selector}`
-        : `${apiUrl}/${resource}/${selector}`;
+        ? `/${parentModule}/${resource}/${selector}`
+        : `/${resource}/${selector}`;
 
       const cleanedVariables = removeEmptyFields(variables);
 
@@ -275,8 +275,8 @@ export const dataProvider = (
       }
 
       const url = parentModule
-        ? `${apiUrl}/${parentModule}/${resource}/${id}`
-        : `${apiUrl}/${resource}/${id}`;
+        ? `/${parentModule}/${resource}/${id}`
+        : `/${resource}/${id}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
         headers,
@@ -301,8 +301,8 @@ export const dataProvider = (
       }
 
       const url = parentModule
-        ? `${apiUrl}/${parentModule}/${resource}/${selector}`
-        : `${apiUrl}/${resource}/${selector}`;
+        ? `/${parentModule}/${resource}/${selector}`
+        : `/${resource}/${selector}`;
 
       const { data } = await httpClient[requestMethod]<ApiResponse<any>>(url, {
         data: variables,
@@ -315,7 +315,7 @@ export const dataProvider = (
     },
 
     getApiUrl: () => {
-      return apiUrl;
+      return httpClient.defaults.baseURL || "";
     },
 
     custom: async ({
